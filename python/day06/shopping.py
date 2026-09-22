@@ -12,11 +12,11 @@ while True:
     if float(order) > max_price:
         max_price = float(order)
 
-    if float(order) >= 10000:
+    if total_price >= 10000:
         discount_percent = 15
-    elif float(order) >= 4999:
+    elif total_price >= 5000:
         discount_percent = 10
-    elif float(order) >= 1000:
+    elif total_price >= 1000:
         discount_percent = 5
     new_price = total_price - (discount_percent / 100 * total_price)
 if quantity == 0:

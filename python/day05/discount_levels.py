@@ -3,7 +3,7 @@ discount_percent = 0
 
 if order >= 10000:
     discount_percent = 15
-elif order >= 4999:
+elif order >= 5000:
     discount_percent = 10
 elif order >= 1000:
     discount_percent = 5
