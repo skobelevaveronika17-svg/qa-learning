@@ -45,14 +45,17 @@ for email in emails:
     status = "PASSED"
     check_email_result = check_email(email["email"])
     if check_email_result == email["expected"]:
-        print("PASSED")
+        print(repr(email["email"]), "PASSED")
     else:
+        status = "FAILED"
         print(f"FAILED: {check_email_result}")
     if status in xei:
         xei[status] = xei[status] + 1
     else:
         xei[status] = 1
+
 print(f"Итого: {xei}")
+
 
 
 generate_email_users()
