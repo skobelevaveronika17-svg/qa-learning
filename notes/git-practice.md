@@ -1,1 +1,1 @@
-Цель: middle Automation QA
+Цель:  Automation QA
