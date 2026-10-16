@@ -1,1 +1,1 @@
-Цель: middle Automation QA
+Цель: strong junior к маю 2027
