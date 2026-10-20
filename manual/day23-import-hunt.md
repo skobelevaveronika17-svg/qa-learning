@@ -1,6 +1,18 @@
-# 1 — запуск тестов
-PS C:\work\autotests> python test_api.py
-Traceback (most recent call last):
-  File "C:\work\autotests\test_api.py", line 1, in <module>
-    import requests
-ModuleNotFoundError: No module named 'requests'
+
+
+
+блок → что говорит ошибка (своими словами) → в чём причина → как исправить.
+
+1 → ошибка говорит что нет модуля 'requests' → Модуль не входит в Python, его не скачали в окружение проекта → использовать "pip install requests"
+
+2 → поставили не тот модуль request, а нужен 'requests' → не тот модуль скачан →pip uninstall request, потом pip install requests. Имя пакета копировать, а не набирать
+
+3 → не удается импортировать имя 'make_emial' из 'data'→ Опечатка в имени функции: emial вместо email →  Исправить имя. PyCharm подчёркивает такое красным ещё до запуска
+
+4 →«В модуле json нет dumps» →  Файл Даши называется json.py. Python нашёл его раньше настоящего модуля json — в папке с запускаемым файлом он ищет первым делом → Переименовать файл. Никогда не называть свои файлы как модули Python: json, random, test, email
+
+5 → синтаксическая ошибка → файл назван "make_password v2" и из-за пробела между make_password и  v2 файл не удается импортировать → переименовать файл в make_password_v2 
+
+6 →  «Файла requirements.txt нет» → Даша поставила модули у себя, но не записала список в репозиторий. У неё работает, у других нет → пДаше: pip freeze > requirements.txt, закоммитить файл
+
+

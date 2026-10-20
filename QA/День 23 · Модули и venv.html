@@ -1,0 +1,744 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>День 23 · Модули и venv</title>
+<style>
+/* Тёмная версия оформления дня 13: вкладки сверху, плашки по роли, блоки кода. Одна тёмная тема по просьбе — «на чёрном фоне». */
+:root{
+  --bg:#0d1116; --paper:#151b22; --ink:#e6ebf0; --soft:#9aa6b2; --line:#2a333d;
+  --blue:#7fb2ee; --blue-bg:#142235;
+  --red:#f0928a; --red-bg:#2b1716;
+  --green:#72c79f; --green-bg:#10251c;
+  --amber:#e7bb62; --amber-bg:#2a2210;
+  --violet:#b8a8ea; --violet-bg:#1e1a2f;
+  --code-bg:#080b0f; --code-fg:#dce7f0; --code-cm:#7d8fa0;
+  --chip:#1d252e; --th:#1a222b; --soft-bg:#10161c; --hover:#1d2731; --btn:#e6ebf0; --btn-fg:#0d1116;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.62;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding-inline:18px;padding-block:0 60px}
+header{padding:34px 0 14px}
+.day{font-size:14px;color:var(--soft)}
+h1{font-size:33px;line-height:1.15;margin:.2em 0 .3em;text-wrap:balance}
+.lead{color:var(--soft);margin:0;max-width:62ch}
+
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);padding:10px 0 8px;
+  display:flex;gap:6px;overflow-x:auto;border-bottom:1px solid var(--line)}
+.tabs button{flex:0 0 auto;background:var(--paper);border:1px solid var(--line);border-radius:8px;
+  padding:8px 13px;font:inherit;font-size:14.5px;color:var(--soft);cursor:pointer;white-space:nowrap}
+.tabs button.on{background:var(--btn);color:var(--btn-fg);border-color:var(--btn);font-weight:600}
+.tabs button .n{opacity:.55;margin-right:6px}
+button:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+.pane{display:none;background:var(--paper);border:1px solid var(--line);border-top:0;
+  border-radius:0 0 12px 12px;padding:28px 30px 34px}
+.pane.on{display:block}
+.pane h2{margin:0 0 6px;font-size:26px;line-height:1.2;text-wrap:balance}
+.pane .sub{color:var(--soft);margin:0 0 20px;font-size:15.5px}
+h3{font-size:19.5px;margin:30px 0 8px;text-wrap:balance}
+h4{font-size:17px;margin:20px 0 6px}
+p{margin:12px 0}
+ul,ol{padding-left:24px}li{margin:6px 0}
+b{color:#fff}
+code.i{background:var(--chip);border:1px solid var(--line);border-radius:4px;padding:1px 5px;
+ font-family:Consolas,monospace;font-size:.92em}
+pre{background:var(--code-bg);color:var(--code-fg);border:1px solid var(--line);border-radius:9px;padding:15px 17px;overflow-x:auto;
+ font-family:Consolas,monospace;font-size:14.5px;line-height:1.55;margin:14px 0}
+pre .cm{color:var(--code-cm)}
+pre.light{background:var(--soft-bg)}
+
+.box{border-left:4px solid;border-radius:0 8px 8px 0;padding:14px 18px;margin:18px 0}
+.box .title{font-weight:700;margin-bottom:4px}
+.def{border-color:var(--blue);background:var(--blue-bg)} .def .title{color:var(--blue)}
+.trap{border-color:var(--red);background:var(--red-bg)} .trap .title{color:var(--red)}
+.note{border-color:var(--green);background:var(--green-bg)} .note .title{color:var(--green)}
+.card{border-color:var(--amber);background:var(--amber-bg)} .card .title{color:var(--amber)}
+.task{border-color:var(--violet);background:var(--violet-bg)} .task .title{color:var(--violet)}
+.box p:first-of-type{margin-top:2px}.box p:last-child{margin-bottom:2px}
+
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15.5px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--th);font-weight:600}
+td{font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto}
+.mono{font-family:Consolas,monospace;white-space:nowrap}
+
+details{border:1px solid var(--line);background:var(--soft-bg);border-radius:8px;padding:10px 14px;margin:10px 0}
+summary{cursor:pointer;font-weight:600;color:var(--violet)}
+details[open] summary{margin-bottom:8px}
+
+.simple{border:1px solid var(--line);background:var(--soft-bg);border-radius:10px;padding:14px 18px;margin:16px 0}
+.simple .title{font-weight:700;margin-bottom:4px}
+.steps{counter-reset:st;list-style:none;padding-left:0}
+.steps>li{counter-increment:st;position:relative;padding-left:38px;margin:12px 0}
+.steps>li::before{content:counter(st);position:absolute;left:0;top:1px;width:26px;height:26px;border-radius:50%;
+  background:var(--btn);color:var(--btn-fg);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.done{border:1px dashed var(--green);border-radius:8px;padding:10px 14px;margin:14px 0;font-size:15.5px}
+.done b{color:var(--green)}
+
+.diary{border:1px solid var(--line);border-radius:12px;background:var(--soft-bg);padding:6px 20px;margin:16px 0}
+.diary .d{display:grid;grid-template-columns:92px 1fr;gap:14px;padding:12px 0;border-top:1px solid var(--line)}
+.diary .d:first-child{border-top:0}
+.diary .when{font-family:Consolas,monospace;font-size:14px;color:var(--amber);padding-top:2px}
+.diary .d p{margin:0}
+@media(max-width:560px){.diary .d{grid-template-columns:1fr;gap:2px}}
+
+.flow{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0;align-items:stretch}
+.flow .st{flex:1 1 120px;min-width:0;background:var(--soft-bg);border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-size:14.5px}
+.flow .st b{display:block;font-size:13px;color:var(--amber);letter-spacing:.03em;margin-bottom:2px}
+
+.q{border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:16px 0}
+.qn{font-weight:700;margin-bottom:6px}
+.opts{display:grid;gap:8px;margin-top:12px}
+.opt{text-align:left;background:var(--soft-bg);border:1px solid var(--line);border-radius:8px;
+ padding:10px 14px;cursor:pointer;font:inherit;font-size:16px;color:var(--ink)}
+.opt:hover{background:var(--hover)}
+.opt.right{background:var(--green-bg);border-color:var(--green);font-weight:600}
+.opt.wrong{background:var(--red-bg);border-color:var(--red)}
+.expl{margin-top:12px;padding:12px 14px;background:var(--soft-bg);border-radius:8px}
+.score{position:sticky;bottom:env(safe-area-inset-bottom,0px);background:var(--paper);border:1px solid var(--line);
+ border-radius:10px;padding:12px 18px;margin-top:18px;font-weight:600;font-variant-numeric:tabular-nums}
+.split{display:flex;align-items:center;gap:12px;margin:28px 0 8px;color:var(--soft);font-size:14.5px;font-weight:600}
+.split::before,.split::after{content:"";flex:1;border-top:1px dashed var(--line)}
+
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:34px;padding-top:18px;border-top:1px solid var(--line)}
+.nav button{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 16px;
+ font:inherit;cursor:pointer;color:var(--ink)}
+.nav .next{background:var(--btn);color:var(--btn-fg);border-color:var(--btn)}
+.nav button[disabled]{opacity:.35;cursor:default}
+@media(max-width:640px){.wrap{padding-inline:16px}.pane{padding:20px 17px 26px}h1{font-size:27px}pre{font-size:13.5px}}
+</style>
+
+<style>
+.term{background:var(--code-bg);border:1px solid var(--line);border-radius:9px;padding:13px 16px;font-family:Consolas,monospace;font-size:14.5px;line-height:1.55;overflow-x:auto;white-space:pre;margin:12px 0}
+.term .p{color:var(--green)}
+.term .o{color:var(--soft)}
+.term .e{color:var(--red)}
+.gloss dt{font-weight:700;margin-top:10px}
+.gloss dd{margin:2px 0 0 0;color:var(--soft)}
+.files{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:14px 0}
+.files > div{background:var(--soft-bg);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:0}
+.files .fn{font-family:Consolas,monospace;font-weight:700;color:var(--amber)}
+.files p{margin:6px 0 0;font-size:15px;color:var(--soft)}
+</style>
+
+<div class="wrap">
+
+<header>
+  <div class="day">День 23 · вторник, 20 октября · Этап 2, тема 2.5</div>
+  <h1>Модули и виртуальное окружение</h1>
+  <p class="lead">Пока весь код жил в одном файле. Генератор вырос: пароли, email, проверки, запись в JSON — всё вперемешку. Сегодня учимся раскладывать код по файлам и подключать одно к другому через <code class="i">import</code>. Плюс pip и виртуальное окружение — без них не запустится ни pytest, ни Selenium.</p>
+</header>
+
+<div class="box def">
+  <div class="title">Два захода, около 4:30</div>
+  <p><b>Заход 1 · 2:30</b> — вкладки 0–6. <b>Перерыв — час без экрана.</b> <b>Заход 2 · 2:00</b> — вкладки 7–9.</p>
+  <p>Сегодня ты уже сделала Python дня 22. Если к концу первого захода устанешь — второй заход переноси на завтра, это нормально.</p>
+</div>
+
+<div class="tabs" id="tabs"></div>
+
+<!-- 0 -->
+<div class="pane" data-title="Карточки и код">
+  <h2>Разминка</h2>
+  <p class="sub">25 минут: карточки 15, чтение кода 10</p>
+
+  <h3>Карточки — три блока</h3>
+  <ol class="steps">
+    <li><b>J · Тест-кейсы</b> — второй прогон, 6 карточек, обычный режим.</li>
+    <li><b>L · Списки</b> — второй прогон, 4 карточки, обычный режим.</li>
+    <li><b>S · Куки и браузеры</b> — новый блок, 5 карточек, галочка «Знакомство», без оценки.</li>
+  </ol>
+  <div class="done"><b>Готово, когда</b> записан счёт J + L из 10 и номера карточек, где запнулась.</div>
+
+  <h3>Чтение кода</h3>
+  <p>Строки, словари, функции — всё, что будет на контрольной. Ничего нового. Таблица на бумаге — обязательно.</p>
+  <ol class="steps">
+    <li>В первом вопросе помни: <code class="i">split</code> возвращает список, а <code class="i">[1]</code> — второй его элемент.</li>
+    <li>В четвёртом — словарь внутри списка внутри словаря. Читай слева направо, по одной квадратной скобке: что получилось после каждой.</li>
+  </ol>
+  <div id="quizA"></div>
+</div>
+
+<!-- 1 -->
+<div class="pane" data-title="Словарик">
+  <h2>Шесть слов перед охотой</h2>
+  <p class="sub">10 минут. Подробно — на вкладке «Теория»</p>
+
+  <div class="simple">
+    <div class="title">Простыми словами</div>
+    <p>Любой файл <code class="i">.py</code> — это модуль. Из одного модуля можно взять функцию в другой одной строкой <code class="i">import</code>. Кроме твоих файлов, есть чужие модули: часть встроена в Python (например, <code class="i">json</code>), часть надо скачать командой <code class="i">pip install</code>. А скачивать их принято не «в компьютер вообще», а в отдельную папку для каждого проекта — виртуальное окружение.</p>
+  </div>
+
+  <dl class="gloss">
+    <dt>Модуль</dt>
+    <dd>Файл с кодом на Python. Имя модуля — имя файла без <code class="i">.py</code>: файл <code class="i">checks.py</code> — модуль <code class="i">checks</code>.</dd>
+    <dt>import</dt>
+    <dd>Команда «подключи модуль». <code class="i">import json</code> — подключить весь модуль. <code class="i">from checks import check_email</code> — взять из модуля одну функцию.</dd>
+    <dt>Стандартная библиотека</dt>
+    <dd>Модули, которые уже есть в Python: <code class="i">json</code>, <code class="i">random</code>, <code class="i">datetime</code>. Скачивать не нужно.</dd>
+    <dt>pip</dt>
+    <dd>Программа, которая скачивает чужие модули из интернета. <code class="i">pip install requests</code> — скачать модуль requests.</dd>
+    <dt>Виртуальное окружение, venv</dt>
+    <dd>Отдельная папка проекта (у тебя — <code class="i">.venv</code>), куда pip ставит модули. Видно по <code class="i">(.venv)</code> в начале строки терминала. Если окружение не включено, pip ставит модули в другое место, и проект их не видит.</dd>
+    <dt>requirements.txt</dt>
+    <dd>Список модулей, которые нужны проекту, с версиями. Коллега скачивает репозиторий, ставит всё одной командой — и код у него запускается.</dd>
+  </dl>
+</div>
+
+<!-- 2 -->
+<div class="pane" data-title="Охота">
+  <h2>Шесть ошибок при запуске</h2>
+  <p class="sub">25 минут</p>
+
+  <p>Тестировщица Даша скачала из репозитория команды автотесты и пытается их запустить. Ничего не работает. Ниже — её терминал. Каждый блок — отдельная попытка, отдельная ошибка.</p>
+
+  <div class="box task">
+    <div class="title">Как искать — как с JSON в дне 19</div>
+    <ol class="steps">
+      <li>Читай <b>последнюю строку</b> ошибки — там тип ошибки и короткое объяснение. Переведи её дословно, со словарём, если нужно.</li>
+      <li>Найди в ней имя: модуля, функции или файла. Сравни его с тем, что написано в коде или команде выше.</li>
+      <li>Спроси: «что Даша сделала не так или чего не сделала?» — и сверься со словариком.</li>
+    </ol>
+  </div>
+
+<div class="term"><span class="o"># 1 — запуск тестов</span>
+<span class="p">PS C:\work\autotests&gt; python test_api.py</span>
+<span class="e">Traceback (most recent call last):
+  File "C:\work\autotests\test_api.py", line 1, in &lt;module&gt;
+    import requests
+ModuleNotFoundError: No module named 'requests'</span></div>
+
+<div class="term"><span class="o"># 2 — Даша поставила модуль и запустила снова</span>
+<span class="p">PS C:\work\autotests&gt; pip install request</span>
+<span class="o">Successfully installed request-2019.4.13</span>
+<span class="p">PS C:\work\autotests&gt; python test_api.py</span>
+<span class="e">ModuleNotFoundError: No module named 'requests'</span></div>
+
+<div class="term"><span class="o"># 3 — в файле generator.py</span>
+<span class="p">from data import make_emial</span>
+<span class="e">ImportError: cannot import name 'make_emial' from 'data'</span></div>
+
+<div class="term"><span class="o"># 4 — Даша назвала свой учебный файл json.py, а в нём:</span>
+<span class="p">import json
+print(json.dumps({"ok": True}))</span>
+<span class="e">AttributeError: module 'json' has no attribute 'dumps'</span></div>
+
+<div class="term"><span class="o"># 5 — файл называется make_password v2.py, Даша подключает его из другого файла</span>
+<span class="p">import make_password v2</span>
+<span class="e">    import make_password v2
+                         ^^
+SyntaxError: invalid syntax</span></div>
+
+<div class="term"><span class="o"># 6 — Даша поставила всё нужное, у неё тесты работают. Коллега скачал репозиторий:</span>
+<span class="p">PS C:\projects\autotests&gt; pip install -r requirements.txt</span>
+<span class="e">ERROR: Could not open requirements file: [Errno 2] No such file or directory: 'requirements.txt'</span></div>
+
+  <div class="box task">
+    <div class="title">Задание</div>
+    <ol class="steps">
+      <li>Создай файл <code class="i">manual/day23-import-hunt.md</code>.</li>
+      <li>На каждый из шести блоков — строка в формате: <b>блок → что говорит ошибка (своими словами) → в чём причина → как исправить</b>.</li>
+      <li>«Как исправить» напиши хотя бы словами. Точные команды будут в «Теории» — потом допишешь.</li>
+    </ol>
+  </div>
+
+  <div class="box card">
+    <div class="title">Подсказки, если встала</div>
+    <ol>
+      <li><b>Блок 2:</b> посимвольно сравни, что Даша поставила и что ищет Python.</li>
+      <li><b>Блок 3:</b> то же самое — сравни имя функции посимвольно.</li>
+      <li><b>Блок 4:</b> Python ищет модуль сначала в папке, где лежит запускаемый файл. Что он там найдёт по имени <code class="i">json</code>?</li>
+      <li><b>Блок 5:</b> в имени модуля есть что-то, что Python читает как конец команды.</li>
+      <li><b>Блок 6:</b> у Даши всё работает, а у коллеги — нет. Чего не хватает в репозитории?</li>
+    </ol>
+  </div>
+  <div class="done"><b>Готово, когда</b> в файле 6 строк, в каждой все четыре части.</div>
+</div>
+
+<!-- 3 -->
+<div class="pane" data-title="Разбор">
+  <h2>Шесть ошибок Даши</h2>
+  <p class="sub">15 минут · открывай после охоты</p>
+
+  <div class="scroll"><table>
+    <tr><th>#</th><th>Что говорит ошибка</th><th>Причина</th><th>Как исправить</th></tr>
+    <tr><td>1</td><td>«Нет модуля requests»</td><td>Модуль не входит в Python, его не скачали в окружение проекта</td><td>Включить окружение и <code class="i">pip install requests</code>, а лучше — <code class="i">pip install -r requirements.txt</code></td></tr>
+    <tr><td>2</td><td>Модуля requests всё ещё нет, хотя что-то установилось</td><td>Опечатка: поставлен <b>request</b> без s — это <b>другой</b>, чужой пакет. Так злоумышленники и делают: выкладывают пакеты с именами-опечатками</td><td><code class="i">pip uninstall request</code>, потом <code class="i">pip install requests</code>. Имя пакета копировать, а не набирать</td></tr>
+    <tr><td>3</td><td>«Не могу взять make_emial из data»</td><td>Опечатка в имени функции: <code class="i">emial</code> вместо <code class="i">email</code></td><td>Исправить имя. PyCharm подчёркивает такое красным ещё до запуска</td></tr>
+    <tr><td>4</td><td>«В модуле json нет dumps»</td><td>Файл Даши называется <code class="i">json.py</code>. Python нашёл <b>его</b> раньше настоящего модуля json — в папке с запускаемым файлом он ищет первым делом</td><td>Переименовать файл. Никогда не называть свои файлы как модули Python: json, random, test, email</td></tr>
+    <tr><td>5</td><td>«Неверный синтаксис» на пробеле</td><td>Пробел в имени файла: для Python <code class="i">import make_password v2</code> — это два слова. Модуль с пробелом в имени подключить нельзя</td><td>Переименовать: <code class="i">make_password_v2.py</code>. Имена модулей — маленькие латинские буквы, цифры и подчёркивание, не с цифры</td></tr>
+    <tr><td>6</td><td>«Файла requirements.txt нет»</td><td>Даша поставила модули у себя, но не записала список в репозиторий. У неё работает, у других нет</td><td>Даше: <code class="i">pip freeze &gt; requirements.txt</code>, закоммитить файл</td></tr>
+  </table></div>
+
+  <div class="box note">
+    <div class="title">Блок 5 — это про твой репозиторий</div>
+    <p>У тебя есть файл <code class="i">python/day20/make_password v2.py</code>. Пока его никто не подключает, всё работает. Как только генератор станет модулями — понадобится переименовать. Сделаем это в задании.</p>
+  </div>
+
+  <div class="box card">
+    <div class="title">Что общего у блоков 1–5</div>
+    <p>Во всех ответ — в последней строке ошибки, и в ней есть имя. Ошибка почти всегда говорит, что не так: нужно только сравнить имя в ошибке с тем, что ты написала. Это та же привычка, что в охоте Олега и в JSON дня 19.</p>
+  </div>
+</div>
+
+<!-- 4 -->
+<div class="pane" data-title="Теория">
+  <h2>Модули, pip и окружение</h2>
+  <p class="sub">35 минут · пять частей</p>
+
+  <h3>1. Модуль — это просто файл. Пример на двух файлах</h3>
+  <p>В одной папке лежат два файла.</p>
+  <div class="files">
+    <div><div class="fn">greet.py</div><p>модуль с функцией</p></div>
+    <div><div class="fn">main.py</div><p>файл, который запускаем</p></div>
+  </div>
+<pre><span class="cm"># greet.py</span>
+print("greet загружен")
+
+def hello(name):
+    return f"Привет, {name}!"</pre>
+<pre><span class="cm"># main.py</span>
+import greet
+from greet import hello
+
+print(greet.hello("Анна"))
+print(hello("Вероника"))</pre>
+  <p>Запускаем <code class="i">python main.py</code>. Вывод:</p>
+<pre class="light">greet загружен
+Привет, Анна!
+Привет, Вероника!</pre>
+  <div class="scroll"><table>
+    <tr><th>Строка</th><th>Что происходит</th></tr>
+    <tr><td class="mono">import greet</td><td>Python находит файл <code class="i">greet.py</code> рядом и <b>выполняет его целиком</b> — поэтому напечаталось «greet загружен». Функции из него доступны через точку: <code class="i">greet.hello</code></td></tr>
+    <tr><td class="mono">from greet import hello</td><td>Берём одну функцию по имени. Теперь её можно вызывать без <code class="i">greet.</code>. Повторно файл не выполняется: Python подключает каждый модуль один раз</td></tr>
+  </table></div>
+
+  <div class="box def">
+    <div class="title">[Бумага] Три способа импорта</div>
+    <div class="scroll"><table>
+      <tr><th>Запись</th><th>Как потом вызывать</th><th>Когда удобно</th></tr>
+      <tr><td class="mono">import json</td><td class="mono">json.dumps(...)</td><td>Модуль большой, нужно много функций. Сразу видно, откуда функция</td></tr>
+      <tr><td class="mono">from checks import check_email</td><td class="mono">check_email(...)</td><td>Нужны одна-две функции</td></tr>
+      <tr><td class="mono">import datetime as dt</td><td class="mono">dt.date.today()</td><td>Длинное имя модуля. <code class="i">as</code> — короткое прозвище</td></tr>
+    </table></div>
+    <p>Импорты пишут <b>в самом начале файла</b>: сначала модули Python, потом свои.</p>
+  </div>
+
+  <h3>2. if __name__ == "__main__"</h3>
+  <p>Проблема: в <code class="i">greet.py</code> хочется оставить проверки функций. Но тогда при каждом <code class="i">import greet</code> они будут выполняться и печатать в чужой вывод.</p>
+  <p>Решение — спрятать проверки под условие:</p>
+<pre><span class="cm"># greet.py</span>
+def hello(name):
+    return f"Привет, {name}!"
+
+if __name__ == "__main__":
+    print(hello("тест") == "Привет, тест!")</pre>
+  <div class="simple">
+    <div class="title">Простыми словами</div>
+    <p>У каждого модуля есть скрытая переменная <code class="i">__name__</code>. Если файл запустили напрямую — <code class="i">python greet.py</code>, — в ней лежит <code class="i">"__main__"</code>, и проверки выполняются. Если файл подключили через import — в ней лежит <code class="i">"greet"</code>, и проверки пропускаются. Одна строка — и файл работает и как модуль, и как отдельная программа.</p>
+  </div>
+
+  <h3>3. Как называть модули</h3>
+  <div class="box trap">
+    <div class="title">[Бумага] Четыре правила имени файла</div>
+    <ol>
+      <li>Маленькие латинские буквы, цифры, подчёркивание: <code class="i">check_email.py</code>.</li>
+      <li>Без пробелов и дефисов: <code class="i">make password.py</code> и <code class="i">make-password.py</code> не подключить.</li>
+      <li>Не с цифры: <code class="i">22_cookies.py</code> не подключить, <code class="i">day22_cookies.py</code> — можно.</li>
+      <li>Не как модули Python: <code class="i">json.py</code>, <code class="i">random.py</code>, <code class="i">email.py</code> перекроют настоящие — блок 4 охоты.</li>
+    </ol>
+  </div>
+
+  <h3>4. pip и requirements.txt</h3>
+  <div class="box def">
+    <div class="title">[Бумага] Пять команд pip</div>
+    <div class="scroll"><table>
+      <tr><th>Команда</th><th>Что делает</th></tr>
+      <tr><td class="mono">pip install requests</td><td>Скачать и поставить модуль</td></tr>
+      <tr><td class="mono">pip list</td><td>Показать, что установлено в окружении</td></tr>
+      <tr><td class="mono">pip freeze &gt; requirements.txt</td><td>Записать список установленного с версиями в файл. Знак <code class="i">&gt;</code> значит «вывод не на экран, а в файл»</td></tr>
+      <tr><td class="mono">pip install -r requirements.txt</td><td>Поставить всё по списку из файла. <code class="i">-r</code> — «из файла»</td></tr>
+      <tr><td class="mono">pip uninstall request</td><td>Удалить модуль</td></tr>
+    </table></div>
+  </div>
+  <p>Как выглядит requirements.txt — просто строки «имя==версия»:</p>
+<pre class="light">requests==2.32.3
+pytest==8.3.3</pre>
+  <p>Почему версии важны: в новой версии модуля функция может измениться. С записанной версией у всей команды и на сервере CI стоит одно и то же — тест не упадёт «только у меня».</p>
+
+  <h3>5. Виртуальное окружение</h3>
+  <p><b>Зачем.</b> Проект А работает с pytest 7, проект Б — с pytest 8. Если ставить всё в один общий Python, проекты начнут мешать друг другу. Окружение — своя папка с модулями для каждого проекта.</p>
+  <div class="box def">
+    <div class="title">[Бумага] Окружение — три команды для Windows</div>
+    <div class="scroll"><table>
+      <tr><th>Что</th><th>Команда</th></tr>
+      <tr><td>Создать окружение в папке .venv</td><td class="mono">python -m venv .venv</td></tr>
+      <tr><td>Включить (PowerShell)</td><td class="mono">.venv\Scripts\Activate.ps1</td></tr>
+      <tr><td>Выключить</td><td class="mono">deactivate</td></tr>
+    </table></div>
+    <p>Окружение включено, если в начале строки терминала есть <code class="i">(.venv)</code>. У тебя PyCharm делает это сам — на скриншотах дня 21 строка начинается с <code class="i">(.venv) PS C:\projects\qa-learning&gt;</code>.</p>
+    <p>Папка <code class="i">.venv</code> в репозиторий <b>не</b> попадает — она в .gitignore, ты проверяла в дне 21. В репозиторий идёт только requirements.txt, а окружение каждый создаёт у себя.</p>
+  </div>
+  <div class="box trap">
+    <div class="title">Если PowerShell пишет «выполнение сценариев отключено»</div>
+    <p>Это защита Windows. Не меняй настройки системы, просто работай в терминале PyCharm — там окружение включается само.</p>
+  </div>
+
+  <div class="box card">
+    <div class="title">Формулировка для собеседования — выучи вслух</div>
+    <p>Вопрос: «Как вы готовите окружение для запуска автотестов?»</p>
+    <p>«Для каждого проекта создаю виртуальное окружение через venv, чтобы зависимости не пересекались с другими проектами. Ставлю пакеты через pip, а список с версиями фиксирую в requirements.txt и коммичу — тогда коллеги и CI ставят то же самое одной командой pip install -r. Саму папку окружения в репозиторий не кладу.»</p>
+  </div>
+</div>
+
+<!-- 5 -->
+<div class="pane" data-title="Задание">
+  <h2>Окружение и порядок в репозитории</h2>
+  <p class="sub">30 минут · в терминале PyCharm, в папке qa-learning</p>
+
+  <div class="box trap">
+    <div class="title">Перед началом</div>
+    <ol>
+      <li><code class="i">git status</code> — должно быть <code class="i">nothing to commit, working tree clean</code>. Если нет — сначала закоммить.</li>
+      <li>В начале строки терминала есть <code class="i">(.venv)</code>. Если нет — закрой и открой терминал в PyCharm.</li>
+    </ol>
+  </div>
+
+  <h3>Часть 1 · Что стоит в окружении · 10 минут</h3>
+  <ol class="steps">
+    <li>Выполни <code class="i">pip list</code>. Запиши в файл <code class="i">notes/day23-venv.md</code>, сколько пакетов в списке и какие. Скорее всего, их два-три: pip и ещё что-то служебное. Это значит, окружение чистое.</li>
+    <li>Проверь, какой Python запускается:
+<pre>python -c "import sys; print(sys.executable)"</pre>
+      В ответе должен быть путь с <code class="i">.venv</code>, например <code class="i">C:\projects\qa-learning\.venv\Scripts\python.exe</code>. Запиши, что вышло. Если пути с .venv нет — окружение не включено, напиши мне.</li>
+    <li>Поставь модуль, который понадобится нам для тестирования API:
+<pre>pip install requests</pre>
+      В конце будет <code class="i">Successfully installed requests-…</code> и ещё несколько пакетов — это то, без чего requests не работает. Запиши номер версии requests.</li>
+    <li>Ещё раз <code class="i">pip list</code>. Запиши, сколько пакетов стало и почему больше, чем один.</li>
+  </ol>
+
+  <h3>Часть 2 · requirements.txt · 10 минут</h3>
+  <ol class="steps">
+    <li>Запиши список в файл:
+<pre>pip freeze &gt; requirements.txt</pre>
+      В корне репозитория появится файл <code class="i">requirements.txt</code>. Открой его в PyCharm и посмотри: строки «имя==версия».</li>
+    <li>Проверь, что Git видит новый файл, а не папку .venv:
+<pre>git status</pre>
+      Должен быть <code class="i">requirements.txt</code> в Untracked files и <b>ничего</b> из .venv.</li>
+    <li>Закоммить:
+<pre>git add requirements.txt
+git commit -m "Добавлен requirements.txt"</pre></li>
+  </ol>
+
+  <h3>Часть 3 · Переименовать файл с пробелом · 10 минут</h3>
+  <p><b>Зачем.</b> Блок 5 охоты: файл с пробелом в имени нельзя подключить через import. А во втором заходе пароли станут модулем.</p>
+  <ol class="steps">
+    <li>Переименуй через Git — тогда он поймёт, что это тот же файл, а не удалённый и новый. Имя в кавычках, потому что в нём пробел:
+<pre>git mv "python/day20/make_password v2.py" python/day20/make_password_v2.py</pre></li>
+    <li><code class="i">git status</code> — должно быть <code class="i">renamed: python/day20/make_password v2.py -&gt; python/day20/make_password_v2.py</code>.</li>
+    <li>Найди в репозитории другие файлы с пробелами, дефисами или цифрой в начале имени — в папке <code class="i">python/</code>. Если есть — переименуй так же. Если нет — так и запиши.</li>
+    <li>Закоммить и отправь:
+<pre>git commit -m "Имена файлов без пробелов"
+git push</pre></li>
+  </ol>
+  <div class="done"><b>Готово, когда</b> на GitHub есть requirements.txt с requests, нет файлов с пробелами в python/, а в notes/day23-venv.md записаны результаты частей 1 и 2.</div>
+</div>
+
+<!-- 6 -->
+<div class="pane" data-title="Тест">
+  <h2>Тест</h2>
+  <p class="sub">8 вопросов, 10 минут · конец первого захода</p>
+  <div id="quizB"></div>
+  <div class="score" id="scoreB">Отвечено 0 из 8</div>
+  <div class="split">перерыв — не меньше часа без экрана</div>
+</div>
+
+<!-- 7 -->
+<div class="pane" data-title="Python: генератор">
+  <h2>Генератор — из одного файла в три модуля</h2>
+  <p class="sub">60 минут · новая папка python/generator/ · в отдельной ветке</p>
+
+  <p>Сейчас код генератора разбросан по файлам дней 19–21, и в каждом что-то скопировано из предыдущего. Собираем его в один небольшой проект из трёх файлов. Это мини-проект 1, финальная версия.</p>
+
+  <div class="files">
+    <div><div class="fn">data.py</div><p>Делает тестовые данные: make_email, make_password, make_bad_email</p></div>
+    <div><div class="fn">checks.py</div><p>Проверяет данные, как форма: has_digit, has_upper, check_password, check_email</p></div>
+    <div><div class="fn">run.py</div><p>Запускаемый файл: собирает пользователей, пишет JSON, прогоняет проверки, печатает итог</p></div>
+  </div>
+
+  <h3>Шаг 0 · Ветка и папка · 3 минуты</h3>
+  <ol class="steps">
+    <li><code class="i">git switch -c feature/generator-modules</code></li>
+    <li>В PyCharm: правый клик по папке <code class="i">python</code> → New → Directory → <code class="i">generator</code>.</li>
+    <li>В ней три пустых файла: <code class="i">data.py</code>, <code class="i">checks.py</code>, <code class="i">run.py</code>.</li>
+  </ol>
+
+  <h3>Шаг 1 · data.py · 15 минут</h3>
+  <p><b>Что сделать.</b> Перенеси в <code class="i">data.py</code> три функции, ничего не меняя внутри:</p>
+  <ol class="steps">
+    <li><code class="i">make_email</code> — из любого дня 19–21.</li>
+    <li><code class="i">make_password</code> — версию v2 из <code class="i">python/day20/make_password_v2.py</code> (с None для маленьких длин).</li>
+    <li><code class="i">make_bad_email</code> — из <code class="i">python/day21_emails.py</code>.</li>
+    <li>Внизу файла — проверки, <b>спрятанные</b> под <code class="i">if __name__ == "__main__":</code>. Возьми по одной-две из прошлых дней, например:
+<pre class="light">if __name__ == "__main__":
+    print(make_email("anna") == "anna@test.ru")
+    print(make_password(8) == "Aaaaaaa1")
+    print(make_password(1) is None)
+    print(make_bad_email("anna", "noat") == "annatest.ru")</pre></li>
+    <li>Удали из файла всё, что не относится к этим трём функциям: старые циклы, словари, печать.</li>
+  </ol>
+  <p><b>Проверка.</b> Правый клик по <code class="i">data.py</code> → Run. Должны быть только True.</p>
+
+  <h3>Шаг 2 · checks.py · 10 минут</h3>
+  <p><b>Что сделать.</b> Так же перенеси четыре функции проверки: <code class="i">has_digit</code>, <code class="i">has_upper</code>, <code class="i">check_password</code> — из генератора дня 20, <code class="i">check_email</code> — из дня 21. Внизу — две-три проверки под <code class="i">if __name__ == "__main__":</code>, например <code class="i">print(check_password("Anna1234") == "OK")</code>.</p>
+  <p><b>Проверка.</b> Run для <code class="i">checks.py</code> — только True.</p>
+
+  <h3>Шаг 3 · run.py · 25 минут</h3>
+  <p><b>Что сделать.</b> Это главный файл. В нём нет ни одной функции из data.py и checks.py — только импорт.</p>
+  <ol class="steps">
+    <li><b>Импорты в начале файла</b>, сначала модуль Python, потом свои:
+<pre class="light">import json
+from data import make_email, make_password, make_bad_email
+from checks import check_password, check_email</pre></li>
+    <li><b>generate_users()</b> — перенеси из дня 20 с восемью пользователями: valid (длина 12), min8, max20, short, long, nodigit, noupper, empty.</li>
+    <li><b>Запись и чтение JSON</b> — по рецепту дня 19, файл <code class="i">test_users.json</code>.</li>
+    <li><b>Цикл проверки</b> по прочитанным пользователям, как в днях 20–22: строка на каждого (email и PASSED или FAILED с тем, что вернулось) и один итог словарём-счётчиком <b>после</b> цикла.</li>
+  </ol>
+  <p><b>Ожидаемый вывод</b> при запуске <code class="i">run.py</code>:</p>
+<pre class="light">valid@test.ru PASSED
+min8@test.ru PASSED
+max20@test.ru PASSED
+short@test.ru PASSED
+long@test.ru PASSED
+nodigit@test.ru PASSED
+noupper@test.ru PASSED
+empty@test.ru PASSED
+Итого: {'PASSED': 8}</pre>
+  <p><b>Заметь:</b> проверки из data.py и checks.py в этом выводе <b>не</b> появились, хотя оба файла подключены. Это и есть работа <code class="i">if __name__ == "__main__"</code>. Если True всё-таки напечатались — значит, проверки в каком-то файле не спрятаны под условие.</p>
+  <details><summary>Если пишет ModuleNotFoundError: No module named 'data'</summary>
+    <p>Python ищет модули в папке, где лежит запускаемый файл. Проверь, что <code class="i">run.py</code>, <code class="i">data.py</code> и <code class="i">checks.py</code> лежат <b>в одной папке</b> <code class="i">python/generator/</code>, и что имена написаны без опечаток — как в блоке 3 охоты.</p>
+  </details>
+
+  <h3>Шаг 4 · Проверка, что проверка умеет падать · 5 минут</h3>
+  <ol class="steps">
+    <li>У пользователя min8 поставь <code class="i">make_password(7)</code>, expected оставь «OK».</li>
+    <li>Запусти: должно быть <code class="i">min8@test.ru FAILED, вернулось: …</code> и <code class="i">'FAILED': 1</code> в итоге.</li>
+    <li>Верни <code class="i">make_password(8)</code>.</li>
+  </ol>
+
+  <h3>Шаг 5 · Слить в main · 2 минуты</h3>
+<pre>git add python/generator
+git commit -m "Генератор: три модуля, data, checks, run"
+git switch main
+git merge feature/generator-modules
+git branch -d feature/generator-modules
+git push</pre>
+
+  <div class="box trap">
+    <div class="title">Что прислать по этой вкладке</div>
+    <ol>
+      <li>Написать «запушила».</li>
+      <li>Вставить вывод <code class="i">run.py</code>: сломанный прогон и зелёный.</li>
+      <li>Ответить одной фразой: почему проверки из data.py не напечатались при запуске run.py.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- 8 -->
+<div class="pane" data-title="Тест-кейсы">
+  <h2>TC-012 и TC-013 — границы длины пароля</h2>
+  <p class="sub">30 минут · после них — 12 из 20</p>
+
+  <div class="box note">
+    <div class="title">Дубли проверены</div>
+    <p>Я сверила с твоим test-cases.md: длина пароля на границах 8 и 20 ещё не проверяется. TC-002 (три пробела) тоже про 3.4, но это не граница, а представитель класса «короче 8».</p>
+  </div>
+
+  <p>Требование 3.4: «Длина пароля меньше 8 или больше 20 символов → "Пароль должен содержать от 8 до 20 символов"». Границы — 8 и 20. По трёхточечному подходу из дня 7 нужны 7, 8, 9 и 19, 20, 21. Сегодня пишем два самых важных значения.</p>
+
+  <h3>TC-012 · Пароль из 7 символов — сразу за нижней границей</h3>
+  <ol class="steps">
+    <li><b>Пароль.</b> Подбери пароль ровно из 7 символов, в котором есть и цифра, и заглавная. Зачем: чтобы он нарушал <b>только</b> 3.4. Если в нём не будет цифры — непонятно, какое сообщение ожидать, это уже TC-011.</li>
+    <li><b>Посчитай длину</b> и запиши в тестовых данных так: <code class="i">пароль Xxxxxx1 — 7 символов: X, x, x, x, x, x, 1</code> — по буквам, чтобы проверяющий сразу видел, что их 7. Используй свой пароль, не этот пример.</li>
+    <li><b>Email</b> — <code class="i">anna@gmail.com</code>.</li>
+    <li><b>Шаги:</b> ввести email, ввести пароль, нажать «Войти».</li>
+    <li><b>Ожидаемый результат:</b> какое сообщение (дословно), где, и ушёл ли запрос на сервер. Вспомни правило 4.1.</li>
+    <li><b>Предусловие:</b> пользователь не авторизован. До сервера дело не дойдёт, поэтому про Анну и счётчик писать не нужно.</li>
+    <li><b>Постусловие:</b> подумай сама, по TC-011.</li>
+  </ol>
+
+  <h3>TC-013 · Пароль из 20 символов — верхняя граница, успешный вход</h3>
+  <p>Этот кейс сложнее, и в нём главное — <b>предусловие</b>. Чтобы проверить, что пароль из 20 символов принимается, нужен пользователь, у которого <b>настоящий</b> пароль ровно 20 символов. С паролем Анны <code class="i">Anna1234</code> это не проверить: ты введёшь 20 символов — и получишь «Неверный email или пароль», потому что пароль не её.</p>
+  <ol class="steps">
+    <li><b>Предусловие.</b> Опиши пользователя: email (придумай другой, не anna, например <code class="i">max20@gmail.com</code>), пароль ровно из 20 символов, с цифрой и заглавной, не заблокирован, неверных попыток 0. Пользователь не авторизован.</li>
+    <li><b>Тестовые данные.</b> Пароль и его длина, посчитанная по группам — например, «первые 10: …, вторые 10: …». Двадцать символов на глаз считать трудно, отсюда и ошибки на единицу.</li>
+    <li><b>Подсказка, как получить пароль ровно из 20 символов:</b> у тебя есть генератор. <code class="i">make_password(20)</code> вернёт пароль нужной длины с цифрой и заглавной — используй его.</li>
+    <li><b>Шаги:</b> ввести email, ввести пароль, нажать «Войти».</li>
+    <li><b>Ожидаемый результат:</b> что видит пользователь при успешном входе. Посмотри, как это написано в твоём TC-001, и напиши так же.</li>
+    <li><b>Постусловие:</b> пользователь в кабинете — что сделать, чтобы не мешать следующим кейсам?</li>
+  </ol>
+
+  <div class="box card">
+    <div class="title">Со звёздочкой — TC-003 на свободный номер</div>
+    <p>Номер TC-003 свободен с тех пор, как мы нашли дубль. Если останется время, напиши туда пароль из 21 символа — сразу за верхней границей. Как TC-012, только с другой стороны.</p>
+  </div>
+
+<pre class="light">ID:
+Название:
+Приоритет:
+Предусловие:
+Тестовые данные:
+Шаги:
+  1.
+Ожидаемый результат:
+Постусловие:</pre>
+
+  <div class="done"><b>Готово, когда</b> в TC-012 пароль ровно 7 символов и нарушает только 3.4, длина показана по буквам; в TC-013 в предусловии отдельный пользователь с паролем ровно 20 символов, а постусловие возвращает систему в исходное состояние.</div>
+</div>
+
+<!-- 9 -->
+<div class="pane" data-title="Итоги">
+  <h2>Закрываем день</h2>
+  <p class="sub">5 минут</p>
+
+  <div class="box note">
+    <div class="title">[Бумага]</div>
+    <ol>
+      <li>Модуль — это файл .py. Import выполняет файл один раз.</li>
+      <li>Три способа импорта: <code class="i">import x</code>, <code class="i">from x import y</code>, <code class="i">import x as z</code>. Импорты — в начале файла.</li>
+      <li><code class="i">if __name__ == "__main__":</code> — проверки, которые не выполняются при импорте.</li>
+      <li>Четыре правила имени файла.</li>
+      <li>Пять команд pip. <code class="i">pip freeze &gt; requirements.txt</code> и <code class="i">pip install -r requirements.txt</code>.</li>
+      <li>Зачем venv; три команды; .venv — не в репозиторий, requirements.txt — в репозиторий.</li>
+      <li>Ошибку читаем с последней строки и сравниваем имя в ней с кодом.</li>
+    </ol>
+  </div>
+
+  <div class="box card">
+    <div class="title">[Карточки] Новый блок T · Модули и окружение</div>
+    <p>Четыре карточки уже в колоде. Первый прогон — завтра, в режиме «Знакомство».</p>
+  </div>
+
+  <div class="box def">
+    <div class="title">Что мне прислать</div>
+    <ol>
+      <li>Счёт карточек J + L из 10.</li>
+      <li>Чтение кода — сколько из 4.</li>
+      <li>Охоту — запушить <code class="i">manual/day23-import-hunt.md</code> и написать, сколько из 6 нашла сама.</li>
+      <li>Номера вопросов теста, где ошиблась.</li>
+      <li>Задание — запушить. Я проверю requirements.txt и имена файлов на GitHub.</li>
+      <li>Генератор — «запушила» и два вывода run.py, как написано на вкладке.</li>
+      <li>TC-012 и TC-013 — запушить в test-cases.md.</li>
+    </ol>
+  </div>
+
+  <h3>Дальше</h3>
+  <ol>
+    <li><b>День 24</b> — файлы: чтение и запись текста, режимы, <code class="i">with</code>. Генератор будет читать настройки из файла.</li>
+    <li><b>Суббота, 24 октября</b> — CP1, если подтвердишь дату.</li>
+  </ol>
+</div>
+
+</div>
+
+<script>
+var QA=[
+{q:'def domain(email):\n    return email.split("@")[1]\n\nprint(domain("anna@test.ru"), len("a@b@c".split("@")))',
+ o:['anna 2','test.ru 3','test.ru 2','@test.ru 3'],a:1,
+ e:'"anna@test.ru".split("@") — это ["anna", "test.ru"], элемент [1] — "test.ru". "a@b@c" режется по двум @ на три куска: ["a", "b", "c"], длина 3. Кстати, так check_email и ловит два @.'},
+{q:'counts = {}\nfor d in ["test.ru", "mail.ru", "test.ru"]:\n    counts[d] = counts.get(d, 0) + 1\n\nprint(counts["test.ru"], len(counts))',
+ o:['2 3','1 2','2 2','3 2'],a:2,
+ e:'Словарь-счётчик: test.ru встретился дважды, mail.ru — один раз. Ключей два, поэтому len — 2, а не 3.'},
+{q:'def first_word(text):\n    if text == "":\n        return None\n    return text.split(" ")[0]\n\nprint(first_word("Неверный формат email"), first_word(""))',
+ o:['Неверный None','Неверный формат email None','Неверный ""','Ошибка'],a:0,
+ e:'Строка режется по пробелам, [0] — первое слово. Для пустой строки сработал ранний выход — None. Без этой проверки "".split(" ") дал бы [""], и функция вернула бы пустую строку, а не None.'},
+{q:'data = {"users": [{"email": "a@test.ru"}, {"email": "b@test.ru"}]}\nprint(data["users"][1]["email"], len(data["users"]))',
+ o:['a@test.ru 2','b@test.ru 2','b@test.ru 1','Ошибка KeyError'],a:1,
+ e:'По шагам: data["users"] — список из двух словарей. [1] — второй словарь. ["email"] — "b@test.ru". len(data["users"]) — длина списка, 2. Так выглядит JSON-ответ сервера, и так его разбирают в API-тестах.'}
+];
+
+var QB=[
+{q:'Что такое модуль в Python?',
+ o:['Встроенная функция','Любой файл .py; его имя без .py — имя модуля','Только скачанный через pip пакет','Папка с тестами'],a:1,
+ e:'Твой checks.py — такой же модуль, как json. Разница только в том, где он лежит.'},
+{q:'В main.py написано import greet, а в greet.py вверху print("загружен"). Что произойдёт при запуске main.py?',
+ o:['Ничего не напечатается','Напечатается «загружен»: при import файл выполняется целиком','Ошибка: print в модуле запрещён','«загружен» напечатается при каждом вызове функции'],a:1,
+ e:'Import выполняет весь код модуля один раз. Поэтому проверки и печать в модуле прячут под if __name__ == "__main__".'},
+{q:'Зачем if __name__ == "__main__": в модуле?',
+ o:['Чтобы модуль нельзя было импортировать','Код под ним выполняется только при прямом запуске файла, а при import пропускается','Это обязательная первая строка любого файла','Чтобы ускорить программу'],a:1,
+ e:'При прямом запуске __name__ равно "__main__", при импорте — имени модуля. Удобно держать проверки функций прямо в файле модуля.'},
+{q:'Ты назвала учебный файл random.py и в нём пишешь import random. Что будет?',
+ o:['Всё работает','Python подключит твой же файл вместо настоящего модуля random — функций из него не окажется','Python спросит, какой модуль взять','Файл удалится'],a:1,
+ e:'Python ищет модуль сначала в папке запускаемого файла. Своим файлам не дают имена модулей Python.'},
+{q:'Какое имя файла можно подключить через import?',
+ o:['make password.py','make-password.py','23_password.py','make_password_v2.py'],a:3,
+ e:'Пробел и дефис ломают синтаксис import, имя не может начинаться с цифры. Только латиница, цифры и подчёркивание.'},
+{q:'Что делает pip freeze > requirements.txt?',
+ o:['Удаляет все пакеты','Записывает список установленных пакетов с версиями в файл','Ставит пакеты из файла','Замораживает версию Python'],a:1,
+ e:'freeze — «зафиксировать». Знак > отправляет вывод в файл. Обратная команда — pip install -r requirements.txt.'},
+{q:'Что из этого кладут в Git-репозиторий?',
+ o:['Папку .venv','requirements.txt','Обе','Ни то, ни другое'],a:1,
+ e:'Окружение каждый создаёт у себя, оно большое и зависит от компьютера. В репозиторий идёт только список — requirements.txt.'},
+{q:'Ты поставила pip install requests, а Python пишет No module named requests. Самая частая причина?',
+ o:['Модуль сломан','Пакет поставлен в другой Python, окружение не было включено','Нужно перезагрузить компьютер','Requests не работает на Windows'],a:1,
+ e:'Первым делом смотрим, есть ли (.venv) в строке терминала и какой Python запускается: python -c "import sys; print(sys.executable)". Вторая частая причина — опечатка в имени пакета, как request без s.'}
+];
+
+function buildQuiz(host,data,scoreEl,code){
+  var answered=0,right=0;
+  data.forEach(function(item,i){
+    var box=document.createElement('div');box.className='q';
+    var t=document.createElement('div');t.className='qn';t.textContent='Вопрос '+(i+1);box.appendChild(t);
+    if(code){var pre=document.createElement('pre');pre.textContent=item.q;box.appendChild(pre);
+      var hint=document.createElement('div');hint.textContent='Что напечатается?';box.appendChild(hint);}
+    else{var qt=document.createElement('div');qt.textContent=item.q;box.appendChild(qt);}
+    var opts=document.createElement('div');opts.className='opts';
+    var expl=document.createElement('div');expl.className='expl';expl.hidden=true;expl.textContent=item.e;
+    var locked=false;
+    item.o.forEach(function(text,j){
+      var b=document.createElement('button');b.className='opt';b.type='button';b.textContent=text;
+      if(code)b.style.fontFamily='Consolas,monospace';
+      b.onclick=function(){
+        if(locked)return;locked=true;answered++;if(j===item.a)right++;
+        [].forEach.call(opts.children,function(el,k){
+          if(k===item.a)el.classList.add('right');else if(k===j)el.classList.add('wrong');
+        });
+        expl.hidden=false;
+        if(scoreEl)scoreEl.textContent='Отвечено '+answered+' из '+data.length+', верных '+right;
+      };
+      opts.appendChild(b);
+    });
+    box.appendChild(opts);box.appendChild(expl);host.appendChild(box);
+  });
+}
+buildQuiz(document.getElementById('quizA'),QA,null,true);
+buildQuiz(document.getElementById('quizB'),QB,document.getElementById('scoreB'),false);
+
+var panes=[].slice.call(document.querySelectorAll('.pane'));
+var tabs=document.getElementById('tabs');
+panes.forEach(function(p,i){
+  var b=document.createElement('button');b.type='button';
+  b.innerHTML='<span class="n">'+i+'</span>'+p.dataset.title;
+  b.onclick=function(){go(i);};
+  tabs.appendChild(b);
+  var nav=document.createElement('div');nav.className='nav';
+  var prev=document.createElement('button');prev.type='button';prev.textContent='← Назад';
+  prev.onclick=function(){go(i-1);};if(i===0)prev.disabled=true;
+  var next=document.createElement('button');next.type='button';next.className='next';
+  next.textContent=(i===panes.length-1)?'В начало':'Дальше →';
+  next.onclick=function(){go(i===panes.length-1?0:i+1);};
+  nav.appendChild(prev);nav.appendChild(next);p.appendChild(nav);
+});
+function go(i){
+  panes.forEach(function(p,j){p.classList.toggle('on',i===j);});
+  [].forEach.call(tabs.children,function(b,j){b.classList.toggle('on',i===j);});
+  try{tabs.children[i].scrollIntoView({block:'nearest',inline:'center'});}catch(e){}
+  try{localStorage.setItem('d23tab',String(i));}catch(e){}
+  window.scrollTo(0,0);
+}
+var start=0;
+try{var s=parseInt(localStorage.getItem('d23tab'),10);if(s>=0&&s<panes.length)start=s;}catch(e){}
+go(start);
+</script>
+
+</body></html>
