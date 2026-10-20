@@ -31,7 +31,7 @@
   },
   {
     "email": "min8@test.ru",
-    "password": "Aaaaaa1",
+    "password": "Aaaaaaa1",
     "expected": "OK"
   },
   {
