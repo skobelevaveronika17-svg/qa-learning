@@ -45,6 +45,6 @@ for case in cases:
         summary[status] = summary[status] + 1
     else:
         summary[status] = 1
-    print(f"Итого:{summary}")
+print(f"Итого:{summary}")
 
 print(parse_cookies("token=abc=="))
