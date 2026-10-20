@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>День 9 — Комбинации условий</title>
+<style>
+:root{
+  --bg:#eef1f2; --paper:#fff; --ink:#1b2430; --soft:#4e5a67; --line:#d7dde0;
+  --blue:#1f5fa9; --blue-bg:#e9f1fa;
+  --red:#b0352b; --red-bg:#fbecea;
+  --green:#276f52; --green-bg:#e8f4ee;
+  --amber:#9a6a00; --amber-bg:#fbf2df;
+  --violet:#5e4b8b; --violet-bg:#efebf8;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.62;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:0 18px 60px}
+header{padding:34px 0 14px}
+.day{font-size:14px;color:var(--soft)}
+h1{font-size:33px;line-height:1.15;margin:.2em 0 .3em}
+.lead{color:var(--soft);margin:0;max-width:62ch}
+
+.tabs{position:sticky;top:0;z-index:30;background:var(--bg);padding:10px 0 8px;
+  display:flex;gap:6px;overflow-x:auto;border-bottom:1px solid var(--line)}
+.tabs button{flex:0 0 auto;background:var(--paper);border:1px solid var(--line);border-radius:8px;
+  padding:8px 13px;font:inherit;font-size:14.5px;color:var(--soft);cursor:pointer;white-space:nowrap}
+.tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink);font-weight:600}
+.tabs button .n{opacity:.55;margin-right:6px}
+
+.pane{display:none;background:var(--paper);border:1px solid var(--line);border-top:0;
+  border-radius:0 0 12px 12px;padding:28px 30px 34px}
+.pane.on{display:block}
+.pane h2{margin:0 0 6px;font-size:26px;line-height:1.2}
+.pane .sub{color:var(--soft);margin:0 0 20px;font-size:15.5px}
+h3{font-size:19.5px;margin:28px 0 8px}
+h4{font-size:17px;margin:20px 0 6px}
+p{margin:12px 0}
+ul,ol{padding-left:24px}li{margin:6px 0}
+code.i{background:#eef1f3;border:1px solid var(--line);border-radius:4px;padding:1px 5px;
+ font-family:Consolas,monospace;font-size:.92em}
+
+.box{border-left:4px solid;border-radius:0 8px 8px 0;padding:14px 18px;margin:18px 0}
+.box .title{font-weight:700;margin-bottom:4px}
+.def{border-color:var(--blue);background:var(--blue-bg)} .def .title{color:var(--blue)}
+.trap{border-color:var(--red);background:var(--red-bg)} .trap .title{color:var(--red)}
+.note{border-color:var(--green);background:var(--green-bg)} .note .title{color:var(--green)}
+.card{border-color:var(--amber);background:var(--amber-bg)} .card .title{color:var(--amber)}
+.box p:first-of-type{margin-top:2px}.box p:last-child{margin-bottom:2px}
+
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15.5px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:#f2f5f6;font-weight:600}
+td.v{background:#f2f9f5}td.x{background:#fdf2f1}
+.scroll{overflow-x:auto}
+.mono{font-family:Consolas,monospace}
+.ctr{text-align:center}
+
+details{border:1px solid var(--line);background:#fcfcfd;border-radius:8px;padding:10px 14px;margin:10px 0}
+summary{cursor:pointer;font-weight:600;color:var(--violet)}
+details[open] summary{margin-bottom:8px}
+
+/* form */
+.shop{border:1px solid var(--line);border-radius:12px;background:#fafbfc;padding:22px 24px;margin:18px 0}
+.shop h4{margin:0 0 14px;font-size:18px}
+.fld{margin:14px 0}
+.fld label{display:block;font-size:14.5px;color:var(--soft);margin-bottom:5px}
+.fld input[type=text]{width:100%;max-width:340px;padding:9px 12px;border:1px solid var(--line);
+ border-radius:7px;font:inherit;font-size:16px;background:#fff;color:var(--ink)}
+.radios{display:flex;gap:18px;flex-wrap:wrap}
+.radios label{display:flex;align-items:center;gap:7px;font-size:16px;color:var(--ink);cursor:pointer}
+.shop button.go{background:var(--ink);color:#fff;border:0;border-radius:8px;padding:11px 22px;
+ font:inherit;font-size:16px;cursor:pointer;margin-top:8px}
+.shop button.go:hover{background:#2c3a48}
+.shop button.rst{background:#fff;border:1px solid var(--line);border-radius:8px;padding:11px 18px;
+ font:inherit;font-size:16px;cursor:pointer;margin-left:8px;color:var(--ink)}
+#result{margin-top:18px;padding:16px 18px;border-radius:9px;background:#fff;border:1px solid var(--line);
+ font-family:Consolas,monospace;font-size:15px;white-space:pre-wrap;display:none}
+#result.err{background:var(--red-bg);border-color:var(--red)}
+
+.log{width:100%;min-height:150px;padding:12px 14px;border:1px solid var(--line);border-radius:8px;
+ font:inherit;font-size:16px;background:#fff;color:var(--ink);resize:vertical}
+
+.q{border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:16px 0}
+.qn{font-weight:700;margin-bottom:6px}
+.opts{display:grid;gap:8px;margin-top:12px}
+.opt{text-align:left;background:#f6f8f9;border:1px solid var(--line);border-radius:8px;
+ padding:10px 14px;cursor:pointer;font:inherit;font-size:16px;color:var(--ink)}
+.opt:hover{background:#eaf0f3}
+.opt.right{background:var(--green-bg);border-color:var(--green);font-weight:600}
+.opt.wrong{background:var(--red-bg);border-color:var(--red)}
+.expl{display:none;margin-top:12px;padding:12px 14px;background:#f4f6f7;border-radius:8px}
+.score{position:sticky;bottom:0;background:var(--paper);border:1px solid var(--line);
+ border-radius:10px;padding:12px 18px;margin-top:18px;font-weight:600}
+
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:34px;padding-top:18px;border-top:1px solid var(--line)}
+.nav button{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 16px;
+ font:inherit;cursor:pointer;color:var(--ink)}
+.nav .next{background:var(--ink);color:#fff;border-color:var(--ink)}
+.nav button[disabled]{opacity:.35;cursor:default}
+
+.term{background:#0f1720;color:#d6e2ec;border-radius:8px;padding:12px 14px;font-family:Consolas,monospace;
+ font-size:14.5px;display:flex;justify-content:space-between;align-items:center;gap:12px;margin:10px 0}
+.term button{background:#2b3d4d;color:#e7f0f7;border:0;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:13px}
+@media(max-width:640px){.pane{padding:20px 17px 26px}h1{font-size:27px}.shop{padding:18px 16px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="day">День 9 · Тест-дизайн</div>
+  <h1>Когда условий несколько</h1>
+  <p class="lead">Вчера ты искала баги в коде. Сегодня — в работающей форме, которая прямо здесь, на второй вкладке. В ней семь багов. Техники дня появятся из того, что ты <b>не</b> найдёшь.</p>
+</header>
+
+<div class="tabs" id="tabs"></div>
+
+<!-- 0 -->
+<div class="pane" data-title="Карточки">
+  <h2>Разминка</h2>
+  <p class="sub">12 минут</p>
+  <ul>
+    <li><b>G — строки</b>, 1-й прогон. 5 карточек со вчера.</li>
+    <li><b>E — циклы</b>, 2-й прогон. 8 карточек.</li>
+  </ul>
+  <p>Блоки A и F по графику тоже выпадали на сегодня — сдвигаю их на день 10, чтобы не выйти за потолок в двенадцать карточек.</p>
+
+  <div class="box note">
+    <div class="title">Обрати внимание на карточку про isdigit</div>
+    <p>Вчера ты споткнулась на ней в тесте. Сегодня она в прогоне — хороший момент проверить, осело ли.</p>
+  </div>
+
+  <div class="box def">
+    <div class="title">План дня</div>
+    <p>Охота на баги в живой форме — 40 минут. Разбор — 15. Три техники, каждая вырастает из конкретного пропущенного бага — 45. Задание — 25. Тест — 12.</p>
+    <p>Потолок — <b>2 часа 30 минут</b>.</p>
+  </div>
+</div>
+
+<!-- 1 -->
+<div class="pane" data-title="Охота">
+  <h2>Форма оформления заказа</h2>
+  <p class="sub">40 минут. Форма рабочая, её можно ломать</p>
+
+  <div class="box def">
+    <div class="title">Требования — читай внимательно, это твой единственный источник правды</div>
+    <ol>
+      <li>Цена товара — положительное число, может быть дробным.</li>
+      <li>Количество — целое от 1 до 99.</li>
+      <li>Сумма товаров = цена × количество.</li>
+      <li>Доставка курьером — 300 рублей. При сумме товаров <b>от 5000</b> доставка курьером бесплатна.</li>
+      <li>Самовывоз — всегда бесплатно.</li>
+      <li>Промокод <b>SALE10</b> даёт скидку 10% на сумму товаров. Действует при сумме товаров <b>от 1000</b>.</li>
+      <li>Промокод нечувствителен к регистру, пробелы по краям игнорируются.</li>
+      <li>Промокод действует при любом способе доставки.</li>
+      <li>Итого = сумма товаров − скидка + стоимость доставки.</li>
+      <li>Все поля обязательны.</li>
+    </ol>
+  </div>
+
+  <div class="shop">
+    <h4>Оформление заказа</h4>
+    <div class="fld">
+      <label for="f-price">Цена товара, руб</label>
+      <input type="text" id="f-price" value="500">
+    </div>
+    <div class="fld">
+      <label for="f-qty">Количество</label>
+      <input type="text" id="f-qty" value="2">
+    </div>
+    <div class="fld">
+      <label for="f-promo">Промокод</label>
+      <input type="text" id="f-promo" placeholder="необязательно">
+    </div>
+    <div class="fld">
+      <label>Способ доставки</label>
+      <div class="radios">
+        <label><input type="radio" name="dlv" value="courier" checked> Курьером</label>
+        <label><input type="radio" name="dlv" value="pickup"> Самовывоз</label>
+      </div>
+    </div>
+    <button class="go" onclick="calcOrder()">Оформить заказ</button>
+    <button class="rst" onclick="resetOrder()">Сбросить форму</button>
+    <div id="result"></div>
+  </div>
+
+  <div class="box trap">
+    <div class="title">Как искать</div>
+    <p>Не тыкай наугад. Возьми вчерашнюю технику: по каждому правилу из требований подбери граничные значения и прогони. Потом попробуй сочетания правил между собой.</p>
+    <p>Кнопка «Сбросить форму» возвращает всё в исходное состояние. Она пригодится, запомни, что она есть.</p>
+  </div>
+
+  <h3>Журнал находок</h3>
+  <p>Записывай сюда всё, что кажется неправильным. Формат как в настоящем баг-репорте: что ввела → что ожидала → что получила.</p>
+  <textarea class="log" id="log" placeholder="1. Ввела цену 2500, количество 2, курьер. Ожидала: доставка бесплатна (сумма 5000). Получила: ..."></textarea>
+  <p style="color:var(--soft);font-size:15px">Текст никуда не отправляется и не сохраняется — перенеси его потом в файл.</p>
+
+  <div class="box note">
+    <div class="title">Сколько искать</div>
+    <p>Багов ровно семь. Не останавливайся на трёх-четырёх: последние прячутся не в отдельных полях, а в их сочетаниях. Если за 40 минут нашла четыре — это хороший результат, переходи к разбору.</p>
+  </div>
+</div>
+
+<!-- 2 -->
+<div class="pane" data-title="Разбор">
+  <h2>Что было зашито</h2>
+  <p class="sub">15 минут. Открывать только после охоты</p>
+
+  <p>Открывай по одному и отмечай, нашла или нет.</p>
+
+  <details>
+    <summary>Баг 1 — доставка</summary>
+    <p><b>Как воспроизвести:</b> цена 4999, количество 1, курьер.</p>
+    <p><b>Ожидание:</b> доставка 300 рублей, потому что сумма меньше 5000.</p>
+    <p><b>Факт:</b> доставка бесплатная.</p>
+    <p><b>Что это:</b> ошибка на единицу, порог стоит на 4999 вместо 5000. Твой старый знакомый — третья встреча за две недели.</p>
+    <p><b>Чем ловится:</b> граничные значения. 4998 / 4999 / 5000.</p>
+  </details>
+
+  <details>
+    <summary>Баг 2 — количество</summary>
+    <p><b>Как воспроизвести:</b> количество 0.</p>
+    <p><b>Ожидание:</b> отказ, допустимо от 1 до 99.</p>
+    <p><b>Факт:</b> заказ оформляется на сумму 0 рублей, да ещё и с доставкой 300.</p>
+    <p><b>Чем ловится:</b> граничные значения, нижняя граница. Именно тот ноль, про который ты писала в задании дня 7.</p>
+  </details>
+
+  <details>
+    <summary>Баг 3 — промокод и регистр</summary>
+    <p><b>Как воспроизвести:</b> сумма 2000, промокод <code class="i">sale10</code> строчными.</p>
+    <p><b>Ожидание:</b> скидка 10%, в требованиях сказано «нечувствителен к регистру».</p>
+    <p><b>Факт:</b> скидки нет, при этом никакого сообщения об ошибке.</p>
+    <p><b>Чем ловится:</b> знание, что сравнение строк чувствительно к регистру. Вчерашняя тема, вчерашняя нормализация.</p>
+  </details>
+
+  <details>
+    <summary>Баг 4 — промокод и пробелы</summary>
+    <p><b>Как воспроизвести:</b> промокод <code class="i">&nbsp;SALE10&nbsp;</code> с пробелом в начале или в конце.</p>
+    <p><b>Ожидание:</b> скидка есть, пробелы игнорируются по требованию.</p>
+    <p><b>Факт:</b> скидки нет.</p>
+    <p><b>Почему это важно:</b> промокоды копируют из писем и мессенджеров, и пробел прилетает почти всегда. В жизни этот баг генерирует поток обращений в поддержку.</p>
+  </details>
+
+  <details>
+    <summary>Баг 5 — порог промокода</summary>
+    <p><b>Как воспроизвести:</b> цена 100, количество 1, промокод SALE10.</p>
+    <p><b>Ожидание:</b> скидки нет, промокод действует от 1000.</p>
+    <p><b>Факт:</b> скидка 10 рублей начислена.</p>
+    <p><b>Чем ловится:</b> чтением требований и проверкой границы 999 / 1000 / 1001.</p>
+  </details>
+
+  <details>
+    <summary>Баг 6 — промокод и самовывоз</summary>
+    <p><b>Как воспроизвести:</b> сумма 2000, промокод SALE10, выбрать <b>самовывоз</b>.</p>
+    <p><b>Ожидание:</b> скидка 200 рублей, доставка 0, итого 1800. В требованиях прямо сказано: промокод действует при любом способе доставки.</p>
+    <p><b>Факт:</b> скидки нет, итого 2000.</p>
+    <p><b>Вот это интересный.</b> Каждое поле по отдельности работает: промокод при курьере — работает, самовывоз без промокода — работает. Баг живёт только в <b>пересечении</b> двух условий. Проверяя поля по одному, его не найти никогда.</p>
+  </details>
+
+  <details>
+    <summary>Баг 7 — скидка не пересчитывается</summary>
+    <p><b>Как воспроизвести:</b> цена 1000, количество 2, промокод SALE10, курьер. Оформить — скидка 200. Не трогая промокод, поменять количество на 5 и оформить снова.</p>
+    <p><b>Ожидание:</b> сумма 5000, скидка 500.</p>
+    <p><b>Факт:</b> сумма 5000, а скидка всё ещё 200 — от прошлого расчёта.</p>
+    <p><b>Почему его почти невозможно найти обычным способом:</b> он зависит не от того, что введено, а от того, <b>что было введено до этого</b>. Один и тот же набор данных даёт разный результат в зависимости от истории действий. Если сбросить форму и ввести те же значения заново — всё правильно.</p>
+  </details>
+
+  <h3>Честный подсчёт</h3>
+  <div class="scroll"><table>
+    <tr><th>Баг</th><th>Чем ловится</th><th>Насколько вероятно найти вчерашними техниками</th></tr>
+    <tr><td>1. Доставка от 4999</td><td>граничные значения</td><td class="v">высоко</td></tr>
+    <tr><td>2. Количество 0</td><td>граничные значения</td><td class="v">высоко</td></tr>
+    <tr><td>3. Регистр промокода</td><td>классы эквивалентности</td><td class="v">средне</td></tr>
+    <tr><td>4. Пробелы в промокоде</td><td>классы эквивалентности</td><td class="v">средне</td></tr>
+    <tr><td>5. Порог промокода</td><td>границы + чтение требований</td><td class="v">средне</td></tr>
+    <tr><td>6. Промокод + самовывоз</td><td>ничем из вчерашнего</td><td class="x">низко</td></tr>
+    <tr><td>7. Скидка залипла</td><td>ничем из вчерашнего</td><td class="x">очень низко</td></tr>
+  </table></div>
+
+  <div class="box def">
+    <div class="title">Вот зачем нужен сегодняшний день</div>
+    <p>Классы и границы работают с <b>одним полем за раз</b>. Как только правила начинают пересекаться или зависеть от истории действий, этих техник не хватает.</p>
+    <p>Баг 6 — это про комбинации условий. Для них есть <b>таблица решений</b>.<br>
+       Баг 7 — это про состояние системы. Для него есть <b>тестирование состояний и переходов</b>.<br>
+       А когда комбинаций становится слишком много, чтобы проверить все, есть <b>попарное тестирование</b>.</p>
+  </div>
+
+  <div class="box note">
+    <div class="title">Про результат</div>
+    <p>Если нашла 4–5 — это нормальный результат для второй недели. Если нашла шестой — очень хорошо. Если седьмой — отлично, потому что его пропускают и люди с опытом.</p>
+  </div>
+</div>
+
+<!-- 3 -->
+<div class="pane" data-title="Таблица решений">
+  <h2>Таблица решений</h2>
+  <p class="sub">20 минут. Техника, которая поймала бы баг 6</p>
+
+  <div class="box def">
+    <div class="title">Таблица решений</div>
+    <p>Техника чёрного ящика для случаев, когда результат зависит от <b>сочетания нескольких условий</b>. Все условия выписываются строками, все их комбинации — столбцами, и для каждой комбинации указывается ожидаемый результат.</p>
+  </div>
+
+  <p>Посмотрим на правила промокода. Условий три:</p>
+  <ol>
+    <li>Промокод введён верно</li>
+    <li>Сумма товаров от 1000</li>
+    <li>Выбран самовывоз</li>
+  </ol>
+
+  <p>Каждое условие — да или нет. Три условия по два значения дают 2 × 2 × 2 = <b>8 комбинаций</b>. Выписываем их все:</p>
+
+  <div class="scroll"><table>
+    <tr><th>Условия</th><th class="ctr">1</th><th class="ctr">2</th><th class="ctr">3</th><th class="ctr">4</th><th class="ctr">5</th><th class="ctr">6</th><th class="ctr">7</th><th class="ctr">8</th></tr>
+    <tr><td>Промокод верный</td><td class="ctr">да</td><td class="ctr">да</td><td class="ctr">да</td><td class="ctr">да</td><td class="ctr">нет</td><td class="ctr">нет</td><td class="ctr">нет</td><td class="ctr">нет</td></tr>
+    <tr><td>Сумма от 1000</td><td class="ctr">да</td><td class="ctr">да</td><td class="ctr">нет</td><td class="ctr">нет</td><td class="ctr">да</td><td class="ctr">да</td><td class="ctr">нет</td><td class="ctr">нет</td></tr>
+    <tr><td>Самовывоз</td><td class="ctr">да</td><td class="ctr">нет</td><td class="ctr">да</td><td class="ctr">нет</td><td class="ctr">да</td><td class="ctr">нет</td><td class="ctr">да</td><td class="ctr">нет</td></tr>
+    <tr><th>Результат</th><th class="ctr">—</th><th class="ctr">—</th><th class="ctr">—</th><th class="ctr">—</th><th class="ctr">—</th><th class="ctr">—</th><th class="ctr">—</th><th class="ctr">—</th></tr>
+    <tr><td>Скидка 10%</td><td class="ctr v">✓</td><td class="ctr v">✓</td><td class="ctr"></td><td class="ctr"></td><td class="ctr"></td><td class="ctr"></td><td class="ctr"></td><td class="ctr"></td></tr>
+    <tr><td>Скидки нет</td><td class="ctr"></td><td class="ctr"></td><td class="ctr x">✓</td><td class="ctr x">✓</td><td class="ctr x">✓</td><td class="ctr x">✓</td><td class="ctr x">✓</td><td class="ctr x">✓</td></tr>
+  </table></div>
+
+  <p><b>Столбец 1 — это и есть баг 6.</b> Промокод верный, сумма подходит, самовывоз. По требованиям скидка должна быть, форма её не даёт.</p>
+
+  <p>Обрати внимание, что произошло. Ты не «догадалась проверить самовывоз с промокодом». Ты <b>механически выписала все комбинации</b> — и нужная оказалась в списке сама. В этом весь смысл техники: она не требует сообразительности, она требует аккуратности.</p>
+
+  <h3>Как её строить</h3>
+  <ol>
+    <li>Выписать все условия, от которых зависит результат. Только те, что реально влияют.</li>
+    <li>Посчитать количество комбинаций: 2 в степени числа условий, если все условия двоичные.</li>
+    <li>Заполнить столбцы так, чтобы не пропустить ни одной комбинации. Верхняя строка — половина «да», половина «нет». Следующая — четвертями. Следующая — через одну. Так ты не собьёшься.</li>
+    <li>Для каждого столбца указать ожидаемый результат по требованиям.</li>
+    <li>Каждый столбец — один тест-кейс.</li>
+  </ol>
+
+  <div class="box trap">
+    <div class="title">Сокращение таблицы</div>
+    <p>Видно, что столбцы 5–8 дают один и тот же результат: если промокод неверный, остальное уже неважно. Такие столбцы объединяют в один, а в ячейках ставят прочерк — «значение не имеет значения».</p>
+    <p>Восемь комбинаций превращаются в пять тест-кейсов. Но <b>сначала выписывают все, потом сокращают</b> — иначе легко выкинуть комбинацию, которая на самом деле важна.</p>
+  </div>
+
+  <div class="box trap">
+    <div class="title">Рост таблицы</div>
+    <p>Три условия — 8 комбинаций. Четыре — 16. Пять — 32. Десять — 1024. Таблица решений хороша до четырёх-пяти условий, дальше становится неподъёмной. Что делать в этом случае — на вкладке про pairwise.</p>
+  </div>
+
+  <div class="box card">
+    <div class="title">На карточку</div>
+    <p>Что такое таблица решений и когда применяется? — Техника чёрного ящика для комбинаций условий: все условия строками, все комбинации столбцами, для каждой ожидаемый результат. Применяется, когда результат зависит от нескольких условий сразу.</p>
+  </div>
+</div>
+
+<!-- 4 -->
+<div class="pane" data-title="Состояния">
+  <h2>Состояния и переходы</h2>
+  <p class="sub">15 минут. Техника, которая поймала бы баг 7</p>
+
+  <div class="box def">
+    <div class="title">Тестирование состояний и переходов</div>
+    <p>Техника для систем, у которых есть <b>память</b>: результат зависит не только от того, что ввели сейчас, но и от того, что происходило раньше. Система описывается как набор состояний и переходов между ними, а тесты строятся по этим переходам.</p>
+  </div>
+
+  <p>Баг 7 нельзя описать словами «при таких данных неверный результат». Данные-то правильные. Неверна <b>история</b>: форма запомнила скидку и не пересчитала её.</p>
+
+  <p>Форма заказа имеет как минимум три состояния:</p>
+
+  <div class="scroll"><table>
+    <tr><th>Состояние</th><th>Что это значит</th></tr>
+    <tr><td>Пустая</td><td>Ничего не рассчитано, скидка не применялась</td></tr>
+    <tr><td>Рассчитана без промокода</td><td>Итог посчитан, скидки нет</td></tr>
+    <tr><td>Рассчитана со скидкой</td><td>Итог посчитан, скидка применена и запомнена</td></tr>
+  </table></div>
+
+  <p>А вот переходы — то есть действия, которые переводят форму из состояния в состояние:</p>
+
+  <div class="scroll"><table>
+    <tr><th>Из состояния</th><th>Действие</th><th>Должно перейти в</th><th>Что проверяем</th></tr>
+    <tr><td>Пустая</td><td>Оформить без промокода</td><td>Рассчитана без скидки</td><td>Итог верный</td></tr>
+    <tr><td>Пустая</td><td>Оформить с промокодом</td><td>Рассчитана со скидкой</td><td>Скидка верная</td></tr>
+    <tr><td>Рассчитана со скидкой</td><td>Изменить количество и оформить</td><td>Рассчитана со скидкой, <b>пересчитанной</b></td><td class="x">Здесь баг 7</td></tr>
+    <tr><td>Рассчитана со скидкой</td><td>Стереть промокод и оформить</td><td>Рассчитана без скидки</td><td>Скидка должна исчезнуть</td></tr>
+    <tr><td>Рассчитана со скидкой</td><td>Сбросить форму</td><td>Пустая</td><td>Всё обнулено</td></tr>
+  </table></div>
+
+  <p>Третья строка — ровно тот сценарий, который ловит баг. И заметь: чтобы его получить, нужно было выполнить <b>два действия подряд</b>. Ни одно из них по отдельности бага не показывает.</p>
+
+  <div class="box def">
+    <div class="title">Где эта техника нужна в первую очередь</div>
+    <ul>
+      <li>Корзина и оформление заказа — то, что перед тобой.</li>
+      <li>Статусы заказа: новый → оплачен → собран → отправлен → доставлен. И запрещённые переходы: из «доставлен» нельзя вернуться в «новый».</li>
+      <li>Авторизация: гость → вошёл → заблокирован после трёх попыток. Ты это писала кодом на дне 6.</li>
+      <li>Любые многошаговые формы и мастера настройки.</li>
+    </ul>
+  </div>
+
+  <div class="box trap">
+    <div class="title">Самое ценное — запрещённые переходы</div>
+    <p>Начинающие проверяют, что разрешённые переходы работают. Баги живут в том, что запрещённые <b>не запрещены</b>: заказ отменяется после доставки, товар добавляется в оплаченный заказ, пользователь входит после блокировки.</p>
+    <p>На собеседовании это сильный ответ: «проверяю не только валидные переходы, но и невалидные — что система не даёт сделать то, чего делать нельзя».</p>
+  </div>
+
+  <div class="box card">
+    <div class="title">На карточку</div>
+    <p>Когда применяют тестирование состояний и переходов? — Когда поведение зависит от истории действий, а не только от текущего ввода: корзина, статусы заказа, авторизация, многошаговые формы. Проверяют и разрешённые переходы, и запрещённые.</p>
+  </div>
+</div>
+
+<!-- 5 -->
+<div class="pane" data-title="Pairwise">
+  <h2>Попарное тестирование</h2>
+  <p class="sub">10 минут. Что делать, когда комбинаций слишком много</p>
+
+  <p>Добавим форме реалистичности. Пусть у неё будет:</p>
+  <ul>
+    <li>способ доставки — 3 варианта,</li>
+    <li>способ оплаты — 4 варианта,</li>
+    <li>тип пользователя — 3 варианта (гость, обычный, с подпиской),</li>
+    <li>промокод — 3 варианта (нет, верный, просроченный),</li>
+    <li>город — 4 варианта.</li>
+  </ul>
+
+  <p>Сколько всего комбинаций? 3 × 4 × 3 × 3 × 4 = <b>432</b>. По минуте на проверку — это неделя работы одного человека на одной форме.</p>
+
+  <div class="box def">
+    <div class="title">Попарное тестирование, pairwise</div>
+    <p>Техника, основанная на наблюдении: подавляющее большинство багов вызывается <b>одним параметром или парой параметров</b>, а не редкой комбинацией из пяти. Поэтому достаточно набора тестов, в котором встречается каждая <b>пара</b> значений хотя бы раз — а не каждое полное сочетание.</p>
+  </div>
+
+  <p>Для нашего примера 432 комбинации сжимаются примерно до 16–20 тестов, и при этом каждая пара «оплата картой + самовывоз», «гость + просроченный промокод» и так далее будет проверена хотя бы однажды.</p>
+
+  <div class="box trap">
+    <div class="title">Вручную это не строят</div>
+    <p>Составить покрывающий набор руками почти невозможно и не нужно. Используют генераторы — PICT от Microsoft, allpairs, онлайн-сервисы. Ты задаёшь параметры и их значения, инструмент выдаёт таблицу.</p>
+    <p>На собеседовании достаточно знать идею, назвать инструмент и честно сказать, что расчёт делает генератор. Никто не ждёт, что вы считаете это в уме.</p>
+  </div>
+
+  <h3>Три техники рядом</h3>
+  <div class="scroll"><table>
+    <tr><th>Техника</th><th>Когда</th><th>Что даёт</th></tr>
+    <tr><td>Классы и границы</td><td>одно поле, диапазон значений</td><td>какие значения подставлять</td></tr>
+    <tr><td>Таблица решений</td><td>2–5 условий влияют на результат вместе</td><td>полный перебор комбинаций</td></tr>
+    <tr><td>Состояния и переходы</td><td>результат зависит от истории действий</td><td>сценарии из нескольких шагов</td></tr>
+    <tr><td>Pairwise</td><td>больше пяти параметров, комбинаций сотни</td><td>сокращение перебора без большой потери качества</td></tr>
+  </table></div>
+
+  <div class="box card">
+    <div class="title">На карточку</div>
+    <p>Что такое попарное тестирование и зачем? — Сокращение количества комбинаций: проверяем не все сочетания параметров, а набор, где каждая пара значений встречается хотя бы раз. Основано на том, что большинство багов вызывает один параметр или пара. Считают генератором, например PICT.</p>
+  </div>
+</div>
+
+<!-- 6 -->
+<div class="pane" data-title="Задание">
+  <h2>Задание</h2>
+  <p class="sub">25 минут. Файл <code class="i">manual/day09-practice.md</code></p>
+
+  <div class="box def">
+    <div class="title">Часть 1 — таблица решений на доставку</div>
+    <p>Условия, влияющие на стоимость доставки:</p>
+    <ol>
+      <li>Выбран самовывоз</li>
+      <li>Сумма товаров от 5000</li>
+      <li>У пользователя есть подписка (подписчикам доставка всегда бесплатна)</li>
+    </ol>
+    <p>Построй полную таблицу: три условия, восемь столбцов, для каждого — стоимость доставки по требованиям. Потом сократи её, объединив столбцы, где часть условий уже не имеет значения, и запиши, сколько тест-кейсов получилось после сокращения.</p>
+  </div>
+
+  <details>
+    <summary>Подсказка, если непонятно, как заполнять столбцы</summary>
+    <p>Первая строка условий: четыре «да», четыре «нет». Вторая: два «да», два «нет», два «да», два «нет». Третья: чередование через один. Так гарантированно получатся все восемь разных комбинаций и ни одна не повторится.</p>
+  </details>
+
+  <div class="box def">
+    <div class="title">Часть 2 — состояния корзины</div>
+    <p>Опиши состояния и переходы для корзины интернет-магазина. Минимум четыре состояния: пустая, с товарами, оформляется, оплачена.</p>
+    <p>Для каждого перехода запиши, что проверяешь. Отдельно выпиши <b>три запрещённых перехода</b> — те, которые система обязана не дать сделать.</p>
+    <p>Схему нарисуй от руки, сфотографируй и положи в <code class="i">notes/images/</code>. <b>[Схема]</b></p>
+  </div>
+
+  <details>
+    <summary>Подсказка про запрещённые переходы</summary>
+    <p>Думай про то, что было бы выгодно недобросовестному пользователю: изменить состав заказа после оплаты, отменить доставленный заказ, оформить пустую корзину. Каждая такая дырка в реальном магазине стоит денег.</p>
+  </details>
+
+  <div class="box def">
+    <div class="title">Часть 3 — посчитать комбинации</div>
+    <p>У формы регистрации четыре параметра: страна (5 значений), валюта (3), язык интерфейса (4), тип аккаунта (2).</p>
+    <p>Посчитай общее число комбинаций. Напиши одним абзацем, почему проверять их все нецелесообразно и какую технику ты применишь вместо этого.</p>
+  </div>
+
+  <div class="box note">
+    <div class="title">Что проверить в своей работе</div>
+    <ul>
+      <li>В таблице решений ровно 8 столбцов до сокращения, все разные.</li>
+      <li>Для каждого столбца указан результат, а не прочерк.</li>
+      <li>Среди переходов корзины есть и разрешённые, и запрещённые.</li>
+      <li>Число комбинаций в части 3 посчитано умножением, а не сложением.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 7 -->
+<div class="pane" data-title="Тест">
+  <h2>Тест</h2>
+  <p class="sub">10 вопросов</p>
+  <div id="quiz"></div>
+  <div class="score" id="score">Отвечено: 0 из 10</div>
+</div>
+
+<!-- 8 -->
+<div class="pane" data-title="Итоги">
+  <h2>Закрываем день</h2>
+
+  <div class="box note">
+    <div class="title">В тетрадь</div>
+    <ul>
+      <li>Таблица решений: определение, как строить, правило заполнения столбцов половинами и четвертями.</li>
+      <li>Состояния и переходы: определение, где применяется, и что запрещённые переходы важнее разрешённых.</li>
+      <li>Pairwise: идея и название инструмента.</li>
+      <li>Таблица «какая техника когда» — четыре строки с вкладки про pairwise.</li>
+    </ul>
+  </div>
+
+  <div class="box card">
+    <div class="title">На карточки — четыре новых, в блок C</div>
+    <ol>
+      <li>Что такое таблица решений и когда применяется?</li>
+      <li>Сколько комбинаций даёт таблица из 4 двоичных условий?</li>
+      <li>Когда применяют тестирование состояний и переходов?</li>
+      <li>Что такое попарное тестирование и зачем оно нужно?</li>
+    </ol>
+  </div>
+
+  <div class="box note">
+    <div class="title">В errors-log.md — не про код, а про тестирование</div>
+    <ul>
+      <li>Баг может жить в пересечении двух условий, каждое из которых по отдельности работает.</li>
+      <li>Баг может зависеть от истории действий: те же данные после сброса формы дают другой результат.</li>
+      <li>Проверка полей по одному не находит ни того, ни другого.</li>
+    </ul>
+  </div>
+
+  <h3>Коммит</h3>
+  <div class="term"><span>git add .</span><button onclick="cp(this,'git add .')">Копировать</button></div>
+  <div class="term"><span>git commit -m "day09: decision table, state transitions, pairwise"</span><button onclick="cp(this,'git commit -m &quot;day09: decision table, state transitions, pairwise&quot;')">Копировать</button></div>
+  <div class="term"><span>git push</span><button onclick="cp(this,'git push')">Копировать</button></div>
+
+  <div class="box def">
+    <div class="title">Завтра — день 10</div>
+    <p>Чек-лист на форму авторизации, 40+ пунктов, полностью твоими руками. И ретро второй недели: что научилась делать, где застряла, что менять.</p>
+  </div>
+
+  <h3>Что прислать</h3>
+  <ul>
+    <li><b>Сколько багов нашла до разбора и какие именно.</b> Это главная цифра дня.</li>
+    <li>Журнал находок — как записала, в таком виде и присылай.</li>
+    <li>Три части задания.</li>
+    <li>Результат теста.</li>
+  </ul>
+</div>
+
+</div>
+
+<script>
+/* ===== buggy order form ===== */
+var cachedDiscount=null, cachedPromo=null;
+
+function calcOrder(){
+  var res=document.getElementById('result');
+  res.style.display='block';res.className='';
+  var priceRaw=document.getElementById('f-price').value;
+  var qtyRaw=document.getElementById('f-qty').value;
+  var promo=document.getElementById('f-promo').value;
+  var dlv=document.querySelector('input[name=dlv]:checked').value;
+
+  var price=parseFloat(priceRaw.replace(',','.'));
+  var qty=parseInt(qtyRaw,10);
+
+  if(isNaN(price)||price<=0){res.className='err';res.textContent='Ошибка: цена должна быть положительным числом';return;}
+  if(isNaN(qty)){res.className='err';res.textContent='Ошибка: количество должно быть целым числом';return;}
+  if(qty<0||qty>99){res.className='err';res.textContent='Ошибка: количество от 1 до 99';return;}
+
+  var sum=price*qty;
+
+  var discount=0;
+  if(promo===''){
+    cachedDiscount=null;cachedPromo=null;
+  }else if(promo==='SALE10'){
+    if(dlv==='pickup'){
+      discount=0;
+    }else if(cachedPromo===promo&&cachedDiscount!==null){
+      discount=cachedDiscount;
+    }else{
+      discount=sum*0.1;
+      cachedDiscount=discount;cachedPromo=promo;
+    }
+  }
+
+  var delivery=0;
+  if(dlv==='courier'){delivery=(sum>=4999)?0:300;}
+
+  var total=sum-discount+delivery;
+  res.textContent=
+    'Сумма товаров: '+r2(sum)+' руб\n'+
+    'Скидка: '+r2(discount)+' руб\n'+
+    'Доставка: '+r2(delivery)+' руб\n'+
+    '————————————\n'+
+    'Итого: '+r2(total)+' руб';
+}
+function r2(n){return Math.round(n*100)/100;}
+function resetOrder(){
+  document.getElementById('f-price').value='500';
+  document.getElementById('f-qty').value='2';
+  document.getElementById('f-promo').value='';
+  document.querySelector('input[name=dlv][value=courier]').checked=true;
+  cachedDiscount=null;cachedPromo=null;
+  var res=document.getElementById('result');res.style.display='none';res.textContent='';
+}
+
+/* ===== tabs ===== */
+var panes=[].slice.call(document.querySelectorAll('.pane'));
+var tabs=document.getElementById('tabs');
+panes.forEach(function(p,i){
+  var b=document.createElement('button');
+  b.innerHTML='<span class="n">'+i+'</span>'+p.dataset.title;
+  b.onclick=function(){go(i);};
+  tabs.appendChild(b);
+  var nav=document.createElement('div');nav.className='nav';
+  var prev=document.createElement('button');prev.textContent='← Назад';
+  prev.onclick=function(){go(i-1);};if(i===0)prev.disabled=true;
+  var next=document.createElement('button');next.className='next';
+  next.textContent=(i===panes.length-1)?'В начало':'Дальше →';
+  next.onclick=function(){go(i===panes.length-1?0:i+1);};
+  nav.appendChild(prev);nav.appendChild(next);p.appendChild(nav);
+});
+function go(i){
+  panes.forEach(function(p,j){p.classList.toggle('on',i===j);});
+  [].forEach.call(tabs.children,function(b,j){b.classList.toggle('on',i===j);});
+  tabs.children[i].scrollIntoView({block:'nearest',inline:'center'});
+  window.scrollTo(0,0);
+}
+go(0);
+
+function cp(btn,text){
+  navigator.clipboard.writeText(text).then(function(){
+    var o=btn.textContent;btn.textContent='Скопировано';
+    setTimeout(function(){btn.textContent=o;},1200);
+  });
+}
+
+/* ===== quiz ===== */
+var QS=[
+{q:'Когда применяют таблицу решений?',
+ o:['Когда нужно проверить одно поле на разные значения','Когда результат зависит от сочетания нескольких условий','Когда полей в форме больше десяти','Когда нет требований'],a:1,
+ e:'Классы и границы работают с одним полем. Таблица решений нужна там, где условия влияют на результат вместе — как промокод, сумма и способ доставки в сегодняшней форме.'},
+
+{q:'Сколько комбинаций даёт таблица решений с четырьмя двоичными условиями?',
+ o:['8','16','4','32'],a:1,
+ e:'Два в четвёртой степени. Каждое новое условие удваивает таблицу: 3 условия — 8, 4 — 16, 5 — 32.'},
+
+{q:'В таблице решений часть столбцов даёт одинаковый результат независимо от значения второго и третьего условия. Что с ними делают?',
+ o:['Удаляют как лишние','Объединяют в один столбец, в незначимых ячейках ставят прочерк','Оставляют как есть, сокращать нельзя','Переносят в отдельную таблицу'],a:1,
+ e:'Это называется сокращением таблицы. Важно: сначала выписывают все комбинации, и только потом сокращают — иначе легко выбросить нужную.'},
+
+{q:'Баг проявляется только при сочетании «промокод введён» и «выбран самовывоз». Каждое условие по отдельности работает. Какой техникой его находят?',
+ o:['Граничные значения','Классы эквивалентности','Таблица решений','Исследовательское тестирование'],a:2,
+ e:'Проверка полей по одному такой баг не находит принципиально. Таблица решений перебирает комбинации механически, и нужная попадает в список сама.'},
+
+{q:'Что такое состояние системы в контексте тестирования?',
+ o:['Текущие значения в полях формы','Положение системы, которое влияет на её поведение и зависит от предыдущих действий','Статус сервера — работает или нет','Версия сборки'],a:1,
+ e:'Ключевое слово — предыдущие действия. Если одни и те же данные дают разный результат в зависимости от истории, значит у системы есть состояние.'},
+
+{q:'Форма посчитала скидку, потом пользователь изменил количество — скидка осталась прежней. После сброса формы и повторного ввода тех же данных всё верно. Что это за баг?',
+ o:['Ошибка на единицу','Баг состояния: результат зависит от истории действий','Баг валидации поля количества','Флакающий тест'],a:1,
+ e:'Данные одинаковые, результат разный — значит дело в том, что система запомнила. Такие баги ловит тестирование состояний и переходов.'},
+
+{q:'Что важнее проверять в тестировании состояний и переходов?',
+ o:['Только разрешённые переходы, они основной сценарий','И разрешённые, и запрещённые — что система не даёт сделать недопустимое','Только начальное и конечное состояния','Количество состояний'],a:1,
+ e:'Разрешённые переходы обычно работают, их пишут в первую очередь. Баги живут в том, что запрещённые переходы оказываются возможны: отменить доставленный заказ, изменить оплаченный.'},
+
+{q:'Форма имеет 4 параметра со значениями 5, 3, 4 и 2. Сколько всего комбинаций?',
+ o:['14','120','60','24'],a:1,
+ e:'Значения перемножаются: 5 × 3 × 4 × 2 = 120. Именно поэтому полный перебор быстро становится нереальным.'},
+
+{q:'На чём основана идея попарного тестирования?',
+ o:['На том, что тестировать надо парами тестировщиков','На том, что большинство багов вызывается одним параметром или парой параметров','На том, что все параметры равнозначны','На случайной выборке комбинаций'],a:1,
+ e:'Отсюда вывод: достаточно набора, где каждая пара значений встречается хотя бы раз. Это сокращает сотни комбинаций до десятков.'},
+
+{q:'Чем ловится баг «доставка становится бесплатной при сумме 4999 вместо 5000»?',
+ o:['Таблицей решений','Граничными значениями','Состояниями и переходами','Попарным тестированием'],a:1,
+ e:'Это одно условие и один порог — классическая ошибка на единицу, техника дня 7. Не всё требует сложных техник: сначала границы, потом комбинации.'}
+];
+var answered=0,box=document.getElementById('quiz');
+QS.forEach(function(it,idx){
+  var d=document.createElement('div');d.className='q';
+  d.innerHTML='<div class="qn">Вопрос '+(idx+1)+'</div><div>'+it.q+'</div>';
+  var opts=document.createElement('div');opts.className='opts';
+  it.o.forEach(function(t,i){
+    var b=document.createElement('button');b.className='opt';b.textContent=t;
+    b.onclick=function(){
+      if(d.dataset.done)return;
+      d.dataset.done='1';answered++;
+      opts.querySelectorAll('.opt')[it.a].classList.add('right');
+      if(i!==it.a)b.classList.add('wrong');
+      d.querySelector('.expl').style.display='block';
+      document.getElementById('score').textContent='Отвечено: '+answered+' из '+QS.length;
+    };
+    opts.appendChild(b);
+  });
+  d.appendChild(opts);
+  var e=document.createElement('div');e.className='expl';e.textContent=it.e;
+  d.appendChild(e);box.appendChild(d);
+});
+</script>
+</body>
+</html>

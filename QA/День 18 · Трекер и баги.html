@@ -1,0 +1,337 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>День 18 · Трекер и баги</title>
+<style>
+/* Оформление дня 13: светлая бумага, вкладки сверху, тёмные блоки кода, цветные плашки по роли */
+:root{
+  --bg:#eef1f2; --paper:#fff; --ink:#1b2430; --soft:#4e5a67; --line:#d7dde0;
+  --blue:#1f5fa9; --blue-bg:#e9f1fa;
+  --red:#b0352b; --red-bg:#fbecea;
+  --green:#276f52; --green-bg:#e8f4ee;
+  --amber:#9a6a00; --amber-bg:#fbf2df;
+  --violet:#5e4b8b; --violet-bg:#efebf8;
+  --code-bg:#0f1720; --code-fg:#dce7f0; --code-cm:#8ea2b4;
+  --chip:#eef1f3; --th:#f2f5f6; --soft-bg:#f6f8f9; --hover:#eaf0f3;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.62;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding-inline:18px;padding-block:0 60px}
+header{padding:34px 0 14px}
+.day{font-size:14px;color:var(--soft)}
+h1{font-size:33px;line-height:1.15;margin:.2em 0 .3em;text-wrap:balance}
+.lead{color:var(--soft);margin:0;max-width:62ch}
+
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);padding:10px 0 8px;
+  display:flex;gap:6px;overflow-x:auto;border-bottom:1px solid var(--line)}
+.tabs button{flex:0 0 auto;background:var(--paper);border:1px solid var(--line);border-radius:8px;
+  padding:8px 13px;font:inherit;font-size:14.5px;color:var(--soft);cursor:pointer;white-space:nowrap}
+.tabs button.on{background:var(--ink);color:var(--paper);border-color:var(--ink);font-weight:600}
+.tabs button .n{opacity:.55;margin-right:6px}
+button:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+.pane{display:none;background:var(--paper);border:1px solid var(--line);border-top:0;
+  border-radius:0 0 12px 12px;padding:28px 30px 34px}
+.pane.on{display:block}
+.pane h2{margin:0 0 6px;font-size:26px;line-height:1.2;text-wrap:balance}
+.pane .sub{color:var(--soft);margin:0 0 20px;font-size:15.5px}
+h3{font-size:19.5px;margin:28px 0 8px}
+h4{font-size:17px;margin:20px 0 6px}
+p{margin:12px 0}
+ul,ol{padding-left:24px}li{margin:6px 0}
+code.i{background:var(--chip);border:1px solid var(--line);border-radius:4px;padding:1px 5px;
+ font-family:Consolas,monospace;font-size:.92em}
+pre{background:var(--code-bg);color:var(--code-fg);border-radius:9px;padding:15px 17px;overflow-x:auto;
+ font-family:Consolas,monospace;font-size:14.5px;line-height:1.55;margin:14px 0}
+pre .cm{color:var(--code-cm)}
+pre.light{background:var(--soft-bg);color:var(--ink);border:1px solid var(--line)}
+
+.box{border-left:4px solid;border-radius:0 8px 8px 0;padding:14px 18px;margin:18px 0}
+.box .title{font-weight:700;margin-bottom:4px}
+.def{border-color:var(--blue);background:var(--blue-bg)} .def .title{color:var(--blue)}
+.trap{border-color:var(--red);background:var(--red-bg)} .trap .title{color:var(--red)}
+.note{border-color:var(--green);background:var(--green-bg)} .note .title{color:var(--green)}
+.card{border-color:var(--amber);background:var(--amber-bg)} .card .title{color:var(--amber)}
+.task{border-color:var(--violet);background:var(--violet-bg)} .task .title{color:var(--violet)}
+.box p:first-of-type{margin-top:2px}.box p:last-child{margin-bottom:2px}
+
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15.5px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--th);font-weight:600}
+td{font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto}
+.mono{font-family:Consolas,monospace;white-space:nowrap}
+
+details{border:1px solid var(--line);background:var(--soft-bg);border-radius:8px;padding:10px 14px;margin:10px 0}
+summary{cursor:pointer;font-weight:600;color:var(--violet)}
+details[open] summary{margin-bottom:8px}
+.mark{display:inline-block;font-size:12.5px;font-weight:700;border-radius:99px;padding:1px 9px;margin-left:6px;vertical-align:1px}
+.m-ok{background:var(--green-bg);color:var(--green)}
+.m-half{background:var(--amber-bg);color:var(--amber)}
+.yours{border-left:3px solid var(--line);padding:2px 0 2px 12px;color:var(--soft);font-size:15.5px;margin:8px 0}
+
+.q{border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:16px 0}
+.qn{font-weight:700;margin-bottom:6px}
+.opts{display:grid;gap:8px;margin-top:12px}
+.opt{text-align:left;background:var(--soft-bg);border:1px solid var(--line);border-radius:8px;
+ padding:10px 14px;cursor:pointer;font:inherit;font-size:16px;color:var(--ink)}
+.opt:hover{background:var(--hover)}
+.opt.right{background:var(--green-bg);border-color:var(--green);font-weight:600}
+.opt.wrong{background:var(--red-bg);border-color:var(--red)}
+.expl{margin-top:12px;padding:12px 14px;background:var(--soft-bg);border-radius:8px}
+.score{position:sticky;bottom:env(safe-area-inset-bottom,0px);background:var(--paper);border:1px solid var(--line);
+ border-radius:10px;padding:12px 18px;margin-top:18px;font-weight:600;font-variant-numeric:tabular-nums}
+
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:34px;padding-top:18px;border-top:1px solid var(--line)}
+.nav button{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 16px;
+ font:inherit;cursor:pointer;color:var(--ink)}
+.nav .next{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.nav button[disabled]{opacity:.35;cursor:default}
+@media(max-width:640px){.wrap{padding-inline:16px}.pane{padding:20px 17px 26px}h1{font-size:27px}pre{font-size:13.5px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+<style>
+.simple{border:1px solid var(--line);background:var(--soft-bg);border-radius:10px;padding:14px 18px;margin:16px 0}
+.simple .title{font-weight:700;margin-bottom:4px;color:var(--ink)}
+.steps{counter-reset:st;list-style:none;padding-left:0}
+.steps>li{counter-increment:st;position:relative;padding-left:38px;margin:12px 0}
+.steps>li::before{content:counter(st);position:absolute;left:0;top:1px;width:26px;height:26px;border-radius:50%;
+  background:var(--ink);color:var(--paper);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.done{border:1px dashed var(--green);border-radius:8px;padding:10px 14px;margin:14px 0;font-size:15.5px}
+.done b{color:var(--green)}
+.req{border:1px solid var(--line);border-radius:10px;background:var(--soft-bg);padding:16px 20px;margin:16px 0}
+.req p{margin:9px 0}
+.req .rn{font-weight:700;font-family:Consolas,monospace;margin-right:6px}
+.ask{display:grid;gap:8px;margin:10px 0}
+.ask label{display:flex;gap:8px;align-items:flex-start;font-size:16px;cursor:pointer}
+.ask input{margin-top:5px}
+</style>
+<div class="wrap">
+
+<header>
+  <div class="day">День 18 · суббота, 10 октября · практика, без новой темы</div>
+  <h1>Трекер и баги на живых сайтах</h1>
+  <p class="lead">Суббота — день рук. Заводим трекер, переносим туда старые репорты и ищем пять новых багов на сайтах, которые специально сделаны с багами для тренировки. Итог дня — баги, которые можно показать работодателю.</p>
+</header>
+
+<div class="box def">
+  <div class="title">План · около 3:20, один заход с перерывом посередине</div>
+  <p>Карточки 15 → трекер 40 → перенос репортов 20 → <b>перерыв 20</b> → охота на сайтах 75 → доделки 30 → ретро 20.</p>
+</div>
+
+<div class="tabs" id="tabs"></div>
+
+<!-- 0 -->
+<div class="pane" data-title="Карточки">
+  <h2>Карточки</h2>
+  <p class="sub">15 минут</p>
+  <ol class="steps">
+    <li><b>B · Виды и уровни</b>, обычный прогон по ядру. Остановись на 9 карточках — это первая половина блока.</li>
+    <li><b>O · Функции</b> — новый блок, галочка «Знакомство». 4 карточки, около 3 минут.</li>
+  </ol>
+  <p>Скачай новую версию <code class="i">flashcards-interview.html</code> — там появились блоки O и P.</p>
+  <div class="done"><b>Готово, когда</b> записала счёт B: сколько ядер из 9 уверенно.</div>
+</div>
+
+<!-- 1 -->
+<div class="pane" data-title="Трекер">
+  <h2>Заводим баг-трекер</h2>
+  <p class="sub">40 минут</p>
+
+  <div class="simple">
+    <div class="title">Простыми словами</div>
+    <p>Баг-трекер — общая таблица багов команды. У каждого бага есть номер, автор, исполнитель и статус, который меняется по жизненному циклу из дня 11. Баги в тетради — это заметки. Баги в трекере — это работа, которую видят другие.</p>
+  </div>
+
+  <h3>Вариант 1 · Jira</h3>
+  <p>Самый распространённый трекер на рынке. Бесплатный тариф — до 10 человек.</p>
+  <ol class="steps">
+    <li>Открой <a href="https://www.atlassian.com/software/jira/free" target="_blank" rel="noopener">atlassian.com/software/jira/free</a> и зарегистрируйся по email.</li>
+    <li>Создай проект. Шаблон — из раздела Software development, например Kanban. Название <b>QA Practice</b>, ключ <b>QAP</b>. Баги будут называться QAP-1, QAP-2…</li>
+    <li>Создай задачу и выбери тип <b>Bug</b>. Посмотри, какие поля есть: Summary, Description, Priority, Labels, Attachment.</li>
+    <li>Отдельного поля «серьёзность» в бесплатной Jira нет. Ставь её меткой в Labels: <code class="i">severity-critical</code>, <code class="i">severity-major</code>, <code class="i">severity-minor</code>, <code class="i">severity-trivial</code>.</li>
+  </ol>
+
+  <div class="box trap">
+    <div class="title">Если регистрация в Jira не проходит</div>
+    <p>Из Беларуси регистрация в Atlassian может не пройти: компания ограничила работу в регионе. Не трать на это больше 10 минут — переходи к варианту 2.</p>
+  </div>
+
+  <h3>Вариант 2 · GitHub Issues</h3>
+  <p>Трекер, встроенный в каждый репозиторий GitHub. У тебя он уже есть, и баги в нём видны в портфолио.</p>
+  <ol class="steps">
+    <li>Открой свой репозиторий <code class="i">qa-learning</code> → вкладка <b>Issues</b>. Если вкладки нет: Settings → General → Features → включи Issues.</li>
+    <li>Issues → <b>Labels</b> → создай метки: <code class="i">bug</code>, <code class="i">severity: critical</code>, <code class="i">severity: major</code>, <code class="i">severity: minor</code>, <code class="i">severity: trivial</code>, <code class="i">priority: high</code>, <code class="i">priority: medium</code>, <code class="i">priority: low</code>.</li>
+    <li>New issue — это новый баг. Заголовок — в Title, всё остальное — в описание по шаблону ниже. Скриншот можно просто перетащить в описание.</li>
+  </ol>
+
+  <h3>Шаблон описания бага</h3>
+  <p>Вставляй в Description или в тело issue. Это те же поля, что в твоих репортах дня 11:</p>
+<pre class="light">**Предусловие:**
+
+**Шаги воспроизведения:**
+1.
+2.
+
+**Фактический результат:**
+
+**Ожидаемый результат:**
+
+**Окружение:** браузер и версия, ОС, сайт
+
+**Вложения:** скриншот</pre>
+
+  <div class="done"><b>Готово, когда</b> трекер создан, метки серьёзности и приоритета заведены, ты знаешь, где какое поле.</div>
+</div>
+
+<!-- 2 -->
+<div class="pane" data-title="Перенос">
+  <h2>Переносим старые репорты</h2>
+  <p class="sub">20 минут</p>
+  <p>У тебя есть репорты в тетради и в <code class="i">manual/</code>: два из дня 11 и один из дня 13 — комментарий с паролем админа. Перенеси их в трекер.</p>
+  <ol class="steps">
+    <li>Один репорт — один баг в трекере.</li>
+    <li>Заодно поправь то, что было в разборе дня 11: заголовок по формуле «что — где — при каких условиях», окружение, обоснование серьёзности.</li>
+    <li>Баг с паролем админа в комментарии — серьёзность <b>critical</b>. Вспомни правило: серьёзность меряется тем, что может сделать нашедший, а не тем, работает ли система.</li>
+  </ol>
+  <div class="done"><b>Готово, когда</b> в трекере три бага, у каждого метки серьёзности и приоритета.</div>
+</div>
+
+<!-- 3 -->
+<div class="pane" data-title="Охота на сайтах">
+  <h2>Пять новых багов</h2>
+  <p class="sub">75 минут · перед этим перерыв 20 минут</p>
+
+  <p>Два учебных сайта, которые сделаны с багами нарочно. Требований к ним нет — и это главное отличие от наших форм.</p>
+
+  <div class="simple">
+    <div class="title">Откуда брать ожидаемый результат, если требований нет</div>
+    <p>Из <b>сравнения</b>: как работает то же самое в другом месте сайта или под другим пользователем. Из <b>здравого смысла</b>: кнопка «Сортировать по цене» должна сортировать по цене. Из <b>других сайтов</b>: так ведёт себя любой интернет-магазин. Такой источник ожидаемого результата называется <b>оракулом</b>. В репорте прямо пишешь, на что опираешься.</p>
+  </div>
+
+  <h3>Сайт 1 · Sauce Demo</h3>
+  <p><a href="https://www.saucedemo.com" target="_blank" rel="noopener">saucedemo.com</a> — учебный интернет-магазин. Логины написаны прямо на странице входа, пароль у всех <code class="i">secret_sauce</code>.</p>
+  <ol class="steps">
+    <li>Войди как <code class="i">standard_user</code> и пройди путь покупки: каталог → сортировка → карточка товара → корзина → оформление. Запомни, как всё работает.</li>
+    <li>Выйди и войди как <code class="i">problem_user</code>. Пройди тот же путь. Всё, что работает иначе, чем у standard_user, — кандидат в баг. Оракул — поведение standard_user.</li>
+    <li>Обязательно пройди оформление заказа до конца: заполни все поля формы.</li>
+  </ol>
+
+  <h3>Сайт 2 · Buggy Cars Rating</h3>
+  <p><a href="https://buggy.justtestit.org" target="_blank" rel="noopener">buggy.justtestit.org</a> — сайт оценки автомобилей. Зарегистрируйся и проверь: регистрацию — поля, границы, пароль; вход; профиль; голосование и комментарии.</p>
+  <p>Здесь пригодится всё, что ты знаешь про формы: классы, границы, F12, Console, Network.</p>
+
+  <div class="box task">
+    <div class="title">Правила охоты</div>
+    <ul>
+      <li><b>Один баг — один репорт.</b> Два симптома в одном заголовке через «и» — скорее всего, два бага.</li>
+      <li><b>Сначала воспроизведи ещё раз</b>, потом пиши. Баг, который не повторился, — заметка, не репорт.</li>
+      <li><b>«Мне не нравится» — не баг.</b> Нужен оракул: с чем сравниваешь.</li>
+      <li><b>F12 открыт всё время.</b> Красная строка в Console — сразу в репорт.</li>
+      <li><b>Скриншот — к каждому.</b></li>
+    </ul>
+  </div>
+
+  <div class="done"><b>Готово, когда</b> в трекере пять новых багов, минимум два с каждого сайта. Шаги повторяются по написанному, у каждого бага есть оракул в ожидаемом результате, окружение и метки.</div>
+</div>
+
+<!-- 4 -->
+<div class="pane" data-title="Доделки">
+  <h2>Доделки недели</h2>
+  <p class="sub">30 минут</p>
+  <p>Суббота — место для всего, что не закрылось в будни. Удваивать понедельник не нужно.</p>
+  <ul>
+    <li>Второй заход дня 17: Python-локаторы и TC-004, TC-005 — если не сделаны.</li>
+    <li>Две строки таблицы локаторов: подпись «Запомнить меня» и «Войти» с причиной.</li>
+    <li>Коммит всего, что накопилось за неделю.</li>
+  </ul>
+  <p>Если всё закрыто — потрать время на шестой баг.</p>
+</div>
+
+<!-- 5 -->
+<div class="pane" data-title="Ретро">
+  <h2>Ретро недели 4</h2>
+  <p class="sub">20 минут · дни 15–18 · первая неделя нового темпа</p>
+
+  <div class="scroll"><table>
+    <tr><th>День</th><th>Тема</th><th>Итог</th></tr>
+    <tr><td>15</td><td>Требования, тест-план</td><td>7 · тест 9/9</td></tr>
+    <tr><td>16</td><td>Функции</td><td>7 · карточки 4/12 → поменяли формат</td></tr>
+    <tr><td>17</td><td>HTML, CSS, локаторы</td><td>карточки 10/10 · чтение кода 4/4 · тест 7/8 · остальное ждёт</td></tr>
+    <tr><td>18</td><td>Трекер и баги</td><td>сегодня</td></tr>
+  </table></div>
+
+  <h3>Что сдвинулось</h3>
+  <ul>
+    <li><b>Чтение кода:</b> 3/4 → 2/4 → 3/4 → 4/4. Таблица на бумаге работает.</li>
+    <li><b>Карточки:</b> с ядром и знакомством — 10 из 10 вместо 4 из 12.</li>
+    <li><b>Запись по новому ключу</b> — после двух ошибок подряд третий раз верно.</li>
+  </ul>
+
+  <h3>Что держит</h3>
+  <ul>
+    <li><b>Свои проверки не запускаются до отправки.</b> Три бага за день 16 поймала бы твоя же таблица или строка с <code class="i">==</code>.</li>
+    <li><b>Находки без «почему».</b> Что вышло — есть, почему это плохо — дописывается после подсказки.</li>
+    <li><b>Пробел в селекторе</b> — две ошибки в DevTools и одна в тесте за один вечер.</li>
+  </ul>
+
+  <h3>Твоя часть — три вопроса</h3>
+  <ol class="steps">
+    <li><b>Новый темп.</b> Пять часов в два захода — как по ощущениям? Хватает ли перерыва? Где устаёшь?</li>
+    <li><b>Самое непонятное за неделю</b> — конкретно: вкладка, абзац, задание.</li>
+    <li><b>Одна вещь</b>, которую поменять в формате дня.</li>
+  </ol>
+  <p style="color:var(--soft);font-size:15.5px">CP1 — в следующую субботу, 17 октября. Тогда и решим про темп окончательно.</p>
+</div>
+
+<!-- 6 -->
+<div class="pane" data-title="Итоги">
+  <h2>Что прислать</h2>
+  <p class="sub">5 минут</p>
+  <ol>
+    <li>Счёт карточек B.</li>
+    <li>Какой трекер завела: Jira или GitHub Issues.</li>
+    <li>Пять новых багов — текстом или скриншотами из трекера.</li>
+    <li>Ответы ретро.</li>
+  </ol>
+  <div class="box task">
+    <div class="title">[Репо]</div>
+<pre>git add .
+git commit -m "День 18: трекер, перенос репортов, баги на Sauce Demo и Buggy Cars"
+git push</pre>
+  </div>
+  <h3>Дальше</h3>
+  <p>Понедельник, день 19 — функции, часть 2, и JSON. Начинаем первый мини-проект: генератор тестовых данных.</p>
+</div>
+
+</div>
+
+<script>
+var panes=[].slice.call(document.querySelectorAll('.pane'));
+var tabs=document.getElementById('tabs');
+panes.forEach(function(p,i){
+  var b=document.createElement('button');b.type='button';
+  b.innerHTML='<span class="n">'+i+'</span>'+p.dataset.title;
+  b.onclick=function(){go(i);};
+  tabs.appendChild(b);
+  var nav=document.createElement('div');nav.className='nav';
+  var prev=document.createElement('button');prev.type='button';prev.textContent='← Назад';
+  prev.onclick=function(){go(i-1);};if(i===0)prev.disabled=true;
+  var next=document.createElement('button');next.type='button';next.className='next';
+  next.textContent=(i===panes.length-1)?'В начало':'Дальше →';
+  next.onclick=function(){go(i===panes.length-1?0:i+1);};
+  nav.appendChild(prev);nav.appendChild(next);p.appendChild(nav);
+});
+function go(i){
+  panes.forEach(function(p,j){p.classList.toggle('on',i===j);});
+  [].forEach.call(tabs.children,function(b,j){b.classList.toggle('on',i===j);});
+  try{tabs.children[i].scrollIntoView({block:'nearest',inline:'center'});}catch(e){}
+  try{localStorage.setItem('d18tab',String(i));}catch(e){}
+  window.scrollTo(0,0);
+}
+var start=0;
+try{var s=parseInt(localStorage.getItem('d18tab'),10);if(s>=0&&s<panes.length)start=s;}catch(e){}
+go(start);
+</script>
+
+</body></html>

@@ -1,0 +1,291 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Роудмап · после дня 19</title>
+<style>
+/* Карта по роудмапу в тёмной версии оформления: карточки этапов, таблица недель, плашки по роли */
+:root{
+  --bg:#0d1116; --paper:#151b22; --ink:#e6ebf0; --soft:#9aa6b2; --line:#2a333d; --th:#1a222b; --soft-bg:#10161c;
+  --blue:#7fb2ee; --blue-bg:#142235; --red:#f0928a; --red-bg:#2b1716;
+  --green:#72c79f; --green-bg:#10251c; --amber:#e7bb62; --amber-bg:#2a2210;
+  --violet:#b8a8ea; --violet-bg:#1e1a2f; --track:#222a33;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.6;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:920px;margin:0 auto;padding-inline:18px;padding-block:0 70px}
+header{padding:34px 0 10px}
+.kicker{font-size:14px;color:var(--soft)}
+h1{font-size:33px;line-height:1.15;margin:.2em 0 .3em;text-wrap:balance}
+.lead{color:var(--soft);margin:0;max-width:64ch}
+h2{font-size:23px;margin:42px 0 6px;text-wrap:balance}
+h3{font-size:18px;margin:24px 0 6px}
+p{margin:12px 0}
+b{color:#fff}
+ul,ol{padding-left:22px}li{margin:5px 0}
+code{background:#1d252e;border:1px solid var(--line);border-radius:4px;padding:1px 5px;font-family:Consolas,monospace;font-size:.9em}
+
+.box{border-left:4px solid;border-radius:0 8px 8px 0;padding:14px 18px;margin:18px 0}
+.box .t{font-weight:700;margin-bottom:4px}
+.def{border-color:var(--blue);background:var(--blue-bg)} .def .t{color:var(--blue)}
+.note{border-color:var(--green);background:var(--green-bg)} .note .t{color:var(--green)}
+.warn{border-color:var(--red);background:var(--red-bg)} .warn .t{color:var(--red)}
+.card{border-color:var(--amber);background:var(--amber-bg)} .card .t{color:var(--amber)}
+.box p:first-of-type{margin-top:2px}.box p:last-child{margin-bottom:2px}
+
+.stage{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin:12px 0}
+.stage.done{opacity:.6}
+.shead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.stitle{font-size:17.5px;font-weight:700}
+.tag{font-size:12.5px;padding:2px 10px;border-radius:99px;white-space:nowrap;font-weight:600}
+.t-done{background:var(--green-bg);color:var(--green)}
+.t-now{background:var(--amber-bg);color:var(--amber)}
+.t-next{background:var(--blue-bg);color:var(--blue)}
+.sdesc{color:var(--soft);font-size:15.5px;margin:6px 0 0}
+.prog{height:7px;background:var(--track);border-radius:99px;margin:10px 0 0;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--green)}
+.prog.now i{background:var(--amber)}
+
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15.5px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--th);font-weight:600}
+td{font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto}
+tr.rest td{background:var(--green-bg)}
+tr.cp td{background:var(--amber-bg)}
+tr.today td{background:var(--violet-bg)}
+tr.sat td:first-child{font-weight:700}
+.pill{display:inline-block;font-size:12.5px;padding:1px 9px;border-radius:99px;font-weight:700;white-space:nowrap}
+.p-cp{background:var(--amber);color:var(--bg)}
+.p-rest{background:var(--green);color:var(--bg)}
+.p-now{background:var(--violet);color:var(--bg)}
+.p-shift{background:var(--red-bg);color:var(--red);border:1px solid var(--red)}
+
+.cp1{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0}
+.cp1 > div{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 16px;min-width:0}
+.cp1 .lbl{font-size:13.5px;color:var(--soft)}
+.cp1 .big{font-size:26px;font-weight:700;line-height:1.2;margin:2px 0 4px;font-variant-numeric:tabular-nums}
+.cp1 .big small{font-size:15px;color:var(--soft);font-weight:400}
+.cp1 p{margin:0;font-size:14.5px;color:var(--soft)}
+.ok{color:var(--green)} .risk{color:var(--amber)} .bad{color:var(--red)}
+@media(max-width:640px){h1{font-size:26px}}
+</style>
+
+<div class="wrap">
+
+<header>
+  <div class="kicker">Карта по роудмапу · пересобрана после дня 19 · вторник, 13 октября 2026</div>
+  <h1>Роудмап после дня 19</h1>
+  <p class="lead">Полная карта до выхода на рынок в новом темпе — около 26 часов в неделю. Этапы целиком, прогноз к CP1, расписание по дням до разгрузки, все 33 недели, чекпоинты и портфолио к маю.</p>
+</header>
+
+<div class="box def">
+  <div class="t">Короткий ответ</div>
+  <p><b>Теория тестирования</b> почти закрыта: этап 1 — около 90%, остались процессы (сегодня) и куки с кросс-браузерным (в четверг). <b>Python</b> отстаёт от карты нового темпа примерно на неделю: модули, файлы и исключения переезжают с недели 5 на неделю 6. Запаса в карте хватает: <b>CP2 остаётся 28 ноября</b>, выход на рынок — май 2027.</p>
+  <p><b>CP1 остаётся в субботу, 17 октября</b> — это день практики, без новой темы, он для контрольной и подходит лучше пятницы. Кейсов к нему будет около 15 из 20, остальное честно фиксируем и добираем на неделе 6.</p>
+</div>
+
+<h2>Этапы целиком</h2>
+<p>Девять этапов, от сегодняшнего дня до выхода на рынок. У каждого — сроки, что входит и что остаётся после него в портфолио.</p>
+
+<div class="stage done">
+  <div class="shead"><span class="stitle">Этап 0 · Окружение</span><span class="tag t-done">закрыт</span></div>
+  <div class="prog"><i style="width:100%"></i></div>
+</div>
+
+<div class="stage">
+  <div class="shead"><span class="stitle">Этап 1 · Теория и ручное тестирование</span><span class="tag t-now">~90% · до чт 15 окт</span></div>
+  <p class="sdesc"><b>Закрыто:</b> основы, виды и уровни, тест-дизайн целиком, чек-листы, баг-репорты, тест-кейсы, требования и тест-план, DevTools и HTTP, HTML/CSS и локаторы. <b>Сегодня:</b> SDLC, STLC, Scrum. <b>Осталось:</b> куки и сессии, кросс-браузерное и адаптивное — день 22.<br><b>В портфолио:</b> чек-лист на 72 пункта, тест-план, 20 тест-кейсов, 15 багов в Jira, анализ требований.</p>
+  <div class="prog now"><i style="width:90%"></i></div>
+</div>
+
+<div class="stage">
+  <div class="shead"><span class="stitle">Этап 2 · Python</span><span class="tag t-now">~45% · до 14 ноя</span></div>
+  <p class="sdesc"><b>Закрыто:</b> переменные, условия, циклы, строки, списки, словари, множества, функции, JSON. <b>Дальше:</b> модули и окружение, файлы, исключения — неделя 6; ООП — неделя 8; comprehensions, декораторы, генераторы — неделя 9.<br><b>Мини-проекты:</b> 1 — генератор тестовых данных (до 23 окт); 2 — сводка прогона из JSON-отчёта (нед. 6); 3 — библиотека тест-кейсов на классах (нед. 8); 4 — декоратор повтора упавшей проверки (нед. 9); 5 — ООП-проект к CP2 (нед. 11).</p>
+  <div class="prog now"><i style="width:45%"></i></div>
+</div>
+
+<div class="stage">
+  <div class="shead"><span class="stitle">Этап 3 · Git</span><span class="tag t-now">~40% · до 28 ноя</span></div>
+  <p class="sdesc">Ветки, слияние, конфликты — 14 окт. Pull request, stash, reset и revert — 22 окт. Дальше каждая версия мини-проектов идёт через ветку и PR. <b>Критерий:</b> случайно сломала ветку — и спокойно чинишь.</p>
+  <div class="prog now"><i style="width:40%"></i></div>
+</div>
+
+<div class="stage">
+  <div class="shead"><span class="stitle">Этап 4 · SQL и базы данных</span><span class="tag t-next">9–28 ноя</span></div>
+  <p class="sdesc">SELECT, WHERE, сортировка, агрегаты, GROUP BY и HAVING, JOIN всех видов, подзапросы, INSERT, UPDATE, DELETE, проверка данных после действия в интерфейсе. <b>В портфолио:</b> 50 задач с решениями, разобранных по темам.</p>
+</div>
+
+<div class="stage">
+  <div class="shead"><span class="stitle">Этап 5 · Тестирование API</span><span class="tag t-next">30 ноя – 30 дек</span></div>
+  <p class="sdesc">REST, методы и заголовки, авторизация токеном, Postman: коллекции, окружения, проверки. Swagger. Тест-дизайн для API. Библиотека <code>requests</code>. <b>В портфолио:</b> коллекция Postman на учебный API, первые API-автотесты на Python.</p>
+</div>
+
+<div class="stage">
+  <div class="shead"><span class="stitle">Этап 6 · pytest и Allure</span><span class="tag t-next">4 – 30 янв</span></div>
+  <p class="sdesc">Фикстуры, conftest, параметризация, данные из JSON (здесь вернётся твой генератор), проверка схемы ответа, маркировки, Allure-отчёты, структура проекта. <b>В портфолио:</b> репозиторий API-автотестов, 30+ тестов с отчётом. Это первый серьёзный проект для резюме.</p>
+</div>
+
+<div class="stage">
+  <div class="shead"><span class="stitle">Этап 7 · UI-автоматизация</span><span class="tag t-next">1 фев – 13 мар</span></div>
+  <p class="sdesc">Selenium: локаторы CSS и XPath, ожидания, действия, формы, вкладки, фреймы. Page Object. Скриншоты упавших тестов в Allure. Playwright — обзорно, чтобы уметь сравнить. Флаки и как с ними бороться. <b>В портфолио:</b> UI-фреймворк на Page Object, 25+ тестов.</p>
+</div>
+
+<div class="stage">
+  <div class="shead"><span class="stitle">Этап 8 · Linux, Docker, CI/CD</span><span class="tag t-next">15 – 27 мар</span></div>
+  <p class="sdesc">Командная строка Linux, Docker: образ, контейнер, Dockerfile для тестов. GitHub Actions — для портфолио, GitLab CI и Jenkins — обзорно, их спрашивают на рынке. <b>В портфолио:</b> тесты запускаются сами на каждый push, отчёт Allure лежит рядом.</p>
+</div>
+
+<div class="stage">
+  <div class="shead"><span class="stitle">Этап 9 · Финальный проект и выход на рынок</span><span class="tag t-next">29 мар – 1 мая</span></div>
+  <p class="sdesc">Один фреймворк: UI + API + проверки в базе, Docker, CI, Allure, README. Резюме, профиль GitHub, мок-интервью по колоде карточек, тестовое задание на время, отклики. <b>Итог:</b> портфолио из 4–5 репозиториев и готовность к собеседованиям.</p>
+</div>
+
+<h2>CP1 · суббота 17 октября</h2>
+<p>Что должно быть и что реально будет. Считаю по плану дней 20–23: по два кейса в день.</p>
+
+<div class="cp1">
+  <div>
+    <div class="lbl">Тест-кейсы</div>
+    <div class="big risk">7 → 15 <small>из 20</small></div>
+    <p>TC-008…015 по два в день. Добор 5 — неделя 6, по одному в день.</p>
+  </div>
+  <div>
+    <div class="lbl">Баги в Jira</div>
+    <div class="big risk">? <small>из 15</small></div>
+    <p>Точной цифры после субботы нет. Пришли — пересчитаю план. Баги на живых сайтах идут тяжело, поэтому на них — суббота 24-го.</p>
+  </div>
+  <div>
+    <div class="lbl">Python: функции и словари</div>
+    <div class="big ok">готово</div>
+    <p>Тесты 9/9, 8/8, 7/8, 8/8, чтение кода 4/4 два дня подряд. Подтверждаем на контрольной.</p>
+  </div>
+  <div>
+    <div class="lbl">Контрольная по границам</div>
+    <div class="big ok">держатся</div>
+    <p>Off-by-one в дне 14 нашла сама. Пробный вариант — в пятницу, зачётный — в субботу.</p>
+  </div>
+</div>
+
+<div class="box card">
+  <div class="t">Как засчитываем недобор</div>
+  <p>CP1 не экзамен с «не сдала». Это точка, где фиксируем факт и решаем. Если кейсов 15, а багов 8 — пишем это в отчёт CP1, переносим добор на неделю 6 и не трогаем новые темы ради догонялок. Правило «пропущенный день не догоняется» работает и здесь.</p>
+</div>
+
+<h2>Ближайшие дни</h2>
+<p>Заход 1 — новое, заход 2 — руки. Фиолетовая строка — сегодня.</p>
+
+<div class="scroll"><table>
+  <tr><th>День</th><th>Дата</th><th>Заход 1 · новое</th><th>Заход 2 · руки</th><th>Карточки</th></tr>
+  <tr class="today"><td>20</td><td>вт 13</td><td><span class="pill p-now">сегодня</span> Процессы: SDLC, STLC, Scrum, shift-left</td><td>Генератор v2 — длина 1 по решению аналитика, границы 8 и 20, итог словарём · TC-008, TC-009</td><td>C · Q знакомство</td></tr>
+  <tr><td>21</td><td>ср 14</td><td>Git: ветки, слияние, конфликты. Ломаем ветку нарочно и чиним</td><td>Генератор в отдельной ветке, слияние в main · TC-010, TC-011</td><td>H · F · R знакомство</td></tr>
+  <tr><td>22</td><td>чт 15</td><td>Куки, сессии, кросс-браузерное и адаптивное. <b>Этап 1 закрыт</b></td><td>Задачи формата контрольной: функции и словари · TC-012, TC-013</td><td>K · G</td></tr>
+  <tr><td>23</td><td>пт 16</td><td>Повторение к CP1: границы и тест-дизайн, пробная контрольная</td><td>TC-014, TC-015 · привести баги в Jira к одному виду</td><td>J · L</td></tr>
+  <tr class="cp sat"><td>24</td><td>сб 17</td><td colspan="2"><span class="pill p-cp">CP1</span> Контрольная по границам и Python — 60 минут. Проверка кейсов и багов. Ретро двух недель нового темпа и решение: 5 часов, 4 или 3:30</td><td>D · M</td></tr>
+  <tr><td></td><td>вс 18</td><td colspan="3" style="color:var(--soft)">Выходной полностью</td></tr>
+  <tr><td>25</td><td>пн 19</td><td>Python: модули, import, pip, виртуальное окружение</td><td>Генератор — на два модуля: данные и проверки · TC-016</td><td>E · N</td></tr>
+  <tr><td>26</td><td>вт 20</td><td>Python: файлы — чтение и запись текста, режимы, <code>with</code></td><td>Генератор читает настройки из <code>settings.json</code> · TC-017</td><td>O · P</td></tr>
+  <tr><td>27</td><td>ср 21</td><td>Python: исключения — <code>try / except</code>, <code>raise</code></td><td>Генератор не падает на битом и пропавшем файле · TC-018</td><td>Q · R</td></tr>
+  <tr><td>28</td><td>чт 22</td><td>Git: pull request, stash, reset и revert</td><td>Свой первый PR в репозитории, ревью по чек-листу · TC-019</td><td>пересоберу на ретро CP1</td></tr>
+  <tr><td>29</td><td>пт 23</td><td>Повторение недели: модули, файлы, исключения</td><td>Генератор — финал: README, запуск одной командой · TC-020</td><td></td></tr>
+  <tr class="sat"><td>30</td><td>сб 24</td><td colspan="2">Практика: баги на живых сайтах до 15 в Jira, доделки недели, ретро недели 6</td><td></td></tr>
+  <tr class="rest"><td></td><td>26–31</td><td colspan="3"><span class="pill p-rest">Разгрузка</span> 2–2,5 часа в день: карточки, повторение слабых мест, доделки. Без новых тем</td></tr>
+</table></div>
+
+<div class="box note">
+  <div class="t">Почему Git в среду, а не модули</div>
+  <p>Ветки нужны уже сейчас: генератор растёт, и следующие версии удобнее делать в отдельной ветке и сливать через pull request. Это заодно первый кусок CP2 — «свободный Git».</p>
+</div>
+
+<h2>Полная карта по неделям</h2>
+<p>Номер недели — от начала учёбы. Неделя — понедельник–суббота, около 26 часов. Заход 1 — темы, заход 2 — практика. Зелёные строки — разгрузка, жёлтые — чекпоинты. Красная пометка — сдвиг против карты от 2 октября.</p>
+
+<div class="scroll"><table>
+  <tr><th>Нед.</th><th>Даты</th><th>Темы · заход 1</th><th>Практика · заход 2</th></tr>
+  <tr class="cp"><td>5</td><td>12–17 окт</td><td>JSON, процессы SDLC/STLC/Scrum, Git: ветки и конфликты. Куки, сессии, кросс-браузерное — <b>этап 1 закрыт</b></td><td>Генератор v1 и v2. Кейсы до 15. <span class="pill p-cp">CP1 · сб 17</span></td></tr>
+  <tr><td>6</td><td>19–24 окт</td><td>Python: модули, pip, venv; файлы; исключения. Git: PR, stash, reset и revert <span class="pill p-shift">сдвиг с нед. 5</span></td><td>Мини-проект 1 закрыт, мини-проект 2 — сводка прогона. Кейсы до 20, баги до 15</td></tr>
+  <tr class="rest"><td>7</td><td>26–31 окт</td><td colspan="2"><span class="pill p-rest">Разгрузка</span> 2–2,5 часа в день: карточки, слабые места, доделки</td></tr>
+  <tr><td>8</td><td>2–7 ноя</td><td>Python: ООП — классы, объекты, методы, наследование, <code>__init__</code> и <code>self</code> <span class="pill p-shift">сдвиг с нед. 6</span></td><td>Мини-проект 3 — библиотека тест-кейсов на классах</td></tr>
+  <tr><td>9</td><td>9–14 ноя</td><td>Python: comprehensions, декораторы, генераторы — <b>этап 2 закрыт</b>. Старт SQL: SELECT, WHERE, ORDER BY <span class="pill p-shift">сдвиг с нед. 8</span></td><td>Мини-проект 4 — декоратор повтора. SQL по 5 задач в день</td></tr>
+  <tr><td>10</td><td>16–21 ноя</td><td>SQL: агрегаты, GROUP BY и HAVING, JOIN, подзапросы</td><td>SQL-задачи, к концу недели около 35</td></tr>
+  <tr class="cp"><td>11</td><td>23–28 ноя</td><td>SQL: INSERT, UPDATE, DELETE; как тестировщик проверяет данные в базе. Повторение Git</td><td>Мини-проект 5 — ООП-проект. 50 SQL-задач. <span class="pill p-cp">CP2 · сб 28 ноя</span></td></tr>
+  <tr><td>12</td><td>30 ноя – 5 дек</td><td><b>Этап 5 · API:</b> REST, методы, заголовки, тело, коды глубже. Postman: коллекции, переменные, окружения</td><td>Коллекция Postman на учебный API, 15 запросов</td></tr>
+  <tr class="rest"><td>13</td><td>7–12 дек</td><td colspan="2"><span class="pill p-rest">Разгрузка</span></td></tr>
+  <tr><td>14</td><td>14–19 дек</td><td>Swagger, авторизация токеном, тест-дизайн для API: позитивные, негативные, граничные. Проверки в Postman</td><td>Кейсы и баги на API в Jira, коллекция с проверками</td></tr>
+  <tr><td>15</td><td>21–26 дек</td><td>Python <code>requests</code>: GET, POST, PUT, DELETE, заголовки, JSON, проверки</td><td>Первые 10 API-автотестов скриптами</td></tr>
+  <tr><td>16</td><td>28–30 дек</td><td>Повторение. API-клиент на классах. <b>31 дек – 2 янв — выходные</b></td><td>Рефакторинг API-тестов</td></tr>
+  <tr><td>17</td><td>4–9 янв</td><td><b>Этап 6 · pytest:</b> структура, assert, запуск, маркировки, фикстуры</td><td>API-тесты переезжают на pytest</td></tr>
+  <tr><td>18</td><td>11–16 янв</td><td>Параметризация, conftest, области фикстур, данные из JSON, проверка схемы ответа</td><td>Data-driven API-тесты на данных генератора</td></tr>
+  <tr class="rest"><td>19</td><td>18–23 янв</td><td colspan="2"><span class="pill p-rest">Разгрузка</span></td></tr>
+  <tr class="cp"><td>20</td><td>25–30 янв</td><td>Allure: шаги, вложения, отчёт. Логирование. Структура проекта и README</td><td>30+ API-тестов с отчётом. <span class="pill p-cp">CP3 · сб 30 янв</span></td></tr>
+  <tr><td>21</td><td>1–6 фев</td><td><b>Этап 7 · Selenium:</b> WebDriver, локаторы CSS и XPath, действия, явные и неявные ожидания</td><td>Первые UI-тесты на форму входа учебного сайта</td></tr>
+  <tr><td>22</td><td>8–13 фев</td><td>Page Object: базовая страница, страницы, фикстура браузера</td><td>Перевод UI-тестов на Page Object</td></tr>
+  <tr><td>23</td><td>15–20 фев</td><td>Формы, выпадающие списки, алерты, фреймы, вкладки. Скриншоты при падении в Allure. Параметризация UI</td><td>15 UI-тестов</td></tr>
+  <tr><td>24</td><td>22–27 фев</td><td>Флаки: причины и лечение. Playwright обзорно и сравнение с Selenium</td><td>25 UI-тестов, стабильный прогон</td></tr>
+  <tr class="rest"><td>25</td><td>1–6 мар</td><td colspan="2"><span class="pill p-rest">Разгрузка</span></td></tr>
+  <tr class="cp"><td>26</td><td>8–13 мар</td><td>Запуск в нескольких браузерах, конфигурация, README фреймворка</td><td>UI-фреймворк в портфолио. <span class="pill p-cp">CP4 · сб 13 мар</span></td></tr>
+  <tr><td>27</td><td>15–20 мар</td><td><b>Этап 8:</b> Linux — командная строка, права, процессы. Docker: образ, контейнер, Dockerfile</td><td>API-тесты запускаются в контейнере</td></tr>
+  <tr class="cp"><td>28</td><td>22–27 мар</td><td>CI/CD: GitHub Actions; GitLab CI и Jenkins обзорно. Отчёт Allure как результат прогона</td><td>Зелёный CI на своём проекте. <span class="pill p-cp">CP5 · сб 27 мар</span></td></tr>
+  <tr><td>29</td><td>29 мар – 3 апр</td><td><b>Этап 9:</b> архитектура финального проекта: UI + API + база, общая конфигурация</td><td>Каркас финального проекта, первые тесты</td></tr>
+  <tr><td>30</td><td>5–10 апр</td><td>Проверки в базе из тестов, Docker и CI для финального проекта. Резюме и профиль GitHub</td><td>Финальный проект в CI. Первые отклики</td></tr>
+  <tr class="rest"><td>31</td><td>12–17 апр</td><td colspan="2"><span class="pill p-rest">Разгрузка</span> Лёгкая неделя: правки резюме, README проектов</td></tr>
+  <tr><td>32</td><td>19–24 апр</td><td>Мок-интервью: теория по всей колоде, задачи на код вживую, тестовое задание на время</td><td>Отклики, разбор каждого ответа</td></tr>
+  <tr class="cp"><td>33</td><td>26 апр – 1 мая</td><td>Доводка финального проекта по замечаниям мок-интервью</td><td>Отклики, собеседования. <span class="pill p-cp">CP6 · сб 1 мая</span></td></tr>
+</table></div>
+
+<h2>Чекпоинты</h2>
+<div class="scroll"><table>
+  <tr><th>CP</th><th>Дата</th><th>Что должно быть</th><th>Как проверяем</th></tr>
+  <tr><td><b>CP1</b></td><td>сб 17 окт</td><td>20 тест-кейсов, 15 багов в Jira, Python: функции и словари уверенно, границы без ошибок</td><td>Контрольная 60 минут, проверка кейсов и багов, ретро темпа</td></tr>
+  <tr><td><b>CP2</b></td><td>сб 28 ноя</td><td>ООП-проект, 50 SQL-задач, свободный Git, 5 мини-проектов</td><td>Код-ревью проекта, контрольная по SQL, конфликт в Git на время</td></tr>
+  <tr><td><b>CP3</b></td><td>сб 30 янв</td><td>Репозиторий API-автотестов: pytest, 30+ тестов, Allure, README</td><td>Запуск с нуля по README на чистой машине</td></tr>
+  <tr><td><b>CP4</b></td><td>сб 13 мар</td><td>UI-фреймворк на Page Object, 25+ стабильных тестов</td><td>Три прогона подряд без флаков, ревью структуры</td></tr>
+  <tr><td><b>CP5</b></td><td>сб 27 мар</td><td>Тесты в Docker, зелёный CI на каждый push</td><td>Push — и прогон идёт сам, отчёт доступен</td></tr>
+  <tr><td><b>CP6</b></td><td>сб 1 мая</td><td>Финальный проект, резюме, мок-интервью пройдены, отклики идут</td><td>Мок-интервью полного формата, разбор откликов</td></tr>
+</table></div>
+
+<h2>Портфолио к маю</h2>
+<div class="scroll"><table>
+  <tr><th>Репозиторий</th><th>Что внутри</th><th>Готов к</th></tr>
+  <tr><td><code>qa-learning</code></td><td>Вся ручная часть: чек-лист, тест-план, тест-кейсы, анализ требований, баг-репорты; мини-проекты Python; SQL-задачи</td><td>CP2</td></tr>
+  <tr><td>Коллекция Postman</td><td>Запросы с проверками и окружениями на учебный API</td><td>декабрь</td></tr>
+  <tr><td><code>api-tests</code></td><td>pytest, requests, data-driven, проверка схем, Allure</td><td>CP3</td></tr>
+  <tr><td><code>ui-tests</code></td><td>Selenium, Page Object, скриншоты в Allure</td><td>CP4</td></tr>
+  <tr><td>Финальный проект</td><td>UI + API + база в одном фреймворке, Docker, CI — главный проект резюме</td><td>CP6</td></tr>
+</table></div>
+
+<div class="box def">
+  <div class="t">Запас и что будет, если не хватит</div>
+  <p>Карта собрана с запасом около 20% по часам. Неделя отставания по Python часть его уже съела. Если на неделе 8 ООП пойдёт тяжело, SQL сдвинется на неделю, CP2 — на 5 декабря, остальные даты — тоже на неделю. Если запас не понадобится, первые отклики начнутся раньше: после CP5, в конце марта, когда в портфолио уже будут API- и UI-тесты.</p>
+  <p>Даты дальше CP2 — ориентир, а не обещание. Пересчитываю их на каждом чекпоинте.</p>
+</div>
+
+<div class="box note">
+  <div class="t">После мая</div>
+  <p>Выход на рынок — это начало второй фазы, а не конец учёбы. Пока идут собеседования: 1–2 часа в день на разбор вопросов, которые задали, и доводку проектов по замечаниям. После выхода на работу — добор до middle: глубже CI, нагрузочное тестирование обзорно, архитектура фреймворков, ревью чужих тестов. Ориентир — 1–1,5 года работы.</p>
+</div>
+
+<h2>Что держим в фокусе до CP1</h2>
+<div class="box warn">
+  <div class="t">Три слабых места, которые я буду называть, если увижу</div>
+  <ol>
+    <li><b>Код без вывода.</b> Присылать код вместе с выводом и прогоном проверок. В генераторе v2 для этого есть отдельный шаг — нарочно сломать данные и убедиться, что тест падает.</li>
+    <li><b>Решать вместо вопроса аналитику.</b> В TC-008 и в критериях «Запомнить меня» специально оставлены места, где ответа в требованиях нет.</li>
+    <li><b>Предусловие про страницу, а не про систему.</b> TC-009 целиком на этом: пользователь, пароль, блокировка, счётчик попыток.</li>
+  </ol>
+</div>
+
+<div class="box note">
+  <div class="t">Что получается хорошо — и на что опираемся</div>
+  <p>Чтение кода с таблицей на бумаге — 4/4 два дня подряд. Тесты — от 7/8 до 9/9. Перенос правила на новый случай без подсказки. Мышление автоматизатора на локаторах. Последний день — 8 из 10.</p>
+</div>
+
+<div class="box card">
+  <div class="t">Темп</div>
+  <p>Правила без изменений: новая теория — не больше 2:30 в день, час без экрана между заходами, воскресенье свободно, пропущенный день не догоняется. Сигнал откатиться — два дня подряд тест ниже 6 или три дня «читаю — не запоминаю». Английский вне плана по твоему решению; вернём, только если сама попросишь.</p>
+</div>
+
+<p style="color:var(--soft);font-size:15px;margin-top:26px">Карта живая: ближайшие дни пересобираю на каждом ретро, раскладку по этапам — на каждом чекпоинте. Следующая пересборка — на CP1, в субботу.</p>
+
+</div>
+
+</body></html>

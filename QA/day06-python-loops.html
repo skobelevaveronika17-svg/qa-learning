@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>День 6 — Циклы for и while</title>
+<style>
+:root{
+  --bg:#eef1f2;
+  --paper:#ffffff;
+  --ink:#1b2430;
+  --ink-soft:#4e5a67;
+  --line:#d7dde0;
+  --blue:#1f5fa9;
+  --blue-bg:#e9f1fa;
+  --red:#b0352b;
+  --red-bg:#fbecea;
+  --green:#276f52;
+  --green-bg:#e8f4ee;
+  --amber:#9a6a00;
+  --amber-bg:#fbf2df;
+  --violet:#5e4b8b;
+  --violet-bg:#efebf8;
+  --code-bg:#18222c;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  font-size:17px;line-height:1.62;
+}
+.wrap{max-width:820px;margin:0 auto;padding:0 20px 120px}
+
+/* progress */
+#bar{position:fixed;top:0;left:0;height:3px;background:var(--blue);width:0;z-index:50}
+
+/* hero */
+header{padding:56px 0 32px}
+.day{font-size:14px;letter-spacing:.04em;color:var(--ink-soft)}
+h1{font-size:40px;line-height:1.12;margin:.2em 0 .35em;font-weight:700}
+.lead{font-size:19px;color:var(--ink-soft);max-width:60ch;margin:0}
+.hero-code{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:32px 0 8px}
+.hero-code .h{font-size:14px;color:var(--ink-soft);margin-bottom:6px}
+@media(max-width:640px){.hero-code{grid-template-columns:1fr}h1{font-size:30px}}
+
+/* plan */
+.plan{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:18px 22px;margin:28px 0}
+.plan ol{margin:8px 0 0;padding-left:22px}
+.plan li{margin:4px 0}
+.plan .t{color:var(--ink-soft);font-size:15px}
+
+/* sections */
+section{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:26px 28px;margin:22px 0}
+section>h2{margin:0 0 14px;font-size:25px;line-height:1.2}
+.num{display:inline-block;min-width:1.6em;color:var(--ink-soft);font-weight:400}
+h3{font-size:19px;margin:26px 0 8px}
+p{margin:12px 0}
+ul,ol{padding-left:24px}
+li{margin:6px 0}
+code.i{background:#eef1f3;border:1px solid var(--line);border-radius:4px;padding:1px 5px;font-family:Consolas,"Courier New",monospace;font-size:.92em}
+
+/* colour blocks */
+.box{border-left:4px solid;border-radius:0 8px 8px 0;padding:14px 18px;margin:18px 0}
+.box .title{font-weight:700;margin-bottom:4px}
+.def{border-color:var(--blue);background:var(--blue-bg)}
+.def .title{color:var(--blue)}
+.trap{border-color:var(--red);background:var(--red-bg)}
+.trap .title{color:var(--red)}
+.note{border-color:var(--green);background:var(--green-bg)}
+.note .title{color:var(--green)}
+.card{border-color:var(--amber);background:var(--amber-bg)}
+.card .title{color:var(--amber)}
+.task{border-color:var(--violet);background:var(--violet-bg)}
+.task .title{color:var(--violet)}
+.box p:first-of-type{margin-top:2px}
+.box p:last-child{margin-bottom:2px}
+
+/* code */
+pre{background:var(--code-bg);color:#e6edf3;border-radius:8px;padding:16px 18px;overflow-x:auto;margin:14px 0}
+pre code{font-family:Consolas,"Courier New",monospace;font-size:15px;line-height:1.55;white-space:pre}
+.kw{color:#ff9db8}.bi{color:#8fd3ff}.st{color:#b6e7a8}.cm{color:#8b98a5;font-style:italic}.nu{color:#ffd28c}
+.out{background:#f4f6f7;border:1px dashed var(--line);border-radius:8px;padding:14px 18px;font-family:Consolas,"Courier New",monospace;font-size:15px;white-space:pre-wrap;margin:14px 0;color:#2c3a46}
+.term{background:#0f1720;color:#d6e2ec;border-radius:8px;padding:12px 14px;font-family:Consolas,monospace;font-size:14.5px;display:flex;justify-content:space-between;align-items:center;gap:12px;margin:10px 0}
+.term button{background:#2b3d4d;color:#e7f0f7;border:0;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:13px;white-space:nowrap}
+.term button:hover{background:#3b5468}
+
+/* tasks */
+.tk{border:1px solid var(--line);border-left:5px solid var(--violet);border-radius:0 12px 12px 0;padding:20px 24px;margin:24px 0;background:#fcfbff}
+.tk h3{margin-top:0;font-size:21px;color:var(--violet)}
+.tk .file{font-family:Consolas,monospace;font-size:14px;color:var(--ink-soft)}
+.part{margin:20px 0 0}
+.part>b{display:block;margin-bottom:2px}
+details{border:1px solid var(--line);background:#fff;border-radius:8px;padding:10px 14px;margin:8px 0}
+details summary{cursor:pointer;font-weight:600;color:var(--violet)}
+details[open] summary{margin-bottom:8px}
+table{border-collapse:collapse;width:100%;margin:10px 0;font-size:15.5px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:#f2f5f6;font-weight:600}
+
+/* quiz */
+.q{border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:16px 0;background:#fff}
+.q .qn{font-weight:700;margin-bottom:6px}
+.opts{display:grid;gap:8px;margin-top:12px}
+.opt{text-align:left;background:#f6f8f9;border:1px solid var(--line);border-radius:8px;padding:10px 14px;cursor:pointer;font:inherit;font-size:16px;color:var(--ink)}
+.opt:hover{background:#eaf0f3}
+.opt.right{background:var(--green-bg);border-color:var(--green);font-weight:600}
+.opt.wrong{background:var(--red-bg);border-color:var(--red)}
+.expl{display:none;margin-top:12px;padding:12px 14px;background:#f4f6f7;border-radius:8px;font-size:16px}
+.score{position:sticky;bottom:0;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 18px;margin-top:18px;font-weight:600}
+
+/* timer */
+#timer{position:fixed;right:18px;bottom:18px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 14px;box-shadow:0 4px 14px rgba(0,0,0,.08);z-index:40;font-size:15px}
+#timer button{background:var(--ink);color:#fff;border:0;border-radius:6px;padding:6px 10px;cursor:pointer;font-size:13px;margin-left:6px}
+#tval{font-family:Consolas,monospace;font-size:17px}
+@media(max-width:640px){#timer{right:10px;bottom:10px;padding:8px 10px;font-size:13px}section{padding:20px 18px}.tk{padding:16px 18px}}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div class="wrap">
+
+<header>
+  <div class="day">День 6 · Python</div>
+  <h1>Циклы: когда компьютер повторяет за тебя</h1>
+  <p class="lead">Условия из дня 5 решали, <i>делать или не делать</i>. Циклы решают, <i>сколько раз сделать</i>. Это последняя базовая конструкция — после неё ты умеешь описать почти любой алгоритм.</p>
+
+  <div class="hero-code">
+    <div>
+      <div class="h">Без цикла — 5 строк и потолок</div>
+<pre><code>print("Тест 1 пройден")
+print("Тест 2 пройден")
+print("Тест 3 пройден")
+print("Тест 4 пройден")
+print("Тест 5 пройден")</code></pre>
+    </div>
+    <div>
+      <div class="h">С циклом — 2 строки и хоть 500</div>
+<pre><code>for number in range(1, 6):
+    print(f"Тест {number} пройден")</code></pre>
+    </div>
+  </div>
+  <p style="color:var(--ink-soft);margin-top:0">Чтобы прогнать 500 тестов в левой колонке, нужно написать 500 строк. В правой — поменять одну цифру.</p>
+</header>
+
+<div class="plan">
+  <b>План дня</b> <span class="t">— примерно 2 часа 30 минут</span>
+  <ol>
+    <li>Карточки за день 5 — <span class="t">10 минут</span></li>
+    <li>Теория: <code class="i">for</code>, <code class="i">range</code>, накопление, <code class="i">while</code>, <code class="i">break</code>/<code class="i">continue</code> — <span class="t">50 минут</span></li>
+    <li>Шесть задач — <span class="t">70 минут</span></li>
+    <li>Тест на чтение кода — <span class="t">15 минут</span></li>
+    <li>Записи и коммит — <span class="t">10 минут</span></li>
+  </ol>
+</div>
+
+<!-- 0 -->
+<section id="s0">
+  <h2><span class="num">0.</span> Сначала карточки</h2>
+  <p>Сегодня первый прогон по карточкам дня 5 — «Условия в Python». По графику первый прогон делается на следующий день после темы, то есть именно сейчас.</p>
+  <ul>
+    <li>Отвечаешь <b>вслух и целиком</b>, только потом переворачиваешь.</li>
+    <li>Две стопки: «уверенно» и «запнулась». Второй заход — только по второй стопке.</li>
+    <li>Подмешай 5–7 карточек из дней 2 и 4, вперемешку запоминается лучше.</li>
+  </ul>
+  <div class="box note">
+    <div class="title">В тетрадь</div>
+    <p>Отметь дату прогона рядом со списком карточек. Следующий прогон по условиям — через 3 дня, то есть на дне 9.</p>
+  </div>
+</section>
+
+<!-- 1 -->
+<section id="s1">
+  <h2><span class="num">1.</span> Что такое цикл</h2>
+
+  <div class="box def">
+    <div class="title">Цикл</div>
+    <p>Конструкция, которая выполняет один и тот же блок кода несколько раз. В Python их два: <code class="i">for</code> — когда заранее известно, <b>по чему</b> идти; <code class="i">while</code> — когда известно только <b>условие остановки</b>.</p>
+  </div>
+
+  <p>Разница ощущается на бытовых примерах:</p>
+  <ul>
+    <li><b>for</b> — «проверь каждый товар в корзине». Количество товаров известно, список конечный.</li>
+    <li><b>while</b> — «наливай воду, пока стакан не полный». Сколько раз — неизвестно, важен только момент остановки.</li>
+  </ul>
+
+  <div class="box def">
+    <div class="title">Итерация</div>
+    <p>Один проход цикла. Если цикл выполнился 5 раз — было 5 итераций. Слово встретится в автотестах и в документации постоянно.</p>
+  </div>
+
+  <p><b>Зачем это тестировщику.</b> Автотест почти всегда цикл: прогнать один и тот же сценарий на 30 наборах данных, проверить каждую ссылку на странице, дождаться появления кнопки (пока не появится — ждём). Без циклов автоматизации не существует.</p>
+
+  <div class="box card">
+    <div class="title">На карточку</div>
+    <p>Чем <code class="i">for</code> отличается от <code class="i">while</code>? — <code class="i">for</code> идёт по готовой последовательности, <code class="i">while</code> крутится, пока истинно условие.</p>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="s2">
+  <h2><span class="num">2.</span> for и range</h2>
+
+  <p>Самый частый цикл в Python выглядит так:</p>
+
+<pre><code>for number in range(1, 4):
+    print(number)</code></pre>
+
+  <div class="out">1
+2
+3</div>
+
+  <p>Разберём построчно, слово за словом:</p>
+  <ul>
+    <li><code class="i">for</code> — ключевое слово, «для каждого».</li>
+    <li><code class="i">number</code> — <b>переменная цикла</b>. Имя придумываешь ты. На каждой итерации Python сам кладёт в неё очередное значение.</li>
+    <li><code class="i">in</code> — «из», указывает, откуда брать значения.</li>
+    <li><code class="i">range(1, 4)</code> — источник значений: 1, 2, 3.</li>
+    <li><code class="i">:</code> — двоеточие, как в <code class="i">if</code>. Означает «дальше идёт блок».</li>
+    <li>Отступ в 4 пробела — тело цикла. Всё, что с отступом, повторяется.</li>
+  </ul>
+
+  <div class="box def">
+    <div class="title">range()</div>
+    <p>Встроенная функция, которая выдаёт последовательность целых чисел. Три формы:</p>
+    <p><code class="i">range(5)</code> → 0, 1, 2, 3, 4 — от нуля, пять штук<br>
+       <code class="i">range(2, 6)</code> → 2, 3, 4, 5 — от 2 до 6, не включая 6<br>
+       <code class="i">range(0, 10, 3)</code> → 0, 3, 6, 9 — третий аргумент это шаг</p>
+  </div>
+
+  <div class="box trap">
+    <div class="title">Ловушка: правая граница не входит</div>
+    <p><code class="i">range(1, 5)</code> — это 1, 2, 3, 4. Пятёрки не будет. Чтобы дойти <b>до числа n включительно</b>, пишут <code class="i">range(1, n + 1)</code>.</p>
+    <p>Это ровно тот же класс ошибок, что баг в <code class="i">discount_levels.py</code> с границей 4999. Ошибка на единицу — самая частая в мире и самая любимая на собеседованиях.</p>
+  </div>
+
+  <p>Шаг может быть отрицательным — тогда идём назад:</p>
+
+<pre><code>for i in range(3, 0, -1):
+    print(i)
+print("Старт!")</code></pre>
+
+  <div class="out">3
+2
+1
+Старт!</div>
+
+  <p>Обрати внимание: <code class="i">print("Старт!")</code> написан <b>без отступа</b>, поэтому он не в цикле и выполняется один раз, после него.</p>
+
+  <div class="box trap">
+    <div class="title">Ловушка: отступ решает всё</div>
+    <p>Сдвинь <code class="i">print("Старт!")</code> на 4 пробела вправо — и «Старт!» напечатается три раза. Python не спросит, он просто сделает. Эта ошибка не даёт сообщения об ошибке, она даёт неправильный результат — самый неприятный вид.</p>
+  </div>
+
+  <h3>Перебор строки</h3>
+  <p><code class="i">for</code> умеет идти не только по <code class="i">range</code>, а по любой последовательности. Строка — тоже последовательность, из символов:</p>
+
+<pre><code>for letter in "кот":
+    print(letter)</code></pre>
+
+  <div class="out">к
+о
+т</div>
+
+  <p>Подробно строки будут на дне 8, сейчас достаточно знать, что так можно.</p>
+
+  <div class="box note">
+    <div class="title">В тетрадь</div>
+    <p>Схема цикла <code class="i">for</code>: <code class="i">for переменная in последовательность:</code> + отступ. И три формы <code class="i">range</code> с примерами значений.</p>
+  </div>
+</section>
+
+<!-- 3 -->
+<section id="s3">
+  <h2><span class="num">3.</span> Накопление: счётчик и сумма</h2>
+
+  <p>Самая полезная вещь, которую делают циклом, — накапливают результат. Схема всегда одинаковая, из трёх шагов.</p>
+
+<pre><code># 1. завели переменную ДО цикла
+total = 0
+
+# 2. на каждой итерации меняем её
+for number in range(1, 5):
+    total = total + number
+
+# 3. пользуемся результатом ПОСЛЕ цикла
+print(total)</code></pre>
+
+  <div class="out">10</div>
+
+  <p>Что происходит по шагам:</p>
+  <table>
+    <tr><th>Итерация</th><th>number</th><th>total до</th><th>total после</th></tr>
+    <tr><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+    <tr><td>2</td><td>2</td><td>1</td><td>3</td></tr>
+    <tr><td>3</td><td>3</td><td>3</td><td>6</td></tr>
+    <tr><td>4</td><td>4</td><td>6</td><td>10</td></tr>
+  </table>
+
+  <div class="box def">
+    <div class="title">Сокращённая запись</div>
+    <p><code class="i">total = total + number</code> пишут короче: <code class="i">total += number</code>. Так же работают <code class="i">-=</code>, <code class="i">*=</code>, <code class="i">/=</code>. Значение то же, читается привычнее для чужого глаза.</p>
+  </div>
+
+  <p>Счётчик — частный случай: прибавляем не значение, а единицу.</p>
+
+<pre><code>count = 0
+for number in range(1, 11):
+    if number % 2 == 0:
+        count += 1
+print(f"Чётных чисел: {count}")</code></pre>
+
+  <div class="out">Чётных чисел: 5</div>
+
+  <p>Здесь <code class="i">if</code> живёт внутри <code class="i">for</code> — два уровня отступа. Это нормально и встречается постоянно.</p>
+
+  <div class="box trap">
+    <div class="title">Ловушка: обнуление внутри цикла</div>
+    <p>Если написать <code class="i">total = 0</code> <b>внутри</b> цикла, на каждой итерации накопленное будет стираться, и в конце останется только последнее значение. Программа отработает без ошибок и выдаст правдоподобную чушь. Проверяется просто: посчитай ожидаемый результат на бумаге для трёх чисел и сравни.</p>
+  </div>
+
+  <div class="box card">
+    <div class="title">На карточку</div>
+    <p>Где объявляется переменная-накопитель? — До цикла. Где используется результат? — После цикла.</p>
+  </div>
+</section>
+
+<!-- 4 -->
+<section id="s4">
+  <h2><span class="num">4.</span> while</h2>
+
+  <p><code class="i">while</code> читается как «пока»: пока условие истинно — повторяй.</p>
+
+<pre><code>count = 3
+while count > 0:
+    print(count)
+    count -= 1
+print("Пуск")</code></pre>
+
+  <div class="out">3
+2
+1
+Пуск</div>
+
+  <p>Условие после <code class="i">while</code> — то же самое, что после <code class="i">if</code>: сравнения, <code class="i">and</code>, <code class="i">or</code>, <code class="i">not</code>. Всё из дня 5 работает здесь без изменений.</p>
+
+  <p>Порядок работы:</p>
+  <ol>
+    <li>Python проверяет условие.</li>
+    <li>Истина — выполняет тело, потом снова возвращается к пункту 1.</li>
+    <li>Ложь — выходит из цикла и идёт дальше по программе.</li>
+  </ol>
+
+  <p>Если условие ложно с самого начала, тело не выполнится <b>ни разу</b>. Это не ошибка, а нормальное поведение — и отдельный тест-кейс, о котором забывают.</p>
+
+  <div class="box trap">
+    <div class="title">Ловушка: бесконечный цикл</div>
+    <p>Убери строку <code class="i">count -= 1</code> — и <code class="i">count</code> навсегда останется равным 3, условие никогда не станет ложным, программа будет печатать тройку до конца времён.</p>
+    <p><b>Остановить:</b> <code class="i">Ctrl+C</code> в терминале. Ничего страшного не произошло, это штатная ситуация, через неё проходят все.</p>
+    <p><b>Правило:</b> написала <code class="i">while</code> — сразу глазами найди строку, которая меняет переменную из условия. Нет такой строки — цикл бесконечный.</p>
+  </div>
+
+  <h3>Когда какой цикл</h3>
+  <table>
+    <tr><th>Ситуация</th><th>Цикл</th></tr>
+    <tr><td>Известно количество повторов</td><td><code class="i">for</code></td></tr>
+    <tr><td>Идём по списку, строке, диапазону</td><td><code class="i">for</code></td></tr>
+    <tr><td>Повторяем, пока пользователь не введёт нужное</td><td><code class="i">while</code></td></tr>
+    <tr><td>Ждём, пока что-то произойдёт</td><td><code class="i">while</code></td></tr>
+  </table>
+
+  <div class="box note">
+    <div class="title">В тетрадь</div>
+    <p>Три пункта порядка работы <code class="i">while</code> и правило про поиск строки, которая меняет условие.</p>
+  </div>
+</section>
+
+<!-- 5 -->
+<section id="s5">
+  <h2><span class="num">5.</span> break и continue</h2>
+
+  <div class="box def">
+    <div class="title">break</div>
+    <p>Немедленно прекращает цикл целиком. Остаток тела не выполняется, следующих итераций не будет, управление уходит на первую строку после цикла.</p>
+  </div>
+
+<pre><code>for number in range(1, 10):
+    if number == 4:
+        break
+    print(number)</code></pre>
+
+  <div class="out">1
+2
+3</div>
+
+  <p>На четвёртой итерации сработал <code class="i">break</code> — до <code class="i">print</code> дело не дошло, четвёрка не напечаталась.</p>
+
+  <div class="box def">
+    <div class="title">continue</div>
+    <p>Пропускает <b>остаток текущей</b> итерации и переходит к следующей. Цикл продолжается.</p>
+  </div>
+
+<pre><code>for number in range(1, 6):
+    if number == 3:
+        continue
+    print(number)</code></pre>
+
+  <div class="out">1
+2
+4
+5</div>
+
+  <p>Тройка пропущена, но цикл дошёл до конца. Разница в одном слове, а поведение противоположное.</p>
+
+  <div class="box trap">
+    <div class="title">Ловушка: код после continue недостижим</div>
+    <p>Всё, что написано в теле цикла <b>после</b> <code class="i">continue</code> на том же уровне отступа, не выполнится никогда. PyCharm подсветит это серым — привыкай замечать серый код, он почти всегда означает ошибку логики.</p>
+  </div>
+
+  <h3>Бесконечный цикл, из которого выходят по break</h3>
+  <p>Частая и совершенно нормальная конструкция:</p>
+
+<pre><code>while True:
+    answer = input("Введите команду (или 'выход'): ")
+    if answer == "выход":
+        break
+    print(f"Выполняю: {answer}")</code></pre>
+
+  <p><code class="i">True</code> — всегда истина, значит условие никогда не станет ложным. Единственный выход — <code class="i">break</code>. Так пишут меню и любые «повторяй, пока пользователь не скажет хватит».</p>
+
+  <div class="box card">
+    <div class="title">На карточку</div>
+    <p><code class="i">break</code> — выйти из цикла совсем. <code class="i">continue</code> — пропустить одну итерацию, цикл продолжается.</p>
+  </div>
+</section>
+
+<!-- 6 -->
+<section id="s6">
+  <h2><span class="num">6.</span> Цикл внутри цикла</h2>
+
+  <p>Тело цикла — обычный код, значит внутри может быть ещё один цикл.</p>
+
+<pre><code>for i in range(1, 3):
+    for j in range(1, 4):
+        print(f"i={i}, j={j}")</code></pre>
+
+  <div class="out">i=1, j=1
+i=1, j=2
+i=1, j=3
+i=2, j=1
+i=2, j=2
+i=2, j=3</div>
+
+  <p>Внешний цикл делает один шаг — внутренний успевает прокрутиться целиком. Итого 2 × 3 = 6 строк. Отсюда правило: количество итераций перемножается, и на больших числах это становится больно.</p>
+
+  <div class="box trap">
+    <div class="title">Ловушка: break выходит только из своего цикла</div>
+    <p><code class="i">break</code> во внутреннем цикле прерывает <b>внутренний</b>, внешний спокойно идёт дальше. Ожидание «выйдет из обоих» — классическая ошибка новичка.</p>
+  </div>
+</section>
+
+<!-- 7 -->
+<section id="s7">
+  <h2><span class="num">7.</span> Задачи</h2>
+
+  <p>Шесть файлов в папке <code class="i">python/day06/</code>. Сначала создай папку:</p>
+  <div class="term"><span>mkdir C:\projects\qa-learning\python\day06</span><button onclick="cp(this,'mkdir C:\\projects\\qa-learning\\python\\day06')">Копировать</button></div>
+
+  <div class="box trap">
+    <div class="title">Два правила, которые легко перепутать</div>
+    <p>Команды терминала — <b>копировать</b>. Код — <b>писать руками</b>, включая примеры из этого урока. Синтаксис оседает только через пальцы.</p>
+  </div>
+
+  <!-- task 1 -->
+  <div class="tk">
+    <h3>1. Обратный отсчёт</h3>
+    <div class="file">countdown.py</div>
+
+    <div class="part"><b>Что должно получиться</b>
+      <div class="out">10
+9
+8
+7
+6
+5
+4
+3
+2
+1
+Поехали!</div>
+      <p>Ввода нет, программа просто печатает. «Поехали!» — ровно один раз, в самом конце.</p>
+    </div>
+
+    <div class="part"><b>Разбор по шагам</b>
+      <ol>
+        <li>Нужен <code class="i">for</code> по <code class="i">range</code> с тремя аргументами: старт, стоп, шаг.</li>
+        <li>Идём от большего к меньшему — значит шаг отрицательный.</li>
+        <li>Последнее нужное число — 1. Правая граница не включается, поэтому стоп должен быть на единицу «дальше» единицы по направлению движения.</li>
+        <li>Печать «Поехали!» — отдельной строкой без отступа, после цикла.</li>
+      </ol>
+    </div>
+
+    <div class="part"><b>Подсказки</b>
+      <details><summary>Подсказка 1 — мягкая</summary>
+        <p>Вспомни третью форму: <code class="i">range(старт, стоп, шаг)</code>. Шаг <code class="i">-1</code> заставляет идти назад. Старт — 10.</p>
+      </details>
+      <details><summary>Подсказка 2 — конкретная</summary>
+        <p>Первая строка: <code class="i">for i in range(10, 0, -1):</code>. Ноль в качестве стопа именно потому, что сам стоп не печатается, а единица печатается.</p>
+      </details>
+    </div>
+
+    <div class="part"><b>Что проверить</b>
+      <table>
+        <tr><th>Проверка</th><th>Ожидание</th></tr>
+        <tr><td>Первое число</td><td>10</td></tr>
+        <tr><td>Последнее число</td><td>1, не 0 и не 2</td></tr>
+        <tr><td>Всего строк с числами</td><td>10</td></tr>
+        <tr><td>«Поехали!»</td><td>один раз, последней строкой</td></tr>
+      </table>
+    </div>
+
+    <div class="part"><b>Типичные ошибки этой задачи</b>
+      <ul>
+        <li><code class="i">range(10, 1, -1)</code> — отсчёт остановится на 2.</li>
+        <li>«Поехали!» с отступом — напечатается 10 раз.</li>
+        <li>Забыт шаг <code class="i">-1</code> — <code class="i">range(10, 0)</code> не выдаст ничего, цикл промолчит.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- task 2 -->
+  <div class="tk">
+    <h3>2. Сумма чисел от 1 до N</h3>
+    <div class="file">sum_to_n.py</div>
+
+    <div class="part"><b>Что должно получиться</b>
+      <div class="out">Введите число: 5
+Сумма чисел от 1 до 5 = 15</div>
+    </div>
+
+    <div class="part"><b>Разбор по шагам</b>
+      <ol>
+        <li>Спросить число через <code class="i">input()</code> и превратить в целое.</li>
+        <li>До цикла завести накопитель со значением 0.</li>
+        <li>Пройти циклом по числам от 1 до введённого <b>включительно</b>.</li>
+        <li>На каждой итерации прибавить текущее число к накопителю.</li>
+        <li>После цикла вывести результат f-строкой.</li>
+      </ol>
+    </div>
+
+    <div class="part"><b>Подсказки</b>
+      <details><summary>Подсказка 1 — мягкая</summary>
+        <p>Схема накопления из блока 3: переменная до цикла, <code class="i">+=</code> внутри, печать после. Не забудь, что <code class="i">input()</code> отдаёт строку.</p>
+      </details>
+      <details><summary>Подсказка 2 — конкретная</summary>
+        <p><code class="i">for i in range(1, n + 1):</code> — плюс один нужен именно потому, что правая граница не входит, а число n должно попасть в сумму.</p>
+      </details>
+    </div>
+
+    <div class="part"><b>Что проверить</b>
+      <table>
+        <tr><th>Ввод</th><th>Ожидание</th><th>Зачем</th></tr>
+        <tr><td>1</td><td>1</td><td>минимальный случай</td></tr>
+        <tr><td>5</td><td>15</td><td>обычный случай</td></tr>
+        <tr><td>10</td><td>55</td><td>проверка формулы</td></tr>
+        <tr><td>0</td><td>0</td><td>цикл не выполнится ни разу</td></tr>
+      </table>
+      <p>Заметь: ты уже подбираешь значения по границам. Завтра, на дне 7, у этого появится название.</p>
+    </div>
+
+    <div class="part"><b>Типичные ошибки этой задачи</b>
+      <ul>
+        <li><code class="i">total = 0</code> внутри цикла — результат окажется равен последнему числу.</li>
+        <li><code class="i">range(1, n)</code> — потеряется само n, при вводе 5 получится 10.</li>
+        <li><code class="i">print</code> внутри цикла — вместо одной строки будет пять.</li>
+        <li>Забыт <code class="i">int()</code> — <code class="i">TypeError</code> при сложении строки с числом.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- task 3 -->
+  <div class="tk">
+    <h3>3. Таблица умножения</h3>
+    <div class="file">multiplication_table.py</div>
+
+    <div class="part"><b>Что должно получиться</b>
+      <div class="out">Введите число: 7
+7 x 1 = 7
+7 x 2 = 14
+7 x 3 = 21
+7 x 4 = 28
+7 x 5 = 35
+7 x 6 = 42
+7 x 7 = 49
+7 x 8 = 56
+7 x 9 = 63
+7 x 10 = 70</div>
+    </div>
+
+    <div class="part"><b>Разбор по шагам</b>
+      <ol>
+        <li>Получить число от пользователя, превратить в целое.</li>
+        <li>Цикл по множителям от 1 до 10 включительно.</li>
+        <li>Внутри — одна f-строка, где считается и подставляется произведение.</li>
+      </ol>
+    </div>
+
+    <div class="part"><b>Подсказки</b>
+      <details><summary>Подсказка 1 — мягкая</summary>
+        <p>В f-строке можно писать не только имя переменной, но и вычисление: внутри фигурных скобок допустима арифметика.</p>
+      </details>
+      <details><summary>Подсказка 2 — конкретная</summary>
+        <p><code class="i">print(f"{n} x {i} = {n * i}")</code>, где <code class="i">i</code> — переменная цикла из <code class="i">range(1, 11)</code>.</p>
+      </details>
+    </div>
+
+    <div class="part"><b>Что проверить</b>
+      <table>
+        <tr><th>Ввод</th><th>Ожидание</th></tr>
+        <tr><td>7</td><td>10 строк, последняя «7 x 10 = 70»</td></tr>
+        <tr><td>1</td><td>«1 x 1 = 1» … «1 x 10 = 10»</td></tr>
+        <tr><td>0</td><td>все произведения равны 0, строк по-прежнему 10</td></tr>
+        <tr><td>-3</td><td>отрицательные произведения, программа не падает</td></tr>
+      </table>
+    </div>
+
+    <div class="part"><b>Типичные ошибки этой задачи</b>
+      <ul>
+        <li><code class="i">range(10)</code> — таблица начнётся с нуля и оборвётся на девятке.</li>
+        <li>Перепутаны местами <code class="i">n</code> и <code class="i">i</code> — числа верные, но текст читается неправильно.</li>
+        <li>Умножение написано вне f-строки без сохранения в переменную — результат потеряется.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- task 4 -->
+  <div class="tk">
+    <h3>4. Три попытки ввода пароля</h3>
+    <div class="file">password_attempts.py</div>
+
+    <div class="part"><b>Что должно получиться</b>
+      <p>Сценарий первый — угадала со второй попытки:</p>
+      <div class="out">Введите пароль: qwerty
+Неверный пароль. Осталось попыток: 2
+Введите пароль: python123
+Добро пожаловать!</div>
+      <p>Сценарий второй — три раза мимо:</p>
+      <div class="out">Введите пароль: 111
+Неверный пароль. Осталось попыток: 2
+Введите пароль: 222
+Неверный пароль. Осталось попыток: 1
+Введите пароль: 333
+Неверный пароль. Осталось попыток: 0
+Аккаунт заблокирован.</div>
+    </div>
+
+    <div class="part"><b>Разбор по шагам</b>
+      <ol>
+        <li>Задать правильный пароль в переменную, например <code class="i">python123</code>.</li>
+        <li>Завести счётчик оставшихся попыток со значением 3.</li>
+        <li>Цикл <code class="i">while</code>, который работает, пока попытки есть.</li>
+        <li>Внутри: спросить пароль, сравнить с правильным.</li>
+        <li>Совпал — приветствие и выход из цикла.</li>
+        <li>Не совпал — уменьшить счётчик и сказать, сколько осталось.</li>
+        <li>После цикла — сообщение о блокировке, но <b>только если пароль так и не угадали</b>.</li>
+      </ol>
+    </div>
+
+    <div class="part"><b>Подсказки</b>
+      <details><summary>Подсказка 1 — мягкая</summary>
+        <p>Сообщение о блокировке — самая хитрая часть. Как программе после цикла понять, чем он закончился? Либо посмотреть на счётчик, либо завести отдельную переменную-флаг, которую ты ставишь в <code class="i">True</code> при удачном входе.</p>
+      </details>
+      <details><summary>Подсказка 2 — конкретная</summary>
+        <p>Вариант с флагом:</p>
+<pre><code>is_logged_in = False
+attempts = 3
+while attempts > 0:
+    ...
+    if entered == real_password:
+        is_logged_in = True
+        break
+    ...
+if not is_logged_in:
+    print("Аккаунт заблокирован.")</code></pre>
+        <p>Многоточиями отмечено то, что пишешь сама.</p>
+      </details>
+    </div>
+
+    <div class="part"><b>Что проверить</b>
+      <table>
+        <tr><th>Что вводим</th><th>Ожидание</th></tr>
+        <tr><td>Правильный пароль с первого раза</td><td>приветствие, про блокировку ни слова</td></tr>
+        <tr><td>Неверный, потом правильный</td><td>одно предупреждение, потом приветствие</td></tr>
+        <tr><td>Три неверных</td><td>три предупреждения и блокировка</td></tr>
+        <tr><td>Четвёртая попытка</td><td>не предлагается вообще</td></tr>
+        <tr><td>Пустая строка</td><td>считается неверным паролем, попытка тратится</td></tr>
+      </table>
+    </div>
+
+    <div class="part"><b>Типичные ошибки этой задачи</b>
+      <ul>
+        <li>Забыто уменьшение счётчика — бесконечный цикл. Останавливай <code class="i">Ctrl+C</code>.</li>
+        <li>Нет <code class="i">break</code> — после верного пароля программа продолжит спрашивать.</li>
+        <li>«Аккаунт заблокирован» печатается всегда, даже при успешном входе.</li>
+        <li><code class="i">=</code> вместо <code class="i">==</code> в сравнении — <code class="i">SyntaxError</code>.</li>
+        <li>Счётчик уменьшается до вывода сообщения или после — сверься с ожидаемым текстом, там числа 2, 1, 0.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- task 5 -->
+  <div class="tk">
+    <h3>5. Только чётные, через continue</h3>
+    <div class="file">even_filter.py</div>
+
+    <div class="part"><b>Что должно получиться</b>
+      <div class="out">Введите число: 10
+2
+4
+6
+8
+10
+Всего чётных: 5</div>
+      <p>Условие: нечётные надо пропускать именно через <code class="i">continue</code>, а не прятать печать внутрь <code class="i">if</code>. Задача — потренировать конструкцию.</p>
+    </div>
+
+    <div class="part"><b>Разбор по шагам</b>
+      <ol>
+        <li>Получить число, превратить в целое.</li>
+        <li>Завести счётчик найденных чётных до цикла.</li>
+        <li>Пройти по числам от 1 до введённого включительно.</li>
+        <li>Если число нечётное — <code class="i">continue</code>.</li>
+        <li>Иначе (то есть до этой строки дошли только чётные) — напечатать и увеличить счётчик.</li>
+        <li>После цикла вывести итог.</li>
+      </ol>
+    </div>
+
+    <div class="part"><b>Подсказки</b>
+      <details><summary>Подсказка 1 — мягкая</summary>
+        <p>Проверка на чётность у тебя уже написана в <code class="i">even_odd.py</code> из дня 5: остаток от деления на 2. Здесь нужна обратная проверка — «остаток не равен нулю».</p>
+      </details>
+      <details><summary>Подсказка 2 — конкретная</summary>
+        <p><code class="i">if i % 2 != 0: continue</code> — и дальше две строки без <code class="i">else</code>, на уровне тела цикла. <code class="i">else</code> здесь не нужен: если число нечётное, до этих строк управление просто не дойдёт.</p>
+      </details>
+    </div>
+
+    <div class="part"><b>Что проверить</b>
+      <table>
+        <tr><th>Ввод</th><th>Ожидание</th></tr>
+        <tr><td>10</td><td>2 4 6 8 10, счётчик 5</td></tr>
+        <tr><td>9</td><td>2 4 6 8, счётчик 4</td></tr>
+        <tr><td>2</td><td>одна строка «2», счётчик 1</td></tr>
+        <tr><td>1</td><td>чисел нет, счётчик 0</td></tr>
+      </table>
+    </div>
+
+    <div class="part"><b>Типичные ошибки этой задачи</b>
+      <ul>
+        <li><code class="i">continue</code> стоит после <code class="i">print</code> — печатаются все числа подряд.</li>
+        <li>Счётчик увеличивается вне <code class="i">if</code> — посчитаются все числа, а не чётные.</li>
+        <li>Перепутаны <code class="i">==</code> и <code class="i">!=</code> — выведутся нечётные.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- task 6 -->
+  <div class="tk">
+    <h3>6. Касса со скидкой <span style="font-weight:400;color:var(--ink-soft)">— со звёздочкой</span></h3>
+    <div class="file">shopping.py</div>
+
+    <div class="part"><b>Что должно получиться</b>
+      <div class="out">Введите цену товара или 'стоп': 1200
+Введите цену товара или 'стоп': 3500
+Введите цену товара или 'стоп': 800
+Введите цену товара или 'стоп': стоп
+
+Товаров: 3
+Сумма: 5500.0
+Самый дорогой товар: 3500.0
+Скидка: 10%
+К оплате: 4950.0</div>
+      <p>Скидка берётся из твоей же таблицы дня 5: от 5000 — 10%, от 3000 — 5%, меньше — без скидки.</p>
+      <p>Если сразу ввести «стоп»:</p>
+      <div class="out">Введите цену товара или 'стоп': стоп
+
+Корзина пуста.</div>
+    </div>
+
+    <div class="part"><b>Разбор по шагам</b>
+      <ol>
+        <li>До цикла: сумма = 0, количество = 0, максимальная цена = 0.</li>
+        <li><code class="i">while True</code> — заранее неизвестно, сколько товаров пробьют.</li>
+        <li>Спросить строку. Если это «стоп» — <code class="i">break</code>.</li>
+        <li>Иначе превратить во <code class="i">float</code> (цены бывают дробные) и обновить все три переменные.</li>
+        <li>Максимум: если текущая цена больше сохранённой — перезаписать.</li>
+        <li>После цикла: если количество равно нулю — сказать «Корзина пуста» и на этом всё.</li>
+        <li>Иначе посчитать скидку цепочкой <code class="i">if / elif / else</code> и вывести итог.</li>
+      </ol>
+    </div>
+
+    <div class="part"><b>Подсказки</b>
+      <details><summary>Подсказка 1 — мягкая</summary>
+        <p>Сравнивать введённое со словом «стоп» нужно <b>до</b> превращения во <code class="i">float</code>. Если сделать наоборот, программа упадёт с <code class="i">ValueError</code> ровно в тот момент, когда пользователь захочет выйти.</p>
+      </details>
+      <details><summary>Подсказка 2 — конкретная</summary>
+        <p>Скелет:</p>
+<pre><code>total = 0
+count = 0
+max_price = 0
+
+while True:
+    answer = input("Введите цену товара или 'стоп': ")
+    if answer == "стоп":
+        break
+    price = float(answer)
+    ...
+
+if count == 0:
+    print("Корзина пуста.")
+else:
+    ...</code></pre>
+        <p>Для округления до копеек пригодится <code class="i">round(число, 2)</code>.</p>
+      </details>
+    </div>
+
+    <div class="part"><b>Что проверить</b>
+      <table>
+        <tr><th>Сценарий</th><th>Ожидание</th></tr>
+        <tr><td>1200, 3500, 800</td><td>сумма 5500, скидка 10%, к оплате 4950</td></tr>
+        <tr><td>Сразу «стоп»</td><td>«Корзина пуста», без падения и без деления</td></tr>
+        <tr><td>Один товар 2999</td><td>скидки нет, максимум равен сумме</td></tr>
+        <tr><td>Один товар 3000</td><td>скидка 5% — граница</td></tr>
+        <tr><td>Товары 2000 и 3000</td><td>сумма 5000, скидка 10% — вторая граница</td></tr>
+        <tr><td>Цена 0</td><td>товар считается, сумма не меняется</td></tr>
+      </table>
+    </div>
+
+    <div class="part"><b>Типичные ошибки этой задачи</b>
+      <ul>
+        <li>Границы скидок съезжают на единицу — та же ошибка, что ты уже ловила в <code class="i">discount_levels.py</code>.</li>
+        <li>Нет проверки на пустую корзину — при попытке посчитать среднее будет <code class="i">ZeroDivisionError</code>.</li>
+        <li><code class="i">float()</code> вызван до проверки на «стоп» — <code class="i">ValueError</code> на выходе.</li>
+        <li><code class="i">max_price</code> обновляется без сравнения — останется цена последнего товара.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="box trap">
+    <div class="title">Правило 20 минут</div>
+    <p>Не идёт больше двадцати минут — открой обе подсказки. Не помогло — переходи к следующей задаче и пиши мне: что делала / что ожидала / полный текст ошибки / что уже пробовала. Таймер внизу справа.</p>
+  </div>
+</section>
+
+<!-- 8 -->
+<section id="s8">
+  <h2><span class="num">8.</span> Тест: читаем чужой код</h2>
+  <p>Десять фрагментов. Задача — сказать, что произойдёт, <b>не запуская</b>. Именно этим занимается ревьюер и тестировщик: код перед тобой, надо предсказать поведение. Разбирай глазами, построчно.</p>
+  <div id="quiz"></div>
+  <div class="score" id="score">Отвечено: 0 из 10</div>
+</section>
+
+<!-- 9 -->
+<section id="s9">
+  <h2><span class="num">9.</span> Закрываем день</h2>
+
+  <div class="box note">
+    <div class="title">В тетрадь</div>
+    <ul>
+      <li>Схема <code class="i">for ... in ...:</code> и три формы <code class="i">range</code>.</li>
+      <li>Три шага накопления: до цикла — внутри — после.</li>
+      <li>Порядок работы <code class="i">while</code> и правило поиска строки, меняющей условие.</li>
+      <li>Разница <code class="i">break</code> и <code class="i">continue</code> своими словами.</li>
+    </ul>
+  </div>
+
+  <div class="box card">
+    <div class="title">На карточки — четыре новых</div>
+    <ul>
+      <li>Чем <code class="i">for</code> отличается от <code class="i">while</code>?</li>
+      <li>Что выдаст <code class="i">range(2, 6)</code>?</li>
+      <li>Где объявляется переменная-накопитель и почему?</li>
+      <li><code class="i">break</code> против <code class="i">continue</code>.</li>
+    </ul>
+  </div>
+
+  <div class="box note">
+    <div class="title">В errors-log.md — новые строки</div>
+    <ul>
+      <li>Правая граница <code class="i">range</code> не входит: чтобы дойти до n, нужен <code class="i">n + 1</code>.</li>
+      <li>Забыл изменить переменную в <code class="i">while</code> — бесконечный цикл, выход <code class="i">Ctrl+C</code>.</li>
+      <li>Накопитель обнулён внутри цикла — ошибки нет, результат неверный.</li>
+      <li><code class="i">break</code> выходит только из своего цикла, не из внешнего.</li>
+    </ul>
+  </div>
+
+  <h3>Коммит</h3>
+  <div class="term"><span>cd C:\projects\qa-learning</span><button onclick="cp(this,'cd C:\\projects\\qa-learning')">Копировать</button></div>
+  <div class="term"><span>git add .</span><button onclick="cp(this,'git add .')">Копировать</button></div>
+  <div class="term"><span>git commit -m "day06: loops for and while"</span><button onclick="cp(this,'git commit -m &quot;day06: loops for and while&quot;')">Копировать</button></div>
+  <div class="term"><span>git push</span><button onclick="cp(this,'git push')">Копировать</button></div>
+  <p>Проверь на GitHub, что папка <code class="i">day06</code> действительно появилась. Сохранить файлы и забыть про push — самая частая потеря дня.</p>
+
+  <div class="box def">
+    <div class="title">Что будет завтра</div>
+    <p>День 7 — тест-дизайн: эквивалентные классы и граничные значения. Те самые «проверь 2999, 3000, 3001», которые ты сегодня делала руками, получат название, правила и место в тест-кейсе.</p>
+  </div>
+
+  <h3>Что прислать мне</h3>
+  <ul>
+    <li>Сколько времени реально ушло и что оказалось тяжелее, чем ожидалось.</li>
+    <li>Код шести файлов — текстом или скриншотами.</li>
+    <li>Результат теста и номера вопросов, на которых споткнулась.</li>
+    <li>Попадала ли в бесконечный цикл и как выбралась.</li>
+  </ul>
+</section>
+
+</div>
+
+<div id="timer">
+  <span id="tval">20:00</span>
+  <button id="tbtn" onclick="tog()">Старт</button>
+  <button onclick="rst()">Сброс</button>
+</div>
+
+<script>
+/* progress bar */
+document.addEventListener('scroll',function(){
+  var h=document.documentElement;
+  var p=h.scrollTop/(h.scrollHeight-h.clientHeight)*100;
+  document.getElementById('bar').style.width=p+'%';
+});
+
+/* copy buttons */
+function cp(btn,text){
+  navigator.clipboard.writeText(text).then(function(){
+    var old=btn.textContent;btn.textContent='Скопировано';
+    setTimeout(function(){btn.textContent=old;},1200);
+  });
+}
+
+/* 20-minute timer */
+var left=1200,run=false,iv=null;
+function fmt(s){var m=Math.floor(s/60),r=s%60;return m+':'+(r<10?'0':'')+r;}
+function tick(){
+  left--;document.getElementById('tval').textContent=fmt(left);
+  if(left<=0){clearInterval(iv);run=false;document.getElementById('tbtn').textContent='Старт';
+    document.getElementById('tval').textContent='Стоп';
+    document.getElementById('timer').style.borderColor='#b0352b';}
+}
+function tog(){
+  if(run){clearInterval(iv);run=false;document.getElementById('tbtn').textContent='Продолжить';}
+  else{iv=setInterval(tick,1000);run=true;document.getElementById('tbtn').textContent='Пауза';}
+}
+function rst(){clearInterval(iv);run=false;left=1200;
+  document.getElementById('tval').textContent='20:00';
+  document.getElementById('tbtn').textContent='Старт';
+  document.getElementById('timer').style.borderColor='';}
+
+/* python highlighter */
+var RE=/("""[\s\S]*?"""|'[^'\n]*'|"[^"\n]*"|#[^\n]*|\b(?:if|elif|else|for|while|in|not|and|or|break|continue|return|def|import|from|as|pass|True|False|None)\b|\b(?:print|input|int|float|str|len|range|round|abs|type|sum)\b|\b\d+\.?\d*\b)/g;
+var KW=['if','elif','else','for','while','in','not','and','or','break','continue','return','def','import','from','as','pass','True','False','None'];
+document.querySelectorAll('pre code').forEach(function(el){
+  var t=el.textContent
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  t=t.replace(RE,function(m){
+    var c;
+    if(m[0]==='#') c='cm';
+    else if(m[0]==='"'||m[0]==="'") c='st';
+    else if(KW.indexOf(m)>-1) c='kw';
+    else if(/^\d/.test(m)) c='nu';
+    else c='bi';
+    return '<span class="'+c+'">'+m+'</span>';
+  });
+  el.innerHTML=t;
+});
+
+/* quiz */
+var QS=[
+ {code:'for i in range(1, 5):\n    print(i)',
+  q:'Что напечатает этот код?',
+  o:['1 2 3 4','1 2 3 4 5','0 1 2 3 4','1 2 3'],a:0,
+  e:'range(1, 5) даёт 1, 2, 3, 4. Правая граница не включается — пятёрки не будет.'},
+
+ {code:'for i in range(0, 10, 3):\n    print(i)',
+  q:'Какие числа появятся на экране?',
+  o:['0 3 6 9','3 6 9','0 3 6 9 12','0 1 2 ... 9'],a:0,
+  e:'Старт 0, шаг 3, стоп 10. Следующее после 9 было бы 12, но это уже за границей.'},
+
+ {code:'count = 0\nwhile count < 3:\n    print("привет")',
+  q:'Что произойдёт при запуске?',
+  o:['Напечатает «привет» три раза','Напечатает «привет» один раз','Бесконечный цикл','Ошибка синтаксиса'],a:2,
+  e:'Ни одна строка не меняет count, условие count < 3 остаётся истинным навсегда. Выход — Ctrl+C.'},
+
+ {code:'total = 0\nfor i in range(1, 4):\n    total = 0\n    total += i\nprint(total)',
+  q:'Что выведет print в конце?',
+  o:['6','3','0','1'],a:1,
+  e:'total обнуляется на каждой итерации, поэтому накопления не происходит. Останется последнее i, то есть 3. Ошибки нет, результат неверный — самый опасный вид бага.'},
+
+ {code:'for i in range(1, 6):\n    if i == 3:\n        break\n    print(i)',
+  q:'Что напечатает код?',
+  o:['1 2 4 5','1 2','1 2 3','1 2 3 4 5'],a:1,
+  e:'break прерывает цикл целиком на третьей итерации, причём до print управление не доходит.'},
+
+ {code:'for i in range(1, 6):\n    if i == 3:\n        continue\n    print(i)',
+  q:'А этот?',
+  o:['1 2','1 2 4 5','1 2 3 4 5','4 5'],a:1,
+  e:'continue пропускает только текущую итерацию. Тройка не печатается, но цикл идёт дальше.'},
+
+ {code:'for i in range(5, 1):\n    print(i)\nprint("конец")',
+  q:'Сколько чисел напечатается?',
+  o:['Четыре: 5 4 3 2','Ни одного, потом «конец»','Ошибка ValueError','Бесконечный цикл'],a:1,
+  e:'Без отрицательного шага range идёт только вперёд. От 5 к 1 вперёд пути нет — последовательность пустая, цикл не выполнится ни разу. Ошибки при этом не будет, «конец» напечатается.'},
+
+ {code:'for i in range(1, 4):\n    for j in range(1, 3):\n        print("*")',
+  q:'Сколько звёздочек окажется на экране?',
+  o:['5','6','3','2'],a:1,
+  e:'Внешний цикл делает 3 итерации, внутренний на каждой — 2. Итого 3 × 2 = 6.'},
+
+ {code:'for i in range(1, 4):\n    for j in range(1, 4):\n        if j == 2:\n            break\n        print(j)',
+  q:'Что напечатает код?',
+  o:['1','1 1 1','1 2 3','ничего'],a:1,
+  e:'break выходит только из внутреннего цикла. Внешний прокручивается все три раза, и каждый раз печатается одна единица.'},
+
+ {code:'password = "abc"\nattempts = 0\nwhile attempts < 3:\n    attempts += 1\nprint(attempts)',
+  q:'Какое значение будет у attempts после цикла?',
+  o:['2','3','4','0'],a:1,
+  e:'Цикл останавливается, когда условие становится ложным. Это происходит при attempts = 3 — именно это значение и остаётся. Переменная цикла живёт и после его окончания.'}
+];
+
+var answered=0;
+var box=document.getElementById('quiz');
+QS.forEach(function(item,idx){
+  var d=document.createElement('div');d.className='q';
+  var esc=item.code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(RE,function(m){
+      var c;
+      if(m[0]==='#') c='cm';
+      else if(m[0]==='"'||m[0]==="'") c='st';
+      else if(KW.indexOf(m)>-1) c='kw';
+      else if(/^\d/.test(m)) c='nu';
+      else c='bi';
+      return '<span class="'+c+'">'+m+'</span>';
+    });
+  d.innerHTML='<div class="qn">Вопрос '+(idx+1)+'</div><pre><code>'+esc+'</code></pre><div>'+item.q+'</div>';
+  var opts=document.createElement('div');opts.className='opts';
+  item.o.forEach(function(text,i){
+    var b=document.createElement('button');b.className='opt';b.textContent=text;
+    b.onclick=function(){
+      if(d.dataset.done) return;
+      d.dataset.done='1';answered++;
+      opts.querySelectorAll('.opt')[item.a].classList.add('right');
+      if(i!==item.a) b.classList.add('wrong');
+      var ex=d.querySelector('.expl');ex.style.display='block';
+      document.getElementById('score').textContent='Отвечено: '+answered+' из '+QS.length;
+    };
+    opts.appendChild(b);
+  });
+  d.appendChild(opts);
+  var ex=document.createElement('div');ex.className='expl';ex.textContent=item.e;
+  d.appendChild(ex);
+  box.appendChild(d);
+});
+</script>
+</body>
+</html>

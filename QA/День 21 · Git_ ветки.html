@@ -1,0 +1,729 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>День 21 · Git: ветки</title>
+<style>
+/* Тёмная версия оформления дня 13: вкладки сверху, плашки по роли, блоки кода. Одна тёмная тема по просьбе — «на чёрном фоне». */
+:root{
+  --bg:#0d1116; --paper:#151b22; --ink:#e6ebf0; --soft:#9aa6b2; --line:#2a333d;
+  --blue:#7fb2ee; --blue-bg:#142235;
+  --red:#f0928a; --red-bg:#2b1716;
+  --green:#72c79f; --green-bg:#10251c;
+  --amber:#e7bb62; --amber-bg:#2a2210;
+  --violet:#b8a8ea; --violet-bg:#1e1a2f;
+  --code-bg:#080b0f; --code-fg:#dce7f0; --code-cm:#7d8fa0;
+  --chip:#1d252e; --th:#1a222b; --soft-bg:#10161c; --hover:#1d2731; --btn:#e6ebf0; --btn-fg:#0d1116;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.62;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding-inline:18px;padding-block:0 60px}
+header{padding:34px 0 14px}
+.day{font-size:14px;color:var(--soft)}
+h1{font-size:33px;line-height:1.15;margin:.2em 0 .3em;text-wrap:balance}
+.lead{color:var(--soft);margin:0;max-width:62ch}
+
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);padding:10px 0 8px;
+  display:flex;gap:6px;overflow-x:auto;border-bottom:1px solid var(--line)}
+.tabs button{flex:0 0 auto;background:var(--paper);border:1px solid var(--line);border-radius:8px;
+  padding:8px 13px;font:inherit;font-size:14.5px;color:var(--soft);cursor:pointer;white-space:nowrap}
+.tabs button.on{background:var(--btn);color:var(--btn-fg);border-color:var(--btn);font-weight:600}
+.tabs button .n{opacity:.55;margin-right:6px}
+button:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+.pane{display:none;background:var(--paper);border:1px solid var(--line);border-top:0;
+  border-radius:0 0 12px 12px;padding:28px 30px 34px}
+.pane.on{display:block}
+.pane h2{margin:0 0 6px;font-size:26px;line-height:1.2;text-wrap:balance}
+.pane .sub{color:var(--soft);margin:0 0 20px;font-size:15.5px}
+h3{font-size:19.5px;margin:30px 0 8px;text-wrap:balance}
+h4{font-size:17px;margin:20px 0 6px}
+p{margin:12px 0}
+ul,ol{padding-left:24px}li{margin:6px 0}
+b{color:#fff}
+code.i{background:var(--chip);border:1px solid var(--line);border-radius:4px;padding:1px 5px;
+ font-family:Consolas,monospace;font-size:.92em}
+pre{background:var(--code-bg);color:var(--code-fg);border:1px solid var(--line);border-radius:9px;padding:15px 17px;overflow-x:auto;
+ font-family:Consolas,monospace;font-size:14.5px;line-height:1.55;margin:14px 0}
+pre .cm{color:var(--code-cm)}
+pre.light{background:var(--soft-bg)}
+
+.box{border-left:4px solid;border-radius:0 8px 8px 0;padding:14px 18px;margin:18px 0}
+.box .title{font-weight:700;margin-bottom:4px}
+.def{border-color:var(--blue);background:var(--blue-bg)} .def .title{color:var(--blue)}
+.trap{border-color:var(--red);background:var(--red-bg)} .trap .title{color:var(--red)}
+.note{border-color:var(--green);background:var(--green-bg)} .note .title{color:var(--green)}
+.card{border-color:var(--amber);background:var(--amber-bg)} .card .title{color:var(--amber)}
+.task{border-color:var(--violet);background:var(--violet-bg)} .task .title{color:var(--violet)}
+.box p:first-of-type{margin-top:2px}.box p:last-child{margin-bottom:2px}
+
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15.5px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--th);font-weight:600}
+td{font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto}
+.mono{font-family:Consolas,monospace;white-space:nowrap}
+
+details{border:1px solid var(--line);background:var(--soft-bg);border-radius:8px;padding:10px 14px;margin:10px 0}
+summary{cursor:pointer;font-weight:600;color:var(--violet)}
+details[open] summary{margin-bottom:8px}
+
+.simple{border:1px solid var(--line);background:var(--soft-bg);border-radius:10px;padding:14px 18px;margin:16px 0}
+.simple .title{font-weight:700;margin-bottom:4px}
+.steps{counter-reset:st;list-style:none;padding-left:0}
+.steps>li{counter-increment:st;position:relative;padding-left:38px;margin:12px 0}
+.steps>li::before{content:counter(st);position:absolute;left:0;top:1px;width:26px;height:26px;border-radius:50%;
+  background:var(--btn);color:var(--btn-fg);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.done{border:1px dashed var(--green);border-radius:8px;padding:10px 14px;margin:14px 0;font-size:15.5px}
+.done b{color:var(--green)}
+
+.diary{border:1px solid var(--line);border-radius:12px;background:var(--soft-bg);padding:6px 20px;margin:16px 0}
+.diary .d{display:grid;grid-template-columns:92px 1fr;gap:14px;padding:12px 0;border-top:1px solid var(--line)}
+.diary .d:first-child{border-top:0}
+.diary .when{font-family:Consolas,monospace;font-size:14px;color:var(--amber);padding-top:2px}
+.diary .d p{margin:0}
+@media(max-width:560px){.diary .d{grid-template-columns:1fr;gap:2px}}
+
+.flow{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0;align-items:stretch}
+.flow .st{flex:1 1 120px;min-width:0;background:var(--soft-bg);border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-size:14.5px}
+.flow .st b{display:block;font-size:13px;color:var(--amber);letter-spacing:.03em;margin-bottom:2px}
+
+.q{border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:16px 0}
+.qn{font-weight:700;margin-bottom:6px}
+.opts{display:grid;gap:8px;margin-top:12px}
+.opt{text-align:left;background:var(--soft-bg);border:1px solid var(--line);border-radius:8px;
+ padding:10px 14px;cursor:pointer;font:inherit;font-size:16px;color:var(--ink)}
+.opt:hover{background:var(--hover)}
+.opt.right{background:var(--green-bg);border-color:var(--green);font-weight:600}
+.opt.wrong{background:var(--red-bg);border-color:var(--red)}
+.expl{margin-top:12px;padding:12px 14px;background:var(--soft-bg);border-radius:8px}
+.score{position:sticky;bottom:env(safe-area-inset-bottom,0px);background:var(--paper);border:1px solid var(--line);
+ border-radius:10px;padding:12px 18px;margin-top:18px;font-weight:600;font-variant-numeric:tabular-nums}
+.split{display:flex;align-items:center;gap:12px;margin:28px 0 8px;color:var(--soft);font-size:14.5px;font-weight:600}
+.split::before,.split::after{content:"";flex:1;border-top:1px dashed var(--line)}
+
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:34px;padding-top:18px;border-top:1px solid var(--line)}
+.nav button{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 16px;
+ font:inherit;cursor:pointer;color:var(--ink)}
+.nav .next{background:var(--btn);color:var(--btn-fg);border-color:var(--btn)}
+.nav button[disabled]{opacity:.35;cursor:default}
+@media(max-width:640px){.wrap{padding-inline:16px}.pane{padding:20px 17px 26px}h1{font-size:27px}pre{font-size:13.5px}}
+</style>
+
+<style>
+.term{background:var(--code-bg);border:1px solid var(--line);border-radius:9px;padding:13px 16px;font-family:Consolas,monospace;font-size:14.5px;line-height:1.55;overflow-x:auto;white-space:pre;margin:12px 0}
+.term .p{color:var(--green)}
+.term .o{color:var(--soft)}
+.term .w{color:var(--amber)}
+.term .e{color:var(--red)}
+.graph{font-family:Consolas,monospace;font-size:14.5px;line-height:1.5;background:var(--soft-bg);border:1px solid var(--line);border-radius:9px;padding:14px 16px;overflow-x:auto;white-space:pre;margin:14px 0}
+.graph .m{color:var(--blue)} .graph .f{color:var(--amber)}
+</style>
+
+<div class="wrap">
+
+<header>
+  <div class="day">День 21 · четверг, 15 октября · Этап 3: Git</div>
+  <h1>Ветки, слияние и конфликты</h1>
+  <p class="lead">До сих пор ты коммитила всё в одну линию. В команде так не работают: каждая задача делается в своей ветке и попадает в общий код через слияние. Сегодня учимся создавать ветки, сливать их, нарочно устраиваем конфликт и чиним его. Во втором заходе — новая часть генератора, сделанная уже по-командному: в отдельной ветке.</p>
+</header>
+
+<div class="box def">
+  <div class="title">Два захода, около 4:30</div>
+  <p><b>Заход 1 · 2:30</b> — вкладки 0–5. <b>Перерыв — час без экрана.</b> <b>Заход 2 · 2:00</b> — вкладки 6–8.</p>
+  <p>Сегодня почти всё делается в терминале PyCharm или в Git Bash. Команды копируй по одной и после каждой смотри, что напечаталось. Вывод команд Git — главная подсказка, как и сообщения Python.</p>
+</div>
+
+<div class="tabs" id="tabs"></div>
+
+<!-- 0 -->
+<div class="pane" data-title="Карточки и код">
+  <h2>Разминка</h2>
+  <p class="sub">25 минут: карточки 15, чтение кода 10</p>
+
+  <h3>Карточки — три блока</h3>
+  <ol class="steps">
+    <li><b>H · Чек-листы</b> — второй прогон, 7 карточек, обычный режим по ядру.</li>
+    <li><b>F · Git</b> — третий прогон, 5 карточек. Сегодня тема про Git — ответь вслух особенно внимательно, вечером проверим, что изменилось.</li>
+    <li><b>R · Процессы</b> — новый блок, 5 карточек, галочка «Знакомство», без оценки.</li>
+  </ol>
+  <div class="done"><b>Готово, когда</b> записан счёт H + F из 12.</div>
+
+  <h3>Чтение кода</h3>
+  <p>Подготовка к CP1: функции и словари. Таблицу на бумаге — обязательно. В четвёртом вопросе новое: метод <code class="i">get</code> со значением по умолчанию внутри счётчика. Подумай, что вернёт <code class="i">count.get(r, 0)</code>, когда ключа ещё нет.</p>
+  <div id="quizA"></div>
+</div>
+
+<!-- 1 -->
+<div class="pane" data-title="Охота">
+  <h2>Чужой терминал</h2>
+  <p class="sub">25 минут</p>
+
+  <p>Тестировщик Олег пишет автотесты в общем репозитории команды. Ниже — его терминал за один день. Вечером тимлид написал: «Олег, ты сломал main, и в репозитории лежит пароль от стенда». Найди, где именно он ошибся.</p>
+
+  <div class="simple">
+    <div class="title">Как читать</div>
+    <p>Строки с <code class="i">$</code> — команды, которые вводил Олег. Строки ниже — что ответил Git. Ответ Git почти всегда говорит, что пошло не так, — Олег его не читал. Ты прочитай.</p>
+  </div>
+
+<div class="term"><span class="o"># 1</span>
+<span class="p">$ git status</span>
+<span class="o">On branch main
+Your branch is up to date with 'origin/main'.</span>
+
+<span class="o"># 2</span>
+<span class="p">$ git add .</span>
+<span class="p">$ git commit -m "fix"</span>
+<span class="o">[main 4c1e2a9] fix
+ 3 files changed, 41 insertions(+)
+ create mode 100644 tests/test_login.py
+ create mode 100644 .env
+ create mode 100644 .idea/workspace.xml</span>
+
+<span class="o"># 3</span>
+<span class="p">$ git push</span>
+<span class="e"> ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'github.com:team/autotests.git'
+hint: Updates were rejected because the remote contains work that you do
+hint: not have locally.</span>
+
+<span class="o"># 4</span>
+<span class="p">$ git push --force</span>
+<span class="o">+ 9b2f7d1...4c1e2a9 main -> main (forced update)</span>
+
+<span class="o"># 5 — позже, новая задача</span>
+<span class="p">$ git switch -c feature/cart-tests</span>
+<span class="o">Switched to a new branch 'feature/cart-tests'</span>
+<span class="p">$ git commit -am "cart tests"</span>
+<span class="p">$ git switch main</span>
+<span class="p">$ git merge feature/cart-tests</span>
+<span class="e">CONFLICT (content): Merge conflict in tests/conftest.py
+Automatic merge failed; fix conflicts and then commit the result.</span>
+<span class="p">$ git add .</span>
+<span class="p">$ git commit -m "merge"</span>
+
+<span class="o"># 6 — содержимое tests/conftest.py после этого</span>
+<span class="w">BASE_URL = "https://stage.shop.ru"
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+TIMEOUT = 10
+=======
+TIMEOUT = 30
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/cart-tests</span></div>
+
+  <div class="box task">
+    <div class="title">Задание</div>
+    <ol class="steps">
+      <li>Создай файл <code class="i">manual/day21-git-hunt.md</code>.</li>
+      <li>Пройди по шести блокам терминала. В каждом блоке задай себе вопрос: «что Git ответил и что Олег сделал вместо того, чтобы прочитать ответ?»</li>
+      <li>На каждую находку — строка в формате: <b>блок → что произошло → почему это плохо → как надо было</b>.</li>
+      <li>Не знаешь, как надо, — опиши хотя бы, что произошло и почему это плохо. Правильные команды будут на вкладке «Теория», потом допишешь.</li>
+    </ol>
+  </div>
+
+  <div class="box card">
+    <div class="title">Сколько искать</div>
+    <p>Шесть ошибок. В блоке 2 их две, в блоке 1 ни одной ошибки нет, но он подсказка к блоку 2.</p>
+  </div>
+  <div class="done"><b>Готово, когда</b> в файле 6 строк, и в каждой есть все четыре части.</div>
+</div>
+
+<!-- 2 -->
+<div class="pane" data-title="Разбор">
+  <h2>Шесть ошибок Олега</h2>
+  <p class="sub">15 минут · открывай после охоты</p>
+
+  <div class="scroll"><table>
+    <tr><th>#</th><th>Блок</th><th>Что произошло</th><th>Почему плохо</th><th>Как надо</th></tr>
+    <tr><td>1</td><td>2</td><td>Коммит прямо в <code class="i">main</code> — блок 1 показал «On branch main»</td><td>В main попадает непроверенный код, без ревью. Сломать main — сломать работу всей команде</td><td>Сначала ветка: <code class="i">git switch -c feature/login-tests</code></td></tr>
+    <tr><td>2</td><td>2</td><td>В коммит попали <code class="i">.env</code> и <code class="i">.idea/</code></td><td><code class="i">.env</code> — файл с паролями и ключами, теперь он виден всем, у кого есть доступ, и остаётся в истории навсегда. <code class="i">.idea/</code> — личные настройки PyCharm, мешают другим</td><td>Добавить их в <code class="i">.gitignore</code>. Перед коммитом — <code class="i">git status</code>, а не вслепую <code class="i">git add .</code>. Пароль от стенда теперь надо менять</td></tr>
+    <tr><td>3</td><td>2</td><td>Сообщение коммита «fix»</td><td>Через месяц никто не поймёт, что исправлено и зачем</td><td>«Добавлены тесты формы входа: пустые поля и неверный пароль»</td></tr>
+    <tr><td>4</td><td>3–4</td><td>Git отказал в push: на сервере есть чужие коммиты. Олег сделал <code class="i">push --force</code></td><td>Force перезаписал main на сервере его версией. Чужие коммиты коллег пропали с сервера</td><td>Прочитать hint: <code class="i">git pull</code>, решить конфликты, если будут, потом <code class="i">git push</code>. Force в общую ветку — никогда</td></tr>
+    <tr><td>5</td><td>5</td><td>Git сообщил о конфликте, Олег сразу сделал <code class="i">add</code> и <code class="i">commit</code></td><td>Конфликт не решён, а закоммичен как есть</td><td>Открыть файл, выбрать правильный вариант, удалить маркеры, потом <code class="i">add</code> и <code class="i">commit</code></td></tr>
+    <tr><td>6</td><td>6</td><td>В <code class="i">conftest.py</code> остались маркеры <code class="i">&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code class="i">=======</code>, <code class="i">&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code></td><td>Это не Python. Все тесты команды падают с ошибкой синтаксиса — следствие ошибки 5</td><td>Оставить одну строку <code class="i">TIMEOUT = ...</code> — какую именно, спросить у автора второй ветки, а не угадывать</td></tr>
+  </table></div>
+
+  <div class="box note">
+    <div class="title">Что общего у всех ошибок</div>
+    <p>Git каждый раз говорил, что не так: «On branch main», «rejected… fetch first», «CONFLICT… fix conflicts». Олег не прочитал ни одного ответа. Это та же привычка, что и в Python: вывод команды — первое, что нужно читать.</p>
+  </div>
+
+  <div class="box card">
+    <div class="title">Связь с прошлыми днями</div>
+    <p>Ошибка 6 — как в охоте дня 19 с JSON: файл, который выглядит почти правильно, но программа его не прочитает. А ошибка 2 — как пароль администратора в комментарии на дне 13: то, что попало в код, видно всем.</p>
+  </div>
+</div>
+
+<!-- 3 -->
+<div class="pane" data-title="Теория">
+  <h2>Ветки, слияние, конфликты</h2>
+  <p class="sub">35 минут · пять частей</p>
+
+  <h3>1. Зачем ветки — на примере</h3>
+  <p>Ты дизайнер, и ты это знаешь: когда пробуешь новый вариант макета, ты не правишь утверждённый, а делаешь копию страницы в Figma. Понравилось — переносишь. Не понравилось — удаляешь копию, оригинал цел.</p>
+  <p>Ветка в Git — то же самое для кода, только без ручного копирования.</p>
+
+  <div class="simple">
+    <div class="title">Простыми словами</div>
+    <p><b>Ветка</b> — отдельная линия коммитов. В ней можно делать что угодно, основная ветка <code class="i">main</code> не меняется. <b>Слияние</b> (merge) — перенос коммитов из ветки обратно в main. <b>Конфликт</b> — когда в обеих ветках поменяли одну и ту же строку, и Git не знает, какую версию оставить.</p>
+  </div>
+
+  <div class="graph"><span class="m">main:           A ── B ──────────── E</span>
+                        \           /
+<span class="f">feature/emails:          C ── D</span></div>
+  <p>A и B — коммиты в main. Ты создала ветку и сделала в ней C и D. В main за это время ничего не менялось — или появился коммит, это неважно. E — слияние: всё из C и D попало в main.</p>
+
+  <h3>2. Команды для веток</h3>
+  <div class="box def">
+    <div class="title">[Бумага] Шесть команд</div>
+    <div class="scroll"><table>
+      <tr><th>Команда</th><th>Что делает</th></tr>
+      <tr><td class="mono">git branch</td><td>Показывает все ветки. Текущая — со звёздочкой</td></tr>
+      <tr><td class="mono">git switch -c имя</td><td>Создаёт ветку и сразу переходит в неё</td></tr>
+      <tr><td class="mono">git switch имя</td><td>Переходит в существующую ветку</td></tr>
+      <tr><td class="mono">git merge имя</td><td>Вливает ветку <b>имя</b> в ту, в которой ты <b>сейчас</b></td></tr>
+      <tr><td class="mono">git log --oneline --graph</td><td>История коммитов, по одной строке, с рисунком веток</td></tr>
+      <tr><td class="mono">git branch -d имя</td><td>Удаляет ветку, уже влитую в main</td></tr>
+    </table></div>
+    <p>В старых инструкциях вместо <code class="i">switch</code> пишут <code class="i">checkout</code>: <code class="i">git checkout -b имя</code> — то же, что <code class="i">git switch -c имя</code>. Работают обе, на собеседовании могут спросить про checkout.</p>
+  </div>
+
+  <div class="box trap">
+    <div class="title">Главная ловушка merge</div>
+    <p><code class="i">git merge feature/emails</code> вливает feature/emails <b>в текущую ветку</b>. Поэтому сначала <code class="i">git switch main</code>, потом merge. Если забыть и стоять в feature — main не изменится, а наоборот, main вольётся в feature.</p>
+  </div>
+
+  <h4>Как называть ветки</h4>
+  <p>Принято: тип и короткое описание через дефис. <code class="i">feature/bad-emails</code> — новое, <code class="i">fix/password-length</code> — исправление, <code class="i">test/login-cases</code> — тесты. Латиница, без пробелов.</p>
+
+  <h3>3. Два вида слияния</h3>
+  <div class="scroll"><table>
+    <tr><th>Вид</th><th>Когда</th><th>Что пишет Git</th></tr>
+    <tr><td><b>Fast-forward</b>, перемотка</td><td>В main ничего не менялось с момента создания ветки. Git просто передвигает main вперёд, на последний коммит ветки</td><td class="mono">Fast-forward</td></tr>
+    <tr><td><b>Merge commit</b>, коммит слияния</td><td>В main за это время появились свои коммиты. Git соединяет две линии новым коммитом. Откроется редактор для сообщения — оставь как есть и закрой</td><td class="mono">Merge made by the 'ort' strategy.</td></tr>
+  </table></div>
+  <p>Ты увидишь оба вида в задании. Ни один не лучше другого, просто разные ситуации.</p>
+
+  <h3>4. Конфликт и как его решить</h3>
+  <p>Пример. В main строка в файле <code class="i">practice.md</code> стала «Цель: QA engineer», а в ветке feature/b та же строка стала «Цель: strong junior к маю». Делаем merge:</p>
+<div class="term"><span class="p">$ git merge feature/b</span>
+<span class="o">Auto-merging practice.md</span>
+<span class="e">CONFLICT (content): Merge conflict in practice.md
+Automatic merge failed; fix conflicts and then commit the result.</span></div>
+  <p>Git вписал в файл обе версии и маркеры между ними:</p>
+<pre class="light">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+Цель: QA engineer
+=======
+Цель: strong junior к маю
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/b</pre>
+  <div class="scroll"><table>
+    <tr><th>Кусок</th><th>Что значит</th></tr>
+    <tr><td class="mono">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</td><td>Начало версии из ветки, где ты сейчас — из main</td></tr>
+    <tr><td class="mono">=======</td><td>Разделитель</td></tr>
+    <tr><td class="mono">&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/b</td><td>Конец версии из ветки, которую вливаешь</td></tr>
+  </table></div>
+
+  <div class="box def">
+    <div class="title">[Бумага] Четыре шага решения конфликта</div>
+    <ol>
+      <li>Открыть файл, найти маркеры.</li>
+      <li>Решить, что оставить: первую версию, вторую, или собрать из обеих. Если не знаешь — спросить автора другой ветки.</li>
+      <li><b>Удалить все три маркера.</b> В файле должен остаться только нормальный текст или код.</li>
+      <li><code class="i">git add файл</code>, потом <code class="i">git commit</code>. Передумала посреди — <code class="i">git merge --abort</code> вернёт всё как было до merge.</li>
+    </ol>
+    <p>PyCharm умеет показывать конфликт в три колонки с кнопками «взять слева» и «взять справа». Это удобно, но сегодня решай руками в тексте: так понятнее, что происходит.</p>
+  </div>
+
+  <h3>5. .gitignore — что не должно попасть в репозиторий</h3>
+  <p>Файл <code class="i">.gitignore</code> в корне репозитория — список того, что Git не замечает. <code class="i">git add .</code> эти файлы пропустит.</p>
+<pre class="light"># настройки PyCharm
+.idea/
+# служебные файлы Python
+__pycache__/
+# пароли и ключи
+.env
+# виртуальное окружение — будет на неделе 6
+venv/</pre>
+  <div class="box trap">
+    <div class="title">Важно</div>
+    <p><code class="i">.gitignore</code> не убирает файлы, которые <b>уже</b> закоммичены. Он только не даёт добавить новые. Поэтому пароль Олега из истории не исчезнет — пароль меняют.</p>
+  </div>
+
+  <div class="box card">
+    <div class="title">Формулировка для собеседования — выучи вслух</div>
+    <p>Вопрос: «Как вы работаете с Git в команде?»</p>
+    <p>«Под каждую задачу создаю отдельную ветку от актуального main. Коммичу небольшими шагами с понятными сообщениями. Перед отправкой делаю pull, чтобы получить изменения коллег, и решаю конфликты, если они есть: смотрю маркеры, оставляю нужную версию, а если не уверена — спрашиваю автора. Потом открываю pull request на ревью. Force push в общие ветки не делаю. Пароли и настройки IDE держу в .gitignore.»</p>
+    <p>Pull request подробно — на дне 28. Пока достаточно знать, что это запрос «посмотрите мою ветку и влейте её в main».</p>
+  </div>
+</div>
+
+<!-- 4 -->
+<div class="pane" data-title="Задание">
+  <h2>Ветка, слияние, конфликт — руками</h2>
+  <p class="sub">35 минут · в твоём репозитории qa-learning</p>
+
+  <div class="box trap">
+    <div class="title">Перед началом</div>
+    <ol>
+      <li>Все сегодняшние и вчерашние файлы закоммичены и запушены. Проверь: <code class="i">git status</code> должен сказать <code class="i">nothing to commit, working tree clean</code>. Если нет — сначала закоммить.</li>
+      <li>Узнай, как называется твоя основная ветка: <code class="i">git branch</code>. Скорее всего <code class="i">main</code>, но может быть <code class="i">master</code>. Если master — везде ниже пиши master вместо main.</li>
+    </ol>
+  </div>
+
+  <h3>Часть 1 · Ветка и fast-forward · 10 минут</h3>
+  <ol class="steps">
+    <li>Создай ветку и перейди в неё:
+<pre>git switch -c practice/branches</pre>
+      Git ответит <code class="i">Switched to a new branch 'practice/branches'</code>.</li>
+    <li>Создай файл <code class="i">notes/git-practice.md</code> с одной строкой: <code class="i">Цель: middle Automation QA</code>. Закоммить:
+<pre>git add notes/git-practice.md
+git commit -m "Практика веток: файл с целью"</pre></li>
+    <li>Вернись в main и посмотри: файла <code class="i">notes/git-practice.md</code> в папке нет. Это нормально — он живёт в ветке.
+<pre>git switch main</pre></li>
+    <li>Влей ветку:
+<pre>git merge practice/branches</pre>
+      Git ответит <code class="i">Fast-forward</code> — файл появился в main.</li>
+    <li>Посмотри историю: <code class="i">git log --oneline --graph -5</code>. Перепиши первую строку вывода в тетрадь.</li>
+  </ol>
+
+  <h3>Часть 2 · Нарочный конфликт · 20 минут</h3>
+  <ol class="steps">
+    <li>Создай вторую ветку от main:
+<pre>git switch -c practice/conflict</pre></li>
+    <li>В <code class="i">notes/git-practice.md</code> замени строку на <code class="i">Цель: strong junior к маю 2027</code>. Закоммить:
+<pre>git commit -am "Цель в ветке"</pre></li>
+    <li>Вернись в main: <code class="i">git switch main</code>. В том же файле замени ту же строку на <code class="i">Цель: Automation QA</code>. Закоммить:
+<pre>git commit -am "Цель в main"</pre>
+      Теперь одна строка изменена по-разному в двух ветках — конфликт гарантирован.</li>
+    <li>Влей ветку:
+<pre>git merge practice/conflict</pre>
+      Git напишет <code class="i">CONFLICT</code>. <b>Не пугайся, это и было целью.</b> Сделай скриншот этого вывода.</li>
+    <li>Выполни <code class="i">git status</code> и прочитай, что пишет Git. Найди там строку <code class="i">both modified</code>.</li>
+    <li>Открой файл. Оставь одну строку: <code class="i">Цель: strong junior к маю 2027, затем middle Automation QA</code>. Удали все три маркера.</li>
+    <li>Заверши слияние:
+<pre>git add notes/git-practice.md
+git commit -m "Решён конфликт в цели"</pre></li>
+    <li>Посмотри граф: <code class="i">git log --oneline --graph -6</code>. Найди место, где две линии сходятся. Сделай скриншот.</li>
+    <li>Удали практические ветки и отправь main:
+<pre>git branch -d practice/branches practice/conflict
+git push</pre></li>
+  </ol>
+
+  <h3>Часть 3 · .gitignore · 5 минут</h3>
+  <ol class="steps">
+    <li>Проверь, есть ли в корне репозитория файл <code class="i">.gitignore</code>. Если нет — создай.</li>
+    <li>Добавь в него строки: <code class="i">.idea/</code>, <code class="i">__pycache__/</code>, <code class="i">.env</code>, <code class="i">venv/</code> — каждая с новой строки.</li>
+    <li>Проверь, не закоммичена ли уже папка <code class="i">.idea</code>: открой репозиторий на GitHub. Если она там есть — напиши мне, уберём её завтра одной командой, сегодня не трогай.</li>
+    <li>Закоммить <code class="i">.gitignore</code> и сделай push.</li>
+  </ol>
+
+  <div class="done"><b>Готово, когда</b> на GitHub в main лежит <code class="i">notes/git-practice.md</code> с решённым конфликтом, лишних веток нет, есть <code class="i">.gitignore</code>, и у тебя два скриншота: CONFLICT и граф.</div>
+  <details><summary>Если что-то пошло не так</summary>
+    <ul>
+      <li><b>Запуталась посреди конфликта</b> — <code class="i">git merge --abort</code>, всё вернётся как было до merge. Начни шаг 4 части 2 заново.</li>
+      <li><b>Открылся непонятный редактор с текстом коммита</b> (бывает при merge commit) — это редактор Vim. Нажми <code class="i">Esc</code>, напечатай <code class="i">:wq</code> и Enter.</li>
+      <li><b>Git пишет «error: Your local changes would be overwritten»</b> при switch — есть незакоммиченные изменения. Сначала закоммить их.</li>
+      <li>Ничего из этого не помогло — сделай скриншот терминала и пришли мне. Не делай <code class="i">--force</code> и не удаляй папку.</li>
+    </ul>
+  </details>
+</div>
+
+<!-- 5 -->
+<div class="pane" data-title="Тест">
+  <h2>Тест</h2>
+  <p class="sub">8 вопросов, 10 минут · конец первого захода</p>
+  <div id="quizB"></div>
+  <div class="score" id="scoreB">Отвечено 0 из 8</div>
+  <div class="split">перерыв — не меньше часа без экрана</div>
+</div>
+
+<!-- 6 -->
+<div class="pane" data-title="Python в ветке">
+  <h2>Невалидные email — в отдельной ветке</h2>
+  <p class="sub">60 минут · новый файл python/day21_emails.py</p>
+
+  <p>Генератор умеет делать пароли для всех классов, а email — только правильные. Сегодня добавляем невалидные email для требования 3.3 — и делаем это так, как в команде: в своей ветке, потом слияние в main.</p>
+
+  <h3>Шаг 0 · Ветка · 2 минуты</h3>
+<pre>git switch -c feature/bad-emails</pre>
+  <p>Весь код ниже пишешь и коммитишь в этой ветке.</p>
+
+  <h3>Разобранный пример — выбор по словарю вместо цепочки if</h3>
+  <p>Функция возвращает текст для статус-кода. Можно написать пять <code class="i">if</code>, а можно положить варианты в словарь и достать нужный через <code class="i">get</code>:</p>
+<pre>def status_text(code):
+    texts = {200: "OK", 401: "Не авторизован", 404: "Не найдено"}
+    return texts.get(code)
+
+print(status_text(200), status_text(404), status_text(500))
+<span class="cm"># OK Не найдено None</span></pre>
+  <div class="scroll"><table>
+    <tr><th>Вызов</th><th>Что происходит</th><th>Результат</th></tr>
+    <tr><td><code class="i">status_text(200)</code></td><td>Ключ 200 есть в словаре</td><td><code class="i">"OK"</code></td></tr>
+    <tr><td><code class="i">status_text(404)</code></td><td>Ключ 404 есть</td><td><code class="i">"Не найдено"</code></td></tr>
+    <tr><td><code class="i">status_text(500)</code></td><td>Ключа нет, <code class="i">get</code> без второго аргумента возвращает None</td><td><code class="i">None</code></td></tr>
+  </table></div>
+  <div class="simple">
+    <div class="title">Простыми словами</div>
+    <p>Если выбор — «по названию взять готовое значение», словарь короче и понятнее цепочки <code class="i">if</code>. Добавить новый вариант — одна строка в словаре.</p>
+  </div>
+
+  <h3>Шаг 1 · make_bad_email · 20 минут</h3>
+  <p>Скопируй <code class="i">make_email</code> из генератора. Напиши <code class="i">make_bad_email(name, kind)</code>: по виду ошибки <code class="i">kind</code> возвращает невалидный email, неизвестный вид — <code class="i">None</code>.</p>
+  <div class="scroll"><table>
+    <tr><th>kind</th><th>Что за ошибка</th><th>Для name="anna" вернуть</th></tr>
+    <tr><td class="mono">"noat"</td><td>нет @</td><td class="mono">annatest.ru</td></tr>
+    <tr><td class="mono">"twoat"</td><td>два @</td><td class="mono">anna@@test.ru</td></tr>
+    <tr><td class="mono">"nodomain"</td><td>нет домена</td><td class="mono">anna@</td></tr>
+    <tr><td class="mono">"space"</td><td>пробел внутри</td><td class="mono">anna @test.ru</td></tr>
+    <tr><td class="mono">"spaces"</td><td>только пробелы, name не используется</td><td class="mono">"   " (три пробела)</td></tr>
+  </table></div>
+  <p>Проверки — скопируй в конец файла. Должно быть шесть <code class="i">True</code>:</p>
+<pre class="light">print(make_bad_email("anna", "noat") == "annatest.ru")
+print(make_bad_email("anna", "twoat") == "anna@@test.ru")
+print(make_bad_email("anna", "nodomain") == "anna@")
+print(make_bad_email("anna", "space") == "anna @test.ru")
+print(make_bad_email("anna", "spaces") == "   ")
+print(make_bad_email("anna", "unknown") is None)</pre>
+  <details><summary>Подсказка</summary>
+    <p>Внутри функции — словарь, где ключи — виды ошибок, а значения — готовые строки через f-строки: <code class="i">"noat": f"{name}test.ru"</code>. В конце — <code class="i">return variants.get(kind)</code>, как в примере.</p>
+  </details>
+  <p>Когда все True — закоммить в ветке: <code class="i">git add python/day21_emails.py</code> и <code class="i">git commit -m "make_bad_email: невалидные email по видам"</code>.</p>
+
+  <h3>Шаг 2 · Проверка всех email разом · 25 минут</h3>
+  <p>Функцию проверки email я даю готовой — это упрощённая версия того, что делает форма по требованиям 3.1 и 3.3. Скопируй её в файл как есть:</p>
+<pre>def check_email(email):
+    if email.strip() == "":
+        return "Заполните поле"
+    if email.count("@") != 1:
+        return "Неверный формат email"
+    if " " in email:
+        return "Неверный формат email"
+    domain = email[email.index("@") + 1:]
+    if domain == "" or "." not in domain:
+        return "Неверный формат email"
+    return "OK"</pre>
+  <div class="scroll"><table>
+    <tr><th>Строка</th><th>Что проверяет</th></tr>
+    <tr><td class="mono">email.strip() == ""</td><td>Пусто или одни пробелы — 3.1</td></tr>
+    <tr><td class="mono">email.count("@") != 1</td><td><code class="i">count</code> считает, сколько раз символ встречается. Ни одного или два — ошибка</td></tr>
+    <tr><td class="mono">email.index("@") + 1</td><td><code class="i">index</code> — номер позиции @. Срез с позиции после @ до конца — это домен</td></tr>
+    <tr><td class="mono">"." not in domain</td><td>В домене нет точки: <code class="i">anna@test</code> — ошибка</td></tr>
+  </table></div>
+
+  <ol class="steps">
+    <li>Напиши <code class="i">generate_email_users()</code> — список из шести словарей с ключами <code class="i">email</code> и <code class="i">expected</code>: один правильный email через <code class="i">make_email("valid")</code> с expected «OK» и пять невалидных через <code class="i">make_bad_email</code>, по одному на каждый вид. Подумай сама, какой expected у вида "spaces", — смотри требование 3.1.</li>
+    <li>Пройди циклом по списку, для каждого вызови <code class="i">check_email</code> и напечатай <code class="i">PASSED</code> или <code class="i">FAILED: что вернула</code>.</li>
+    <li>Посчитай итог словарём-счётчиком, как вчера.</li>
+    <li>Чтобы email с пробелами было видно в выводе, печатай его через <code class="i">repr</code>: <code class="i">print(repr(u["email"]), "PASSED")</code>. Тогда вместо невидимых пробелов будет <code class="i">'   '</code> в кавычках.</li>
+  </ol>
+  <p>Ожидаемый итог:</p>
+<pre class="light">Итого: {'PASSED': 6}</pre>
+
+  <div class="box task">
+    <div class="title">Проверка, что проверка умеет падать</div>
+    <p>Как вчера: поставь одному пользователю неправильный expected, запусти, увидь FAILED, верни обратно.</p>
+  </div>
+
+  <h3>Шаг 3 · Влить в main · 10 минут</h3>
+  <ol class="steps">
+    <li>Закоммить всё в ветке: <code class="i">git commit -am "Проверка невалидных email, data-driven"</code>.</li>
+    <li>Перейди в main: <code class="i">git switch main</code>. Файла <code class="i">day21_emails.py</code> в папке нет — он в ветке.</li>
+    <li>Влей: <code class="i">git merge feature/bad-emails</code>. Запиши, какой вид слияния написал Git.</li>
+    <li>Удали ветку: <code class="i">git branch -d feature/bad-emails</code>.</li>
+    <li>Отправь: <code class="i">git push</code>.</li>
+  </ol>
+
+  <div class="box trap">
+    <div class="title">Что прислать по этой вкладке</div>
+    <ol>
+      <li>Код целиком.</li>
+      <li>Под кодом — весь вывод: шесть True, сломанный прогон, зелёный прогон.</li>
+      <li>Какой вид слияния написал Git на шаге 3.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- 7 -->
+<div class="pane" data-title="Тест-кейсы">
+  <h2>TC-010 и TC-011</h2>
+  <p class="sub">30 минут · к CP1: после сегодня — 11 из 20</p>
+
+  <div class="box trap">
+    <div class="title">Сначала проверь дубли</div>
+    <p>Открой TC-001…009 и убедись, что таких кейсов ещё нет. Если есть — напиши мне, дам другой.</p>
+  </div>
+
+  <p>Оба кейса — на правила показа из требования 4 (справочник дня 13). Их часто забывают, а баги в них видит каждый пользователь.</p>
+
+  <h3>TC-010 · Сообщение исчезает, когда пользователь начинает править поле</h3>
+  <p>Правило 4.4: сообщение исчезает, как только пользователь начинает править то поле, к которому оно относится.</p>
+  <ol class="steps">
+    <li>Получи сообщение под полем email: оставь его пустым, введи правильный пароль, нажми «Войти». Ожидаемый результат — 3.1 дословно, под полем email.</li>
+    <li>Начни вводить в поле email один символ. Что с сообщением?</li>
+    <li>Подумай и добавь третий шаг: что должно быть с сообщением, если править не email, а <b>другое поле</b> — пароль? Правило говорит «то поле, к которому оно относится». Это самый ценный шаг кейса.</li>
+    <li>Предусловие — про состояние системы, как в TC-009.</li>
+  </ol>
+
+  <h3>TC-011 · Одно сообщение на поле: пароль без цифры и без заглавной</h3>
+  <p>Правило 4.2: одно сообщение на поле; если нарушено несколько правил, показывается первое по порядку.</p>
+  <ol class="steps">
+    <li>Подбери пароль, который нарушает сразу 3.5 и 3.6, но проходит 3.4 по длине. Напиши в тестовых данных, какие правила он нарушает и сколько в нём символов.</li>
+    <li>Ожидаемый результат: какое именно сообщение — дословно, где, и сколько сообщений под полем пароля.</li>
+    <li>Email в данных — правильный, чтобы под ним сообщений не было.</li>
+  </ol>
+
+<pre class="light">ID:
+Название:
+Приоритет:
+Предусловие:
+Тестовые данные:
+Шаги:
+  1.
+Ожидаемый результат:
+Постусловие:</pre>
+
+  <div class="done"><b>Готово, когда</b> в TC-010 три шага, третий — про правку другого поля; в TC-011 пароль нарушает ровно два правила формата, длина посчитана, в ожидаемом результате ровно одно сообщение.</div>
+</div>
+
+<!-- 8 -->
+<div class="pane" data-title="Итоги">
+  <h2>Закрываем день</h2>
+  <p class="sub">5 минут</p>
+
+  <div class="box note">
+    <div class="title">[Бумага]</div>
+    <ol>
+      <li>Ветка, слияние, конфликт — по одной фразе.</li>
+      <li>Шесть команд для веток. <code class="i">checkout -b</code> = <code class="i">switch -c</code>.</li>
+      <li>merge вливает указанную ветку в текущую — сначала switch main.</li>
+      <li>Fast-forward и merge commit — когда какой.</li>
+      <li>Маркеры конфликта и четыре шага решения. <code class="i">git merge --abort</code>.</li>
+      <li>Force push в общую ветку — никогда. Отказ push — сначала pull.</li>
+      <li>.gitignore не убирает уже закоммиченное.</li>
+      <li>Выбор по словарю через <code class="i">get</code> вместо цепочки if.</li>
+    </ol>
+  </div>
+
+  <div class="box def">
+    <div class="title">Что мне прислать</div>
+    <ol>
+      <li>Счёт карточек H + F из 12.</li>
+      <li>Ответы на чтение кода — сколько из 4.</li>
+      <li>Охоту — файл целиком, сколько ошибок из 6 нашла сама.</li>
+      <li>Два скриншота из задания: CONFLICT и граф.</li>
+      <li>Номера вопросов теста, где ошиблась.</li>
+      <li>Код email-проверки, под ним весь вывод и вид слияния.</li>
+      <li>TC-010 и TC-011.</li>
+      <li>Сколько багов сейчас в Jira.</li>
+    </ol>
+  </div>
+
+  <h3>Дальше</h3>
+  <ol>
+    <li><b>Пятница, 16 октября</b> — повторение к CP1: границы, тест-дизайн, словари и функции, пробная контрольная. Во втором заходе — TC-012, TC-013.</li>
+    <li><b>Суббота, 17 октября</b> — CP1: контрольная, проверка кейсов и багов, ретро и решение по темпу.</li>
+    <li>Куки, сессии и кросс-браузерное переезжают на понедельник, 19 октября: день 21 сдвинулся на сутки, а повторение перед CP1 важнее.</li>
+  </ol>
+</div>
+
+</div>
+
+<script>
+var QA=[
+{q:'def check(n):\n    if n < 0:\n        return None\n    if n == 0:\n        return "zero"\n    return "ok"\n\nprint(check(-5), check(0), check(3))',
+ o:['None zero ok','zero zero ok','None None ok','Ошибка'],a:0,
+ e:'Ранний выход, как в make_pin. -5 < 0 — сразу None. 0 не меньше 0, но равен 0 — "zero". 3 прошёл обе проверки — "ok".'},
+{q:'statuses = {"200": "OK", "404": "Not Found"}\nprint(statuses.get("500", "Unknown"), len(statuses))',
+ o:['None 2','Unknown 3','Unknown 2','Ошибка KeyError'],a:2,
+ e:'Ключа "500" нет — get возвращает второй аргумент, "Unknown". get только читает, в словарь ничего не добавляет: ключей по-прежнему два.'},
+{q:'def add_tag(tags, tag):\n    if tag not in tags:\n        tags.append(tag)\n    return len(tags)\n\nt = ["smoke"]\nprint(add_tag(t, "smoke"), add_tag(t, "api"), t)',
+ o:["1 2 ['smoke', 'api']","2 3 ['smoke', 'smoke', 'api']","1 2 ['smoke']","1 1 ['smoke', 'api']"],a:0,
+ e:'Первый вызов: "smoke" уже есть — не добавляем, длина 1. Второй: "api" нет — добавляем, длина 2. Список передан в функцию тем же объектом, поэтому t снаружи тоже изменился.'},
+{q:'def summary(results):\n    count = {}\n    for r in results:\n        count[r] = count.get(r, 0) + 1\n    return count\n\nprint(summary(["ok", "fail", "ok", "ok"]))',
+ o:["{'ok': 3, 'fail': 1}","{'ok': 1, 'fail': 1}","{'ok': 2, 'fail': 1}",'Ошибка KeyError'],a:0,
+ e:'Это тот же словарь-счётчик, что у тебя в генераторе, только в одну строку. Ключа ещё нет — get даёт 0, плюс 1. Ключ есть — get даёт текущее значение, плюс 1. Ошибки нет, потому что get не падает на отсутствующем ключе.'}
+];
+
+var QB=[
+{q:'Что делает git switch -c feature/emails?',
+ o:['Переходит в существующую ветку','Создаёт ветку feature/emails и сразу переходит в неё','Удаляет ветку','Вливает ветку в main'],a:1,
+ e:'-c — create, создать. Старая запись того же самого — git checkout -b feature/emails.'},
+{q:'Ты в ветке feature/emails и выполняешь git merge main. Что произойдёт?',
+ o:['feature/emails вольётся в main','main вольётся в feature/emails','Ничего','Ошибка: так нельзя'],a:1,
+ e:'merge вливает указанную ветку в текущую. Чтобы влить feature в main, сначала git switch main.'},
+{q:'Когда Git делает fast-forward?',
+ o:['Когда есть конфликт','Когда в main не было новых коммитов с момента создания ветки','Всегда при merge','Только при push'],a:1,
+ e:'Линия main не расходилась с веткой, поэтому Git просто передвигает main вперёд, без коммита слияния.'},
+{q:'Что означает строка ======= в файле после merge?',
+ o:['Это комментарий Git, его можно оставить','Разделитель между двумя версиями при конфликте','Конец файла','Знак, что слияние прошло успешно'],a:1,
+ e:'Выше — версия текущей ветки (HEAD), ниже — вливаемой. Все три маркера нужно удалить, оставив нужный текст.'},
+{q:'Push отклонён: «Updates were rejected because the remote contains work that you do not have locally». Что делать?',
+ o:['git push --force','git pull, решить конфликты, если будут, потом git push','Удалить репозиторий и склонировать заново','Ничего, это предупреждение'],a:1,
+ e:'На сервере есть чужие коммиты. Force их сотрёт. Правильно — сначала забрать их через pull.'},
+{q:'Ты запуталась посреди конфликта. Как вернуть всё как было до merge?',
+ o:['git merge --abort','git commit','git push','Удалить файл'],a:0,
+ e:'merge --abort отменяет незавершённое слияние и возвращает файлы в состояние до него.'},
+{q:'Файл .env уже закоммичен и запушен. Ты добавила .env в .gitignore. Что теперь?',
+ o:['Файл исчез из репозитория и истории','Файл остался в истории; пароли из него нужно сменить','Git удалит файл с диска','Git запретит следующий push'],a:1,
+ e:'.gitignore работает только для ещё не отслеживаемых файлов. То, что уже в истории, там и останется — поэтому утёкшие пароли меняют.'},
+{q:'Зачем тестировщику своя ветка под каждую задачу?',
+ o:['Так быстрее работает Git','Чтобы непроверенные тесты не попали в общий main и их можно было отдать на ревью','Ветки нужны только разработчикам','Чтобы не делать коммиты'],a:1,
+ e:'Автотесты — такой же код. Сломанный тест в main мешает всей команде, как в охоте с Олегом. Ветка — изоляция и путь к ревью через pull request.'}
+];
+
+function buildQuiz(host,data,scoreEl,code){
+  var answered=0,right=0;
+  data.forEach(function(item,i){
+    var box=document.createElement('div');box.className='q';
+    var t=document.createElement('div');t.className='qn';t.textContent='Вопрос '+(i+1);box.appendChild(t);
+    if(code){var pre=document.createElement('pre');pre.textContent=item.q;box.appendChild(pre);
+      var hint=document.createElement('div');hint.textContent='Что напечатается?';box.appendChild(hint);}
+    else{var qt=document.createElement('div');qt.textContent=item.q;box.appendChild(qt);}
+    var opts=document.createElement('div');opts.className='opts';
+    var expl=document.createElement('div');expl.className='expl';expl.hidden=true;expl.textContent=item.e;
+    var locked=false;
+    item.o.forEach(function(text,j){
+      var b=document.createElement('button');b.className='opt';b.type='button';b.textContent=text;
+      if(code)b.style.fontFamily='Consolas,monospace';
+      b.onclick=function(){
+        if(locked)return;locked=true;answered++;if(j===item.a)right++;
+        [].forEach.call(opts.children,function(el,k){
+          if(k===item.a)el.classList.add('right');else if(k===j)el.classList.add('wrong');
+        });
+        expl.hidden=false;
+        if(scoreEl)scoreEl.textContent='Отвечено '+answered+' из '+data.length+', верных '+right;
+      };
+      opts.appendChild(b);
+    });
+    box.appendChild(opts);box.appendChild(expl);host.appendChild(box);
+  });
+}
+buildQuiz(document.getElementById('quizA'),QA,null,true);
+buildQuiz(document.getElementById('quizB'),QB,document.getElementById('scoreB'),false);
+
+var panes=[].slice.call(document.querySelectorAll('.pane'));
+var tabs=document.getElementById('tabs');
+panes.forEach(function(p,i){
+  var b=document.createElement('button');b.type='button';
+  b.innerHTML='<span class="n">'+i+'</span>'+p.dataset.title;
+  b.onclick=function(){go(i);};
+  tabs.appendChild(b);
+  var nav=document.createElement('div');nav.className='nav';
+  var prev=document.createElement('button');prev.type='button';prev.textContent='← Назад';
+  prev.onclick=function(){go(i-1);};if(i===0)prev.disabled=true;
+  var next=document.createElement('button');next.type='button';next.className='next';
+  next.textContent=(i===panes.length-1)?'В начало':'Дальше →';
+  next.onclick=function(){go(i===panes.length-1?0:i+1);};
+  nav.appendChild(prev);nav.appendChild(next);p.appendChild(nav);
+});
+function go(i){
+  panes.forEach(function(p,j){p.classList.toggle('on',i===j);});
+  [].forEach.call(tabs.children,function(b,j){b.classList.toggle('on',i===j);});
+  try{tabs.children[i].scrollIntoView({block:'nearest',inline:'center'});}catch(e){}
+  try{localStorage.setItem('d21tab',String(i));}catch(e){}
+  window.scrollTo(0,0);
+}
+var start=0;
+try{var s=parseInt(localStorage.getItem('d21tab'),10);if(s>=0&&s<panes.length)start=s;}catch(e){}
+go(start);
+</script>
+
+</body></html>

@@ -1,0 +1,621 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>День 19 · JSON и генератор</title>
+<style>
+/* Оформление дня 13: светлая бумага, вкладки сверху, тёмные блоки кода, цветные плашки по роли */
+:root{
+  --bg:#eef1f2; --paper:#fff; --ink:#1b2430; --soft:#4e5a67; --line:#d7dde0;
+  --blue:#1f5fa9; --blue-bg:#e9f1fa;
+  --red:#b0352b; --red-bg:#fbecea;
+  --green:#276f52; --green-bg:#e8f4ee;
+  --amber:#9a6a00; --amber-bg:#fbf2df;
+  --violet:#5e4b8b; --violet-bg:#efebf8;
+  --code-bg:#0f1720; --code-fg:#dce7f0; --code-cm:#8ea2b4;
+  --chip:#eef1f3; --th:#f2f5f6; --soft-bg:#f6f8f9; --hover:#eaf0f3;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.62;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding-inline:18px;padding-block:0 60px}
+header{padding:34px 0 14px}
+.day{font-size:14px;color:var(--soft)}
+h1{font-size:33px;line-height:1.15;margin:.2em 0 .3em;text-wrap:balance}
+.lead{color:var(--soft);margin:0;max-width:62ch}
+
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);padding:10px 0 8px;
+  display:flex;gap:6px;overflow-x:auto;border-bottom:1px solid var(--line)}
+.tabs button{flex:0 0 auto;background:var(--paper);border:1px solid var(--line);border-radius:8px;
+  padding:8px 13px;font:inherit;font-size:14.5px;color:var(--soft);cursor:pointer;white-space:nowrap}
+.tabs button.on{background:var(--ink);color:var(--paper);border-color:var(--ink);font-weight:600}
+.tabs button .n{opacity:.55;margin-right:6px}
+button:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+.pane{display:none;background:var(--paper);border:1px solid var(--line);border-top:0;
+  border-radius:0 0 12px 12px;padding:28px 30px 34px}
+.pane.on{display:block}
+.pane h2{margin:0 0 6px;font-size:26px;line-height:1.2;text-wrap:balance}
+.pane .sub{color:var(--soft);margin:0 0 20px;font-size:15.5px}
+h3{font-size:19.5px;margin:28px 0 8px}
+h4{font-size:17px;margin:20px 0 6px}
+p{margin:12px 0}
+ul,ol{padding-left:24px}li{margin:6px 0}
+code.i{background:var(--chip);border:1px solid var(--line);border-radius:4px;padding:1px 5px;
+ font-family:Consolas,monospace;font-size:.92em}
+pre{background:var(--code-bg);color:var(--code-fg);border-radius:9px;padding:15px 17px;overflow-x:auto;
+ font-family:Consolas,monospace;font-size:14.5px;line-height:1.55;margin:14px 0}
+pre .cm{color:var(--code-cm)}
+pre.light{background:var(--soft-bg);color:var(--ink);border:1px solid var(--line)}
+
+.box{border-left:4px solid;border-radius:0 8px 8px 0;padding:14px 18px;margin:18px 0}
+.box .title{font-weight:700;margin-bottom:4px}
+.def{border-color:var(--blue);background:var(--blue-bg)} .def .title{color:var(--blue)}
+.trap{border-color:var(--red);background:var(--red-bg)} .trap .title{color:var(--red)}
+.note{border-color:var(--green);background:var(--green-bg)} .note .title{color:var(--green)}
+.card{border-color:var(--amber);background:var(--amber-bg)} .card .title{color:var(--amber)}
+.task{border-color:var(--violet);background:var(--violet-bg)} .task .title{color:var(--violet)}
+.box p:first-of-type{margin-top:2px}.box p:last-child{margin-bottom:2px}
+
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15.5px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--th);font-weight:600}
+td{font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto}
+.mono{font-family:Consolas,monospace;white-space:nowrap}
+
+details{border:1px solid var(--line);background:var(--soft-bg);border-radius:8px;padding:10px 14px;margin:10px 0}
+summary{cursor:pointer;font-weight:600;color:var(--violet)}
+details[open] summary{margin-bottom:8px}
+.mark{display:inline-block;font-size:12.5px;font-weight:700;border-radius:99px;padding:1px 9px;margin-left:6px;vertical-align:1px}
+.m-ok{background:var(--green-bg);color:var(--green)}
+.m-half{background:var(--amber-bg);color:var(--amber)}
+.yours{border-left:3px solid var(--line);padding:2px 0 2px 12px;color:var(--soft);font-size:15.5px;margin:8px 0}
+
+.q{border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:16px 0}
+.qn{font-weight:700;margin-bottom:6px}
+.opts{display:grid;gap:8px;margin-top:12px}
+.opt{text-align:left;background:var(--soft-bg);border:1px solid var(--line);border-radius:8px;
+ padding:10px 14px;cursor:pointer;font:inherit;font-size:16px;color:var(--ink)}
+.opt:hover{background:var(--hover)}
+.opt.right{background:var(--green-bg);border-color:var(--green);font-weight:600}
+.opt.wrong{background:var(--red-bg);border-color:var(--red)}
+.expl{margin-top:12px;padding:12px 14px;background:var(--soft-bg);border-radius:8px}
+.score{position:sticky;bottom:env(safe-area-inset-bottom,0px);background:var(--paper);border:1px solid var(--line);
+ border-radius:10px;padding:12px 18px;margin-top:18px;font-weight:600;font-variant-numeric:tabular-nums}
+
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:34px;padding-top:18px;border-top:1px solid var(--line)}
+.nav button{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 16px;
+ font:inherit;cursor:pointer;color:var(--ink)}
+.nav .next{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.nav button[disabled]{opacity:.35;cursor:default}
+@media(max-width:640px){.wrap{padding-inline:16px}.pane{padding:20px 17px 26px}h1{font-size:27px}pre{font-size:13.5px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+<style>
+.simple{border:1px solid var(--line);background:var(--soft-bg);border-radius:10px;padding:14px 18px;margin:16px 0}
+.simple .title{font-weight:700;margin-bottom:4px;color:var(--ink)}
+.steps{counter-reset:st;list-style:none;padding-left:0}
+.steps>li{counter-increment:st;position:relative;padding-left:38px;margin:12px 0}
+.steps>li::before{content:counter(st);position:absolute;left:0;top:1px;width:26px;height:26px;border-radius:50%;
+  background:var(--ink);color:var(--paper);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.done{border:1px dashed var(--green);border-radius:8px;padding:10px 14px;margin:14px 0;font-size:15.5px}
+.done b{color:var(--green)}
+.req{border:1px solid var(--line);border-radius:10px;background:var(--soft-bg);padding:16px 20px;margin:16px 0}
+.req p{margin:9px 0}
+.req .rn{font-weight:700;font-family:Consolas,monospace;margin-right:6px}
+.ask{display:grid;gap:8px;margin:10px 0}
+.ask label{display:flex;gap:8px;align-items:flex-start;font-size:16px;cursor:pointer}
+.ask input{margin-top:5px}
+</style>
+<style>
+.split{display:flex;align-items:center;gap:12px;margin:28px 0 8px;color:var(--soft);font-size:14.5px;font-weight:600}
+.split::before,.split::after{content:"";flex:1;border-top:1px dashed var(--line)}
+</style>
+
+<div class="wrap">
+
+<header>
+  <div class="day">День 19 · понедельник, 12 октября · Python, темы 2.4 и JSON</div>
+  <h1>JSON и генератор тестовых данных</h1>
+  <p class="lead">JSON — формат, в котором программы обмениваются данными: ответы API, файлы с тестовыми данными, настройки. Сегодня учимся его читать и писать и начинаем первый мини-проект — генератор тестовых пользователей для формы входа.</p>
+</header>
+
+<div class="box def">
+  <div class="title">Два захода, около 4:00</div>
+  <p><b>Заход 1 · 2:20</b> — вкладки 0–5. <b>Перерыв — час без экрана.</b> <b>Заход 2 · 1:40</b> — генератор, тест-кейсы, итоги.</p>
+</div>
+
+<div class="tabs" id="tabs"></div>
+
+<!-- 0 -->
+<div class="pane" data-title="Карточки и код">
+  <h2>Разминка</h2>
+  <p class="sub">25 минут: карточки 15, чтение кода 10</p>
+
+  <h3>Карточки — два прогона</h3>
+  <ol class="steps">
+    <li><b>B · Виды и уровни</b> — вторая половина, обычный прогон по ядру. 8 карточек: начни с той, на которой остановилась в субботу.</li>
+    <li><b>P · Локаторы</b> — новый блок, галочка «Знакомство». 4 карточки.</li>
+  </ol>
+  <div class="done"><b>Готово, когда</b> записала счёт B из 8.</div>
+
+  <h3>Чтение кода</h3>
+  <p>Функции. В третьем вопросе новое — подумай про правило из дня 14: <code class="i">b = a</code> не копирует список.</p>
+  <div id="quizA"></div>
+</div>
+
+<!-- 1 -->
+<div class="pane" data-title="Охота">
+  <h2>Сломанный файл тестовых данных</h2>
+  <p class="sub">25 минут</p>
+
+  <p>Коллега вручную написал файл с тестовыми пользователями для формы входа. Программа его не читает — падает. Найди все ошибки.</p>
+
+<pre class="light">{
+  // тестовые пользователи для формы входа
+  "users": [
+    {
+      "email": "anna@test.ru",
+      "password": "Anna1234",
+      "active": true
+    },
+    {
+      'email': "ivan@test.ru",
+      "password": "Ivan1234",
+      "active": True,
+    },
+    {
+      email: "olga@test.ru",
+      "password": "Olga1234",
+      "active": false,
+      "role": None
+    }
+    {
+      "email": "petr@test.ru",
+      "password": "Petr1234"
+      "active": true
+    }
+  ],
+}</pre>
+
+  <div class="box task">
+    <div class="title">Как искать — Python сам покажет, где ошибка</div>
+    <ol class="steps">
+      <li>Создай <code class="i">python/day19_hunt.py</code>:
+<pre>import json
+
+text = """
+...сюда вставь весь файл целиком...
+"""
+
+data = json.loads(text)
+print("Файл прочитан, пользователей:", len(data["users"]))</pre>
+      </li>
+      <li>Запусти. Python упадёт с <code class="i">JSONDecodeError</code> и напишет <b>номер строки и столбца</b>, где споткнулся.</li>
+      <li>Найди это место, запиши находку, исправь <b>одну</b> ошибку и запусти снова. Следующая ошибка покажется следующей.</li>
+      <li>Повторяй, пока не напечатается «Файл прочитан, пользователей: 4».</li>
+    </ol>
+  </div>
+
+  <div class="simple">
+    <div class="title">Как читать ошибку</div>
+    <p><code class="i">Expecting property name enclosed in double quotes: line 3 column 3</code> — «ожидал имя свойства в двойных кавычках, строка 2, столбец 3». Строки считаются от открывающих трёх кавычек. Первая строка после них пустая, поэтому номер в ошибке на один больше, чем в самом файле: «line 3» — это вторая строка файла. Подсказка обычно точная: что Python ждал и где.</p>
+  </div>
+
+  <div class="box card">
+    <div class="title">Сколько искать</div>
+    <p>Девять ошибок. Пользователь anna написан правильно — это контрольный: сверяйся с ним.</p>
+  </div>
+  <div class="done"><b>Готово, когда</b> файл читается, и у тебя список находок: строка → что не так → какое правило JSON нарушено. Правила — на следующей вкладке.</div>
+</div>
+
+<!-- 2 -->
+<div class="pane" data-title="Разбор">
+  <h2>Девять ошибок</h2>
+  <p class="sub">15 минут. После охоты</p>
+
+  <div class="scroll"><table>
+    <tr><th>#</th><th>Где</th><th>Что не так</th><th>Правило JSON</th></tr>
+    <tr><td>1</td><td>строка 2</td><td><code class="i">// тестовые пользователи…</code></td><td>Комментариев в JSON нет совсем</td></tr>
+    <tr><td>2</td><td>ivan</td><td><code class="i">'email'</code></td><td>Только двойные кавычки — и для ключей, и для строк</td></tr>
+    <tr><td>3</td><td>ivan</td><td><code class="i">True</code></td><td>Логические значения — <code class="i">true</code> и <code class="i">false</code> с маленькой буквы. True — это Python</td></tr>
+    <tr><td>4</td><td>ivan</td><td><code class="i">True,</code> и сразу <code class="i">}</code></td><td>После последнего элемента запятой нет</td></tr>
+    <tr><td>5</td><td>olga</td><td><code class="i">email:</code> без кавычек</td><td>Ключ — всегда строка в двойных кавычках</td></tr>
+    <tr><td>6</td><td>olga</td><td><code class="i">None</code></td><td>Пустое значение — <code class="i">null</code>. None — это Python</td></tr>
+    <tr><td>7</td><td>между olga и petr</td><td><code class="i">}</code> и сразу <code class="i">{</code></td><td>Элементы списка разделяются запятой</td></tr>
+    <tr><td>8</td><td>petr</td><td>после <code class="i">"Petr1234"</code> нет запятой</td><td>Пары ключ–значение разделяются запятой</td></tr>
+    <tr><td>9</td><td>конец файла</td><td><code class="i">],</code> и сразу <code class="i">}</code></td><td>Та же лишняя запятая в конце</td></tr>
+  </table></div>
+
+  <div class="box note">
+    <div class="title">Что общего у ошибок 3 и 6</div>
+    <p>Коллега писал JSON как Python. Они очень похожи — фигурные скобки, квадратные, двоеточия, — но это разные языки. Три отличия, на которых ошибаются все: кавычки только двойные, <code class="i">true/false</code> с маленькой, <code class="i">null</code> вместо <code class="i">None</code>.</p>
+  </div>
+
+  <div class="box card">
+    <div class="title">Это и есть тестирование</div>
+    <p>Ты нашла девять багов в файле, не понимая заранее всех правил: запустила, прочитала сообщение, нашла место, исправила, повторила. Так же работают с упавшим автотестом: читают ошибку, а не гадают.</p>
+  </div>
+</div>
+
+<!-- 3 -->
+<div class="pane" data-title="JSON и функции">
+  <h2>JSON, и как разбить программу на функции</h2>
+  <p class="sub">40 минут</p>
+
+  <div class="simple">
+    <div class="title">Простыми словами</div>
+    <p>JSON — это текст, записанный по строгим правилам, который выглядит почти как словари и списки Python. Python умеет превращать JSON в словари и обратно одной командой. Поэтому ответ сервера или файл с данными становится обычным словарём, а с ним ты уже работать умеешь.</p>
+  </div>
+
+  <h3>Как выглядит JSON</h3>
+<pre class="light">{
+  "email": "anna@test.ru",
+  "age": 25,
+  "active": true,
+  "roles": ["user", "tester"],
+  "manager": null
+}</pre>
+  <p>Объект в фигурных скобках — словарь. Массив в квадратных — список. Внутри — строки, числа, true/false, null и другие объекты и массивы.</p>
+
+  <div class="box def">
+    <div class="title">[Бумага] JSON и Python</div>
+    <div class="scroll"><table>
+      <tr><th>JSON</th><th>Python</th></tr>
+      <tr><td class="mono">{ "a": 1 }</td><td>словарь <code class="i">dict</code></td></tr>
+      <tr><td class="mono">[1, 2]</td><td>список <code class="i">list</code></td></tr>
+      <tr><td class="mono">"текст"</td><td>строка — только в двойных кавычках</td></tr>
+      <tr><td class="mono">25, 3.5</td><td>число</td></tr>
+      <tr><td class="mono">true / false</td><td><code class="i">True / False</code></td></tr>
+      <tr><td class="mono">null</td><td><code class="i">None</code></td></tr>
+    </table></div>
+  </div>
+
+  <div class="box trap">
+    <div class="title">[Бумага] Пять правил, на которых падают</div>
+    <ol>
+      <li>Ключи и строки — только в <b>двойных</b> кавычках.</li>
+      <li><code class="i">true</code>, <code class="i">false</code>, <code class="i">null</code> — с маленькой буквы.</li>
+      <li>Никаких запятых после последнего элемента.</li>
+      <li>Никаких комментариев.</li>
+      <li>Между элементами — запятая всегда.</li>
+    </ol>
+  </div>
+
+  <h3>JSON в Python — модуль json</h3>
+  <p>Перед использованием пишешь в начале файла <code class="i">import json</code>. Это подключение готового набора функций; подробно про модули — в теме 2.5.</p>
+  <div class="scroll"><table>
+    <tr><th>Что нужно</th><th>Как</th><th>Пример</th></tr>
+    <tr><td>Текст JSON → словарь</td><td class="mono">json.loads(text)</td><td class="mono">json.loads('{"a": true}')</td></tr>
+    <tr><td>Словарь → текст JSON</td><td class="mono">json.dumps(data)</td><td class="mono">json.dumps({"a": True})</td></tr>
+    <tr><td>Записать в файл</td><td class="mono">json.dump(data, f)</td><td>см. ниже</td></tr>
+    <tr><td>Прочитать из файла</td><td class="mono">json.load(f)</td><td>см. ниже</td></tr>
+  </table></div>
+  <p>Запоминалка: <b>s</b> на конце — <b>s</b>tring, работа со строкой. Без <b>s</b> — с файлом.</p>
+<pre>print(json.loads('{"a": true, "b": null}'))   <span class="cm"># {'a': True, 'b': None}</span>
+print(json.dumps({"ok": True, "n": None}))    <span class="cm"># {"ok": true, "n": null}</span></pre>
+
+  <h3>Файлы — пока как готовый рецепт</h3>
+  <p>Файлы подробно будут в теме 2.6. Сейчас просто два рецепта — запиши их в тетрадь как формулу:</p>
+<pre><span class="cm"># записать список или словарь в файл</span>
+with open("test_users.json", "w", encoding="utf-8") as f:
+    json.dump(users, f, ensure_ascii=False, indent=2)
+
+<span class="cm"># прочитать обратно</span>
+with open("test_users.json", encoding="utf-8") as f:
+    loaded = json.load(f)</pre>
+  <div class="scroll"><table>
+    <tr><th>Кусок</th><th>Зачем</th></tr>
+    <tr><td class="mono">"w"</td><td>открыть на запись. Без него — на чтение</td></tr>
+    <tr><td class="mono">encoding="utf-8"</td><td>чтобы русские буквы не превратились в кракозябры</td></tr>
+    <tr><td class="mono">ensure_ascii=False</td><td>чтобы русский текст в файле был читаемым, а не <code class="i">П…</code></td></tr>
+    <tr><td class="mono">indent=2</td><td>красивые отступы, а не всё в одну строку</td></tr>
+  </table></div>
+
+  <h3>Как разбить программу на функции</h3>
+  <div class="simple">
+    <div class="title">Простыми словами</div>
+    <p>Одна функция — одно дело. Если функцию трудно назвать одним глаголом — она делает два дела, её надо разделить. Функции вызывают друг друга, как в твоём check_password, который вызывает has_digit и has_upper.</p>
+  </div>
+<pre>def make_email(name, domain="test.ru"):     <span class="cm"># делает почту</span>
+    return f"{name}@{domain}"
+
+def make_user(name, password):              <span class="cm"># собирает пользователя — вызывает make_email</span>
+    return {"email": make_email(name), "password": password}
+
+print(make_user("anna", "Anna1234"))
+<span class="cm"># {'email': 'anna@test.ru', 'password': 'Anna1234'}</span></pre>
+  <p>Каждую маленькую функцию легко проверить отдельно. Если сломалось — сразу видно где.</p>
+
+  <h3>Зачем тестировщику генератор</h3>
+  <p>Тестовые данные руками — это опечатки, как в охоте, и забытые случаи. Генератор создаёт их по правилам, без ошибок, сколько угодно. А если в каждой записи хранить ещё и <b>ожидаемый результат</b>, одна функция проверит все записи разом. Это называется тестированием на основе данных — data-driven, и pytest умеет это из коробки.</p>
+</div>
+
+<!-- 4 -->
+<div class="pane" data-title="Задание">
+  <h2>Требования к функции make_password</h2>
+  <p class="sub">30 минут</p>
+
+  <p>Во втором заходе ты напишешь <code class="i">make_password(length, has_digit=True, has_upper=True)</code> — функцию, которая создаёт пароль нужной длины с цифрой и заглавной или без них. Но сначала — как в дне 15 — требования. Ты выступаешь аналитиком и тестировщиком сразу.</p>
+
+  <div class="box task">
+    <div class="title">Задание</div>
+    <ol class="steps">
+      <li>Создай <code class="i">manual/requirements-make-password.md</code>.</li>
+      <li>Напиши 6–8 требований к функции. Каждое — проверяемое: на него можно написать строку <code class="i">print(make_password(...) == ...)</code>.</li>
+      <li>Пройдись по классам: обычная длина; без цифры; без заглавной; без обоих; длина 0.</li>
+      <li>Отдельно подумай про <b>маленькие длины: 1 и 2</b>. Пароль из одного символа не может одновременно содержать заглавную и цифру. Что должна сделать функция? Если не знаешь — так и пиши: «вопрос аналитику», и формулируй вопрос.</li>
+    </ol>
+  </div>
+
+  <p>Образец одного требования:</p>
+<pre class="light">1. make_password(8) возвращает строку длиной ровно 8 символов,
+   в которой есть хотя бы одна цифра и хотя бы одна заглавная буква.
+   Проверка: len(make_password(8)) == 8</pre>
+
+  <div class="box trap">
+    <div class="title">Проверь себя по свойствам из дня 15</div>
+    <p>Нет ли слов «нормальный», «корректный», «подходящий»? У каждого требования есть конкретное число или конкретный результат? Не противоречат ли требования друг другу?</p>
+  </div>
+
+  <div class="done"><b>Готово, когда</b> 6–8 требований, у каждого — проверка в виде строки Python, и хотя бы один вопрос аналитику про длину 1.</div>
+</div>
+
+<!-- 5 -->
+<div class="pane" data-title="Тест">
+  <h2>Тест</h2>
+  <p class="sub">8 вопросов, 10 минут · конец первого захода</p>
+  <div id="quizB"></div>
+  <div class="score" id="scoreB">Отвечено 0 из 8</div>
+  <div class="split">перерыв — не меньше часа без экрана</div>
+</div>
+
+<!-- 6 -->
+<div class="pane" data-title="Генератор">
+  <h2>Мини-проект 1 · генератор тестовых данных</h2>
+  <p class="sub">60 минут · файл python/day19_generator.py</p>
+
+  <p>Сегодня — первая версия: три функции, файл JSON и проверка всех пользователей одним циклом. В следующие дни генератор будет расти: случайные данные, настройки из файла, модули.</p>
+
+  <h3>0. Разобранный пример — функция вызывает функцию</h3>
+<pre>def make_email(name, domain="test.ru"):
+    return f"{name}@{domain}"
+
+def make_user(name, password, expected):
+    return {"email": make_email(name), "password": password, "expected": expected}
+
+u = make_user("valid", "Anna1234", "OK")
+print(u)</pre>
+  <div class="scroll"><table>
+    <tr><th>Шаг</th><th>Что происходит</th></tr>
+    <tr><td><code class="i">make_user("valid", "Anna1234", "OK")</code></td><td>Вызов: name = "valid", password = "Anna1234", expected = "OK"</td></tr>
+    <tr><td><code class="i">make_email(name)</code> внутри</td><td>Вызов второй функции: domain не передан — берётся "test.ru". Вернулось "valid@test.ru"</td></tr>
+    <tr><td><code class="i">return {...}</code></td><td>Собран словарь из трёх пар и отдан наружу</td></tr>
+    <tr><td><code class="i">u = ...</code></td><td><code class="i">{'email': 'valid@test.ru', 'password': 'Anna1234', 'expected': 'OK'}</code></td></tr>
+  </table></div>
+
+  <h3>Шаг 1 — make_email · 5 минут</h3>
+  <p>Возьми из примера. Проверки:</p>
+<pre class="light">print(make_email("anna") == "anna@test.ru")
+print(make_email("ivan", "mail.ru") == "ivan@mail.ru")</pre>
+
+  <h3>Шаг 2 — make_password · 20 минут</h3>
+  <p><code class="i">make_password(length, has_digit=True, has_upper=True)</code>. Устройство простое, без случайностей: первая буква — заглавная <code class="i">A</code>, если has_upper, иначе маленькая <code class="i">a</code>. Последний символ — <code class="i">1</code>, если has_digit, иначе <code class="i">a</code>. В середине — буквы <code class="i">a</code>, чтобы набрать нужную длину. Длина 0 — пустая строка.</p>
+<pre class="light">print(len(make_password(8)) == 8)
+print(make_password(8) == "Aaaaaaa1")
+print(make_password(8, has_digit=False) == "Aaaaaaaa")
+print(make_password(8, has_upper=False) == "aaaaaaa1")
+print(make_password(0) == "")</pre>
+  <details><summary>Подсказка</summary>
+    <p>Заглавная или маленькая — это выбор из двух, тернарный оператор из дня 5: <code class="i">first = "A" if has_upper else "a"</code>. Середина — строку можно умножить на число: <code class="i">"a" * 3</code> даёт <code class="i">"aaa"</code>. Сколько букв в середине, если первая и последняя уже есть?</p>
+    <p>Длину 0 проверь первой, отдельным <code class="i">if</code>, с <code class="i">return ""</code>.</p>
+  </details>
+  <div class="box trap">
+    <div class="title">Граница, о которой ты писала требования</div>
+    <p>Когда все проверки пройдут, вызови <code class="i">print(make_password(1), len(make_password(1)))</code>. Какая длина получилась? Совпадает с тем, что ты написала в требованиях? Если нет — это баг в функции, найденный по твоим же требованиям. Запиши его, чинить не обязательно.</p>
+  </div>
+
+  <h3>Шаг 3 — генератор и файл · 20 минут</h3>
+  <p><code class="i">generate_users()</code> возвращает список из шести пользователей — по одному на каждый класс из твоей таблицы тест-данных дня 16. У каждого три ключа: email, password, expected.</p>
+  <div class="scroll"><table>
+    <tr><th>Имя для email</th><th>Пароль</th><th>expected</th></tr>
+    <tr><td>valid</td><td><code class="i">make_password(8)</code></td><td>OK</td></tr>
+    <tr><td>short</td><td>длина 7</td><td>Пароль должен содержать от 8 до 20 символов</td></tr>
+    <tr><td>long</td><td>длина 21</td><td>Пароль должен содержать от 8 до 20 символов</td></tr>
+    <tr><td>nodigit</td><td>длина 10, без цифры</td><td>Пароль должен содержать хотя бы одну цифру</td></tr>
+    <tr><td>noupper</td><td>длина 10, без заглавной</td><td>Пароль должен содержать хотя бы одну заглавную букву</td></tr>
+    <tr><td>empty</td><td>длина 0</td><td>Заполните поле</td></tr>
+  </table></div>
+  <p>Потом — запись в <code class="i">test_users.json</code> и чтение обратно по рецепту из теории. Открой файл в PyCharm и посмотри, как он выглядит.</p>
+
+  <h3>Шаг 4 — проверить всех разом · 15 минут</h3>
+  <p>Скопируй в файл свою <code class="i">check_password</code> из дня 16. Пройди циклом по пользователям, <b>прочитанным из файла</b>, и для каждого напечатай:</p>
+<pre class="light">valid@test.ru PASSED
+short@test.ru PASSED
+long@test.ru PASSED
+nodigit@test.ru PASSED
+noupper@test.ru PASSED
+empty@test.ru PASSED</pre>
+  <p>PASSED — если <code class="i">check_password(пароль) == expected</code>. Иначе — <code class="i">FAILED</code> и что вернула функция. Это твой первый data-driven тест.</p>
+
+  <div class="box task">
+    <div class="title">Правило — запусти проверки до того, как присылать</div>
+    <p>Пришли код и вывод целиком: проверки шагов 1–2, длину для make_password(1) и шесть строк PASSED. Если где-то FAILED — сначала разберись сама: это баг в генераторе, в check_password или в expected?</p>
+  </div>
+</div>
+
+<!-- 7 -->
+<div class="pane" data-title="Тест-кейсы">
+  <h2>TC-006 и TC-007</h2>
+  <p class="sub">30 минут · к CP1: после сегодня — 7 из 20</p>
+
+  <p>Тексты сообщений — дословно из справочника дня 13.</p>
+  <div class="scroll"><table>
+    <tr><th>№</th><th>Когда</th><th>Текст</th><th>Где</th></tr>
+    <tr><td>3.3</td><td>Email не похож на адрес</td><td>Неверный формат email</td><td>под полем email</td></tr>
+    <tr><td>3.7</td><td>Неверные данные или такого email нет</td><td>Неверный email или пароль</td><td>над формой</td></tr>
+  </table></div>
+  <p style="color:var(--soft);font-size:15.5px">Правила показа: после неудачи email остаётся, пароль очищается.</p>
+
+  <h3>TC-006 · Email без символа @</h3>
+  <p>Негативный кейс на 3.3. Пароль в данных — заведомо правильный, чтобы ломалось только одно правило.</p>
+
+  <h3>TC-007 · Существующий email, неверный пароль</h3>
+  <p>Негативный кейс на 3.7. Подумай: что в предусловии? Какой пароль выбрать, чтобы он прошёл все проверки формата 3.4–3.6, но был неверным для этого пользователя? Что с полями после попытки? И постусловие: эта попытка — первая из пяти до блокировки.</p>
+
+<pre class="light">ID:
+Название:
+Приоритет:
+Предусловие:
+Тестовые данные:
+Шаги:
+  1.
+Ожидаемый результат:
+Постусловие:</pre>
+
+  <div class="done"><b>Готово, когда</b> данные ломают ровно одно правило, тексты дословно, с местом показа, в TC-007 описано состояние обоих полей и есть постусловие.</div>
+</div>
+
+<!-- 8 -->
+<div class="pane" data-title="Итоги">
+  <h2>Закрываем день</h2>
+  <p class="sub">5 минут</p>
+
+  <div class="box note">
+    <div class="title">[Бумага]</div>
+    <ul>
+      <li>JSON ↔ Python: объект — словарь, массив — список, true/false/null — True/False/None.</li>
+      <li>Пять правил JSON: двойные кавычки, маленькие true/false/null, без запятой в конце, без комментариев, запятая между элементами.</li>
+      <li>loads/dumps — со строкой, load/dump — с файлом.</li>
+      <li>Рецепт записи и чтения файла JSON.</li>
+      <li>Одна функция — одно дело.</li>
+      <li>Data-driven: в каждой записи данные и ожидаемый результат, одна проверка на всех.</li>
+    </ul>
+  </div>
+
+  <div class="box task">
+    <div class="title">[Репо]</div>
+<pre>git add python/day19_hunt.py python/day19_generator.py python/test_users.json manual/requirements-make-password.md manual/test-cases.md
+git commit -m "День 19: JSON, генератор тестовых данных v1, TC-006 и TC-007"
+git push</pre>
+  </div>
+
+  <div class="box def">
+    <div class="title">Что мне прислать</div>
+    <ol>
+      <li>Счёт карточек B из 8.</li>
+      <li>Ответы на чтение кода.</li>
+      <li>Охоту: сколько ошибок нашла сама и что было труднее всего.</li>
+      <li>Требования к make_password.</li>
+      <li>Код генератора и весь вывод.</li>
+      <li>Номера вопросов теста, где ошиблась.</li>
+      <li>TC-006 и TC-007.</li>
+    </ol>
+  </div>
+
+  <h3>Дальше</h3>
+  <p>День 20 — процессы: SDLC, STLC, Scrum. Во втором заходе — генератор v2.</p>
+</div>
+
+</div>
+
+<script>
+var QA=[
+{q:'def make(name, domain="test.ru"):\n    return name + "@" + domain\n\nprint(make("a"), make("b", "x.ru"))',
+ o:['a@test.ru b@test.ru','a@test.ru b@x.ru','a b','Ошибка'],a:1,
+ e:'В первом вызове domain не передан — берётся "test.ru". Во втором передан "x.ru" и заменяет значение по умолчанию.'},
+{q:'def first_failed(results):\n    for r in results:\n        if r == "failed":\n            return r\n\nprint(first_failed(["passed", "passed"]))',
+ o:['failed','passed','None','Ошибка'],a:2,
+ e:'"failed" в списке нет, return внутри цикла ни разу не сработал. После цикла return нет — функция вернула None.'},
+{q:'x = [1, 2, 3]\n\ndef add(lst):\n    lst.append(4)\n\nadd(x)\nprint(len(x))',
+ o:['3','4','None','Ошибка'],a:1,
+ e:'Список передаётся в функцию тем же самым объектом, как b = a — не копией. append внутри функции меняет тот же список x. Поэтому функции, которые меняют тестовые данные, опасны: передавай копию, если данные нужны дальше.'},
+{q:'def area(w, h=2):\n    return w * h\n\nprint(area(h=5, w=3))',
+ o:['6','10','15','Ошибка: порядок'],a:2,
+ e:'Аргументы переданы по именам — порядок неважен. w = 3, h = 5, результат 15.'}
+];
+
+var QB=[
+{q:'Какая запись — правильный JSON?',
+ o:["{'a': 1}",'{"a": 1}','{a: 1}','{"a": 1,}'],a:1,
+ e:'Ключ в двойных кавычках и без запятой в конце. Одинарные кавычки, ключ без кавычек и лишняя запятая — ошибки.'},
+{q:'Как в JSON записывается значение, которое в Python пишется True?',
+ o:['True','"True"','true','1'],a:2,
+ e:'В JSON — true с маленькой буквы, без кавычек. "True" в кавычках — это уже строка, а не логическое значение.'},
+{q:'Как в JSON записывается пустое значение — Python None?',
+ o:['None','null','""','undefined'],a:1,
+ e:'null. Пустая строка "" — это строка, а не отсутствие значения.'},
+{q:'Можно ли писать комментарии в JSON-файле?',
+ o:['Да, через //','Да, через #','Нет, JSON их не поддерживает','Только в начале файла'],a:2,
+ e:'Комментариев в JSON нет вообще. Именно с этого упал файл в охоте.'},
+{q:'Что вернёт json.loads(\'{"a": true, "b": null}\')?',
+ o:["{'a': true, 'b': null}","{'a': True, 'b': None}",'Строку','Ошибку'],a:1,
+ e:'loads превращает текст JSON в словарь Python, и true с null становятся True и None.'},
+{q:'Чем json.dumps отличается от json.dump?',
+ o:['Ничем','dumps превращает данные в строку, dump записывает их в файл','dumps читает, dump пишет','dump — устаревший вариант'],a:1,
+ e:'S на конце — string, работа со строкой. Без s — с файлом. То же правило у loads и load.'},
+{q:'Зачем в записях тестовых данных хранить поле expected?',
+ o:['Для красоты','Чтобы одна проверка в цикле сравнивала результат каждой записи с её ожидаемым — data-driven','Чтобы JSON был длиннее','Так требует Python'],a:1,
+ e:'Каждая запись знает свой ожидаемый результат. Добавила новый случай — он проверяется тем же циклом, без нового кода.'},
+{q:'make_password(1) возвращает "A1" длиной 2. Что это?',
+ o:['Норма','Баг на границе: функция не учла маленькую длину','Ошибка Python','Так и должно быть по требованиям'],a:1,
+ e:'Длина 1 — граница, о которой функция не подумала: первая и последняя буквы плюс середина минус одна. Поэтому тестировщик всегда проверяет 0, 1 и 2.'}
+];
+
+function buildQuiz(host,data,scoreEl,code){
+  var answered=0,right=0;
+  data.forEach(function(item,i){
+    var box=document.createElement('div');box.className='q';
+    var t=document.createElement('div');t.className='qn';t.textContent='Вопрос '+(i+1);box.appendChild(t);
+    if(code){var pre=document.createElement('pre');pre.textContent=item.q;box.appendChild(pre);
+      var hint=document.createElement('div');hint.textContent='Что напечатается?';box.appendChild(hint);}
+    else{var qt=document.createElement('div');qt.textContent=item.q;box.appendChild(qt);}
+    var opts=document.createElement('div');opts.className='opts';
+    var expl=document.createElement('div');expl.className='expl';expl.hidden=true;expl.textContent=item.e;
+    var locked=false;
+    item.o.forEach(function(text,j){
+      var b=document.createElement('button');b.className='opt';b.type='button';b.textContent=text;
+      if(code)b.style.fontFamily='Consolas,monospace';
+      b.onclick=function(){
+        if(locked)return;locked=true;answered++;if(j===item.a)right++;
+        [].forEach.call(opts.children,function(el,k){
+          if(k===item.a)el.classList.add('right');else if(k===j)el.classList.add('wrong');
+        });
+        expl.hidden=false;
+        if(scoreEl)scoreEl.textContent='Отвечено '+answered+' из '+data.length+', верных '+right;
+      };
+      opts.appendChild(b);
+    });
+    box.appendChild(opts);box.appendChild(expl);host.appendChild(box);
+  });
+}
+buildQuiz(document.getElementById('quizA'),QA,null,true);
+buildQuiz(document.getElementById('quizB'),QB,document.getElementById('scoreB'),false);
+
+var panes=[].slice.call(document.querySelectorAll('.pane'));
+var tabs=document.getElementById('tabs');
+panes.forEach(function(p,i){
+  var b=document.createElement('button');b.type='button';
+  b.innerHTML='<span class="n">'+i+'</span>'+p.dataset.title;
+  b.onclick=function(){go(i);};
+  tabs.appendChild(b);
+  var nav=document.createElement('div');nav.className='nav';
+  var prev=document.createElement('button');prev.type='button';prev.textContent='← Назад';
+  prev.onclick=function(){go(i-1);};if(i===0)prev.disabled=true;
+  var next=document.createElement('button');next.type='button';next.className='next';
+  next.textContent=(i===panes.length-1)?'В начало':'Дальше →';
+  next.onclick=function(){go(i===panes.length-1?0:i+1);};
+  nav.appendChild(prev);nav.appendChild(next);p.appendChild(nav);
+});
+function go(i){
+  panes.forEach(function(p,j){p.classList.toggle('on',i===j);});
+  [].forEach.call(tabs.children,function(b,j){b.classList.toggle('on',i===j);});
+  try{tabs.children[i].scrollIntoView({block:'nearest',inline:'center'});}catch(e){}
+  try{localStorage.setItem('d19tab',String(i));}catch(e){}
+  window.scrollTo(0,0);
+}
+var start=0;
+try{var s=parseInt(localStorage.getItem('d19tab'),10);if(s>=0&&s<panes.length)start=s;}catch(e){}
+go(start);
+</script>
+
+</body></html>

@@ -1,0 +1,718 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Условия в Python — день 5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --paper:#E7ECEE; --card:#FCFCFB; --ink:#16232B; --soft:#5A6B72; --line:#CBD4D7;
+  --level:#256B7C; --level-bg:#DDEAEE;
+  --alert:#9C3B33; --alert-bg:#F2E0DD;
+  --note:#4A6B2A; --note-bg:#E3EBD9;
+  --flash:#96700F; --flash-bg:#F2E9CE;
+  --task:#3B5B9C; --task-bg:#DFE5F2;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:16.5px;line-height:1.62;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:840px;margin:0 auto;padding:26px 20px 70px}
+
+.masthead{border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:14px}
+.masthead h1{font-family:"Newsreader",Georgia,serif;font-weight:500;font-size:31px;
+  line-height:1.1;margin:0 0 4px;letter-spacing:-0.01em}
+.masthead p{margin:0;color:var(--soft);font-size:14.5px}
+
+.index{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:26px}
+.chip{font-family:inherit;font-size:13.5px;padding:6px 12px;border:1px solid var(--line);
+  background:transparent;color:var(--soft);border-radius:100px;cursor:pointer}
+.chip:hover{border-color:var(--ink);color:var(--ink)}
+.chip.on{background:var(--ink);border-color:var(--ink);color:var(--card)}
+.chip.done{border-color:var(--note);color:var(--note)}
+.chip.done.on{background:var(--note);border-color:var(--note);color:#fff}
+
+.block{display:none}
+.block.show{display:block}
+.sheet{background:var(--card);border:1px solid var(--line);padding:32px 34px 28px}
+.head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;
+  border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:22px}
+.head h2{font-family:"Newsreader",Georgia,serif;font-weight:500;font-size:29px;line-height:1.12;margin:0}
+.mins{color:var(--soft);font-size:14px;white-space:nowrap}
+.sheet p{max-width:70ch;margin:0 0 15px}
+.sheet h3{font-family:"Newsreader",Georgia,serif;font-weight:600;font-size:20px;margin:28px 0 10px}
+.lead{font-size:18px;color:var(--soft);max-width:66ch}
+b,strong{font-weight:600}
+code{font-family:"IBM Plex Mono",monospace;font-size:0.9em;background:#EEF1F1;padding:1px 5px;border-radius:2px}
+
+pre{font-family:"IBM Plex Mono",monospace;font-size:14.5px;line-height:1.6;
+  background:#1B2A33;color:#E4EAED;padding:16px 18px;margin:0 0 16px;max-width:70ch;
+  overflow-x:auto;border-radius:3px}
+pre .c{color:#7E939E}
+pre .k{color:#E0A8C0}
+pre .s{color:#A8D6A0}
+pre .n{color:#E8C07A}
+
+.term{border-left:3px solid var(--level);background:var(--level-bg);padding:13px 16px;margin:0 0 12px;max-width:70ch}
+.term .name{font-family:"Newsreader",Georgia,serif;font-weight:600;font-size:18px;color:var(--level);display:block;margin-bottom:2px}
+.term p{margin:0}
+.term p + p{margin-top:8px}
+
+.alert{border-left:3px solid var(--alert);background:var(--alert-bg);padding:13px 16px;margin:16px 0;max-width:70ch}
+.alert .name{font-weight:600;color:var(--alert);display:block;margin-bottom:3px}
+.alert p{margin:0}
+.alert p + p{margin-top:8px}
+.alert pre{margin-top:10px;margin-bottom:0}
+
+.example{border:1px dashed var(--line);padding:13px 16px;margin:16px 0;max-width:70ch;background:#F7F8F8}
+.example .name{font-weight:600;display:block;margin-bottom:3px;font-size:14.5px;color:var(--soft)}
+.example p{margin:0}
+.example p + p{margin-top:8px}
+
+.task{border-left:3px solid var(--task);background:var(--task-bg);padding:15px 17px;margin:0 0 14px;max-width:70ch}
+.task .name{font-weight:600;color:var(--task);display:block;margin-bottom:4px}
+.task p{margin:0}
+.task p + p{margin-top:7px}
+.task .file{font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--soft)}
+
+table{border-collapse:collapse;width:100%;max-width:70ch;margin:16px 0;font-size:15.5px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;background:#F1F4F4}
+td code{background:#EEF1F1}
+
+.recap{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:30px;padding-top:22px;border-top:2px solid var(--ink)}
+.box{padding:15px 17px}
+.box.paper{background:var(--note-bg);border-left:3px solid var(--note)}
+.box.cards{background:var(--flash-bg);border-left:3px solid var(--flash)}
+.box h4{font-family:"Newsreader",Georgia,serif;font-size:17px;font-weight:600;margin:0 0 8px}
+.box.paper h4{color:var(--note)}
+.box.cards h4{color:var(--flash)}
+.box ul{margin:0;padding-left:17px;font-size:15px}
+.box li{margin-bottom:5px}
+.box .qa{font-size:15px;margin-bottom:9px}
+.box .qa span{display:block;color:var(--soft)}
+
+.nav{display:flex;justify-content:space-between;gap:14px;margin-top:22px}
+button.btn{font-family:inherit;font-size:15.5px;padding:11px 24px;border:1px solid var(--ink);border-radius:2px;cursor:pointer}
+.primary{background:var(--ink);color:var(--card)}
+.primary:hover{background:#0B171E}
+.ghost{background:transparent;color:var(--ink)}
+.ghost:hover{background:#EEF1F1}
+button:focus-visible,.chip:focus-visible{outline:2px solid var(--task);outline-offset:2px}
+
+.q{border-top:1px solid var(--line);padding:22px 0}
+.q:first-of-type{border-top:none}
+.q .ask{font-weight:500;margin-bottom:12px;max-width:70ch}
+.q .num{color:var(--soft);font-size:14px;margin-right:6px}
+.opt{display:block;margin-bottom:7px;max-width:70ch;cursor:pointer;padding:9px 13px;
+  border:1px solid var(--line);background:#F9FAFA;font-size:15.5px}
+.opt:hover{border-color:var(--soft)}
+.opt input{margin-right:9px}
+.opt.right{background:var(--note-bg);border-color:var(--note)}
+.opt.wrong{background:var(--alert-bg);border-color:var(--alert)}
+.why{margin-top:10px;padding:11px 14px;background:#F1F4F4;border-left:3px solid var(--soft);
+  font-size:15px;max-width:70ch;display:none}
+.why.show{display:block}
+.score{margin-top:24px;padding:20px;background:var(--level-bg);border-left:3px solid var(--level);display:none;max-width:70ch}
+.score.show{display:block}
+.score strong{font-family:"Newsreader",serif;font-size:22px;display:block;margin-bottom:6px}
+
+@media (max-width:640px){
+  .sheet{padding:22px 18px}
+  .masthead h1{font-size:25px}
+  .head{flex-direction:column;gap:4px}
+  .head h2{font-size:23px}
+  .recap{grid-template-columns:1fr}
+  .nav{flex-direction:column-reverse}
+  .nav button{width:100%}
+  pre{font-size:13px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+
+<div class="masthead">
+  <h1>Условия: код начинает принимать решения</h1>
+  <p>День 5. Шесть блоков, шесть задач и тест. Примерно 3 часа.</p>
+</div>
+
+<div class="index" id="index"></div>
+
+<!-- 1 -->
+<section class="block show" data-name="Сравнения">
+<div class="sheet">
+  <div class="head"><h2>Сравнения и True/False</h2><span class="mins">около 20 минут</span></div>
+
+  <p class="lead">До сегодняшнего дня твои программы шли одной дорогой сверху вниз. Сегодня появится развилка: код начнёт проверять условие и выбирать, что делать дальше.</p>
+
+  <p>Всё начинается со сравнения. Когда Python что-то сравнивает, он отвечает одним из двух слов: <code>True</code> или <code>False</code>. Это тип <code>bool</code>, ты его уже видела на третьем дне.</p>
+
+<pre><span class="c"># попробуй выполнить это построчно</span>
+<span class="k">print</span>(5 &gt; 3)      <span class="c"># True</span>
+<span class="k">print</span>(5 &lt; 3)      <span class="c"># False</span>
+<span class="k">print</span>(5 == 5)     <span class="c"># True</span>
+<span class="k">print</span>(5 != 5)     <span class="c"># False</span></pre>
+
+  <table>
+    <tr><th>Оператор</th><th>Значение</th><th>Пример</th></tr>
+    <tr><td><code>==</code></td><td>равно</td><td><code>age == 18</code></td></tr>
+    <tr><td><code>!=</code></td><td>не равно</td><td><code>name != ""</code></td></tr>
+    <tr><td><code>&gt;</code></td><td>больше</td><td><code>price &gt; 1000</code></td></tr>
+    <tr><td><code>&lt;</code></td><td>меньше</td><td><code>count &lt; 10</code></td></tr>
+    <tr><td><code>&gt;=</code></td><td>больше или равно</td><td><code>age &gt;= 18</code></td></tr>
+    <tr><td><code>&lt;=</code></td><td>меньше или равно</td><td><code>age &lt;= 65</code></td></tr>
+  </table>
+
+  <div class="alert">
+    <span class="name">Одно равно и два равно — разные вещи</span>
+    <p><code>=</code> кладёт значение в переменную. <code>==</code> спрашивает, равны ли两 значения.</p>
+    <p>Это ошибка номер один у всех новичков, и Python на ней остановит программу.</p>
+<pre><span class="n">age</span> = 18        <span class="c"># присвоила: теперь age это 18</span>
+<span class="n">age</span> == 18       <span class="c"># спросила: age равен 18? → True</span></pre>
+  </div>
+
+  <p>Сравнивать можно и строки. Тогда <code>==</code> проверяет полное совпадение, включая регистр и пробелы:</p>
+
+<pre><span class="k">print</span>(<span class="s">"Анна"</span> == <span class="s">"Анна"</span>)    <span class="c"># True</span>
+<span class="k">print</span>(<span class="s">"Анна"</span> == <span class="s">"анна"</span>)    <span class="c"># False — разный регистр</span>
+<span class="k">print</span>(<span class="s">"Анна"</span> == <span class="s">"Анна "</span>)   <span class="c"># False — лишний пробел</span></pre>
+
+  <div class="example">
+    <span class="name">Где ты это встретишь как тестировщик</span>
+    <p>Ровно на этих трёх строчках ломается масса форм авторизации. Система не обрезает пробелы по краям, пользователь копирует логин с пробелом в конце — и получает «неверный логин». Проверка на пробелы в начале и конце поля входит в любой чек-лист.</p>
+  </div>
+
+  <div class="recap">
+    <div class="box paper">
+      <h4>В тетрадь</h4>
+      <ul>
+        <li>Таблица из шести операторов сравнения</li>
+        <li>Крупно: <code>=</code> присвоить, <code>==</code> сравнить</li>
+        <li>Результат сравнения — всегда True или False</li>
+      </ul>
+    </div>
+    <div class="box cards">
+      <h4>На карточки</h4>
+      <div class="qa">Чем отличается = от ==<span>= кладёт значение в переменную, == сравнивает два значения</span></div>
+      <div class="qa">Что возвращает любое сравнение?<span>True или False, тип bool</span></div>
+      <div class="qa">Что даст "Анна" == "анна"<span>False, регистр важен</span></div>
+    </div>
+  </div>
+
+  <div class="nav"><span></span><button class="btn primary" data-go="1">Дальше</button></div>
+</div>
+</section>
+
+<!-- 2 -->
+<section class="block" data-name="if / else">
+<div class="sheet">
+  <div class="head"><h2>if и else</h2><span class="mins">около 25 минут</span></div>
+
+  <p class="lead">Конструкция <code>if</code> говорит: если условие верно — выполни этот кусок кода. Если нет — пропусти.</p>
+
+<pre><span class="n">age</span> = 20
+
+<span class="k">if</span> <span class="n">age</span> &gt;= 18:
+    <span class="k">print</span>(<span class="s">"Доступ разрешён"</span>)</pre>
+
+  <p>Разберём по частям, потому что здесь три вещи, которых раньше не было.</p>
+
+  <div class="term">
+    <span class="name">Двоеточие в конце строки</span>
+    <p>После условия обязательно ставится <code>:</code>. Оно означает «дальше идёт блок кода, который относится к этому условию». Забыла двоеточие — получишь <code>SyntaxError</code>.</p>
+  </div>
+
+  <div class="term">
+    <span class="name">Отступ</span>
+    <p>Строки внутри условия сдвинуты вправо на четыре пробела. Именно отступ показывает Python, что относится к условию, а что нет.</p>
+    <p>В большинстве языков для этого используют фигурные скобки. В Python их роль играют отступы — поэтому они не оформление, а часть синтаксиса. PyCharm ставит их сам после двоеточия и Enter.</p>
+  </div>
+
+  <div class="term">
+    <span class="name">else — что делать в остальных случаях</span>
+    <p>Выполняется, когда условие оказалось ложным.</p>
+  </div>
+
+<pre><span class="n">age</span> = 15
+
+<span class="k">if</span> <span class="n">age</span> &gt;= 18:
+    <span class="k">print</span>(<span class="s">"Доступ разрешён"</span>)
+<span class="k">else</span>:
+    <span class="k">print</span>(<span class="s">"Доступ запрещён"</span>)</pre>
+
+  <p>Обрати внимание: <code>else</code> стоит на том же уровне, что и <code>if</code>, без отступа. Условия у него нет — только двоеточие.</p>
+
+  <h3>Что видно по отступам</h3>
+
+<pre><span class="n">age</span> = 15
+
+<span class="k">if</span> <span class="n">age</span> &gt;= 18:
+    <span class="k">print</span>(<span class="s">"Внутри условия"</span>)   <span class="c"># выполнится только если age >= 18</span>
+<span class="k">print</span>(<span class="s">"Снаружи условия"</span>)       <span class="c"># выполнится всегда</span></pre>
+
+  <p>Одна строка сдвинута, вторая нет — и они ведут себя по-разному. Сдвинутая принадлежит условию, несдвинутая живёт сама по себе.</p>
+
+  <div class="alert">
+    <span class="name">IndentationError</span>
+    <p>Самая частая ошибка этого дня. Означает проблему с отступами: строка сдвинута не туда или сдвиг неровный.</p>
+    <p>Чаще всего причина — смешение пробелов и табов. Внешне одинаково, для Python по-разному. Нажми <code>Ctrl+Alt+L</code>, PyCharm выровняет всё сам.</p>
+  </div>
+
+  <div class="example">
+    <span class="name">Связь с тем, что ты учила вчера</span>
+    <p>Строка <code>if age &gt;= 18</code> — это ровно тот случай, который разбирался в теории. Стоит написать <code>&gt;</code> вместо <code>&gt;=</code>, и восемнадцатилетний не пройдёт. Граничное значение, один символ, реальный баг.</p>
+    <p>Когда ты будешь тестировать чужую форму, помни: по ту сторону лежит примерно такая же строчка.</p>
+  </div>
+
+  <div class="recap">
+    <div class="box paper">
+      <h4>В тетрадь</h4>
+      <ul>
+        <li>Шаблон конструкции: <code>if условие:</code> — двоеточие — отступ</li>
+        <li>Почему отступ в Python это синтаксис, а не оформление</li>
+        <li>Пример на отличие строки внутри условия и снаружи</li>
+      </ul>
+    </div>
+    <div class="box cards">
+      <h4>На карточки</h4>
+      <div class="qa">Что обязательно ставится после условия?<span>двоеточие</span></div>
+      <div class="qa">Что показывает отступ в Python?<span>какие строки относятся к блоку; заменяет фигурные скобки других языков</span></div>
+      <div class="qa">Что означает IndentationError?<span>проблема с отступами: неровный сдвиг или смешение пробелов и табов</span></div>
+    </div>
+  </div>
+
+  <div class="nav"><button class="btn ghost" data-go="0">Назад</button><button class="btn primary" data-go="2">Дальше</button></div>
+</div>
+</section>
+
+<!-- 3 -->
+<section class="block" data-name="elif">
+<div class="sheet">
+  <div class="head"><h2>elif: больше двух вариантов</h2><span class="mins">около 25 минут</span></div>
+
+  <p class="lead"><code>if</code> и <code>else</code> дают две дороги. Когда вариантов больше, между ними вставляют <code>elif</code> — сокращение от «else if», то есть «иначе, если».</p>
+
+<pre><span class="n">score</span> = 75
+
+<span class="k">if</span> <span class="n">score</span> &gt;= 90:
+    <span class="k">print</span>(<span class="s">"Отлично"</span>)
+<span class="k">elif</span> <span class="n">score</span> &gt;= 75:
+    <span class="k">print</span>(<span class="s">"Хорошо"</span>)
+<span class="k">elif</span> <span class="n">score</span> &gt;= 60:
+    <span class="k">print</span>(<span class="s">"Удовлетворительно"</span>)
+<span class="k">else</span>:
+    <span class="k">print</span>(<span class="s">"Неудовлетворительно"</span>)</pre>
+
+  <h3>Главное правило: проверка идёт сверху вниз и останавливается</h3>
+
+  <p>Python проверяет условия по очереди. Как только одно оказалось истинным — выполняет его блок и <b>выходит из всей конструкции</b>. Остальные ветки не проверяются даже если тоже подходят.</p>
+
+  <p>В примере выше <code>score = 75</code> подходит и под <code>&gt;= 75</code>, и под <code>&gt;= 60</code>. Выведется только «Хорошо», потому что оно стоит выше.</p>
+
+  <div class="alert">
+    <span class="name">Отсюда — ловушка с порядком условий</span>
+    <p>Переставим ветки местами:</p>
+<pre><span class="n">score</span> = 95
+
+<span class="k">if</span> <span class="n">score</span> &gt;= 60:
+    <span class="k">print</span>(<span class="s">"Удовлетворительно"</span>)
+<span class="k">elif</span> <span class="n">score</span> &gt;= 90:
+    <span class="k">print</span>(<span class="s">"Отлично"</span>)</pre>
+    <p>Выведется «Удовлетворительно». Девяносто пять подошло под первое условие, и до второго дело не дошло. Код формально рабочий, ошибок нет, результат неверный.</p>
+    <p>Правило: при проверке диапазонов условия идут <b>от самого строгого к самому мягкому</b>.</p>
+  </div>
+
+  <div class="example">
+    <span class="name">Почему это важно именно тебе</span>
+    <p>Такой баг невозможно найти, глядя на код бегло — он выглядит правильным. Находится он только проверкой граничных значений: подставить 95, 90, 89, 75, 60, 59 и сравнить с ожидаемым.</p>
+    <p>Это и есть тест-дизайн, который ты будешь разбирать на седьмой день. Здесь ты видишь его с другой стороны — со стороны кода, в котором живёт баг.</p>
+  </div>
+
+  <div class="recap">
+    <div class="box paper">
+      <h4>В тетрадь</h4>
+      <ul>
+        <li>Шаблон цепочки: if — elif — elif — else</li>
+        <li>Крупно: проверка идёт сверху вниз и останавливается на первом совпадении</li>
+        <li>Правило порядка: от строгого условия к мягкому</li>
+        <li>Пример с переставленными ветками — он важнее остального</li>
+      </ul>
+    </div>
+    <div class="box cards">
+      <h4>На карточки</h4>
+      <div class="qa">Что делает Python, когда одно из условий истинно?<span>выполняет его блок и выходит, остальные ветки не проверяет</span></div>
+      <div class="qa">В каком порядке ставить условия для диапазонов?<span>от самого строгого к самому мягкому</span></div>
+      <div class="qa">Как найти баг с неверным порядком условий?<span>проверкой граничных значений</span></div>
+    </div>
+  </div>
+
+  <div class="nav"><button class="btn ghost" data-go="1">Назад</button><button class="btn primary" data-go="3">Дальше</button></div>
+</div>
+</section>
+
+<!-- 4 -->
+<section class="block" data-name="and / or / not">
+<div class="sheet">
+  <div class="head"><h2>Логические операторы</h2><span class="mins">около 25 минут</span></div>
+
+  <p class="lead">Когда условие одно — хватает сравнения. Когда их несколько, их соединяют словами <code>and</code>, <code>or</code>, <code>not</code>.</p>
+
+  <div class="term">
+    <span class="name">and — и</span>
+    <p>Истинно, только если истинны <b>оба</b> условия.</p>
+  </div>
+
+<pre><span class="n">age</span> = 25
+<span class="n">has_passport</span> = <span class="k">True</span>
+
+<span class="k">if</span> <span class="n">age</span> &gt;= 18 <span class="k">and</span> <span class="n">has_passport</span>:
+    <span class="k">print</span>(<span class="s">"Можно оформить договор"</span>)</pre>
+
+  <div class="term">
+    <span class="name">or — или</span>
+    <p>Истинно, если истинно <b>хотя бы одно</b> условие.</p>
+  </div>
+
+<pre><span class="n">is_admin</span> = <span class="k">False</span>
+<span class="n">is_owner</span> = <span class="k">True</span>
+
+<span class="k">if</span> <span class="n">is_admin</span> <span class="k">or</span> <span class="n">is_owner</span>:
+    <span class="k">print</span>(<span class="s">"Можно редактировать"</span>)</pre>
+
+  <div class="term">
+    <span class="name">not — не</span>
+    <p>Переворачивает значение: истину делает ложью и наоборот.</p>
+  </div>
+
+<pre><span class="n">is_blocked</span> = <span class="k">False</span>
+
+<span class="k">if</span> <span class="k">not</span> <span class="n">is_blocked</span>:
+    <span class="k">print</span>(<span class="s">"Вход разрешён"</span>)</pre>
+
+  <h3>Таблица истинности</h3>
+
+  <table>
+    <tr><th>A</th><th>B</th><th>A and B</th><th>A or B</th></tr>
+    <tr><td>True</td><td>True</td><td>True</td><td>True</td></tr>
+    <tr><td>True</td><td>False</td><td>False</td><td>True</td></tr>
+    <tr><td>False</td><td>True</td><td>False</td><td>True</td></tr>
+    <tr><td>False</td><td>False</td><td>False</td><td>False</td></tr>
+  </table>
+
+  <p>Эта таблица понадобится не только в коде: на ней строится техника тест-дизайна «таблица решений», которую ты будешь разбирать на девятый день.</p>
+
+  <h3>Диапазон двумя способами</h3>
+
+<pre><span class="c"># длинный способ</span>
+<span class="k">if</span> <span class="n">age</span> &gt;= 18 <span class="k">and</span> <span class="n">age</span> &lt;= 65:
+    <span class="k">print</span>(<span class="s">"Подходит"</span>)
+
+<span class="c"># короткий, так пишут в Python</span>
+<span class="k">if</span> 18 &lt;= <span class="n">age</span> &lt;= 65:
+    <span class="k">print</span>(<span class="s">"Подходит"</span>)</pre>
+
+  <div class="alert">
+    <span class="name">Частая ошибка с or</span>
+    <p>Так написать нельзя:</p>
+<pre><span class="k">if</span> <span class="n">name</span> == <span class="s">"Анна"</span> <span class="k">or</span> <span class="s">"Мария"</span>:</pre>
+    <p>Python прочитает это как два независимых куска: «name равен Анне» <b>или</b> «строка Мария». Непустая строка считается истиной, поэтому условие будет верным всегда, при любом имени.</p>
+    <p>Правильно — повторить сравнение полностью:</p>
+<pre><span class="k">if</span> <span class="n">name</span> == <span class="s">"Анна"</span> <span class="k">or</span> <span class="n">name</span> == <span class="s">"Мария"</span>:</pre>
+  </div>
+
+  <div class="recap">
+    <div class="box paper">
+      <h4>В тетрадь</h4>
+      <ul>
+        <li>Три оператора с расшифровкой одним словом</li>
+        <li>Таблица истинности целиком</li>
+        <li>Короткая запись диапазона <code>18 &lt;= age &lt;= 65</code></li>
+        <li>Ошибка с <code>or "Мария"</code> — почему условие всегда истинно</li>
+      </ul>
+    </div>
+    <div class="box cards">
+      <h4>На карточки</h4>
+      <div class="qa">Когда истинно and, а когда or?<span>and — оба условия истинны; or — хотя бы одно</span></div>
+      <div class="qa">Что делает not?<span>переворачивает значение на противоположное</span></div>
+      <div class="qa">Почему нельзя писать name == "Анна" or "Мария"?<span>вторая часть проверяется отдельно, непустая строка всегда истинна</span></div>
+    </div>
+  </div>
+
+  <div class="nav"><button class="btn ghost" data-go="2">Назад</button><button class="btn primary" data-go="4">Дальше</button></div>
+</div>
+</section>
+
+<!-- 5 -->
+<section class="block" data-name="Практика">
+<div class="sheet">
+  <div class="head"><h2>Шесть задач</h2><span class="mins">около 70 минут</span></div>
+
+  <p class="lead">Каждая — отдельный файл в папке <code>python/day05/</code>. Пиши руками, не копированием. Если задача не идёт больше двадцати минут — переходи к следующей и возвращайся потом.</p>
+
+  <div class="task">
+    <span class="name">1. Проверка возраста</span>
+    <p class="file">age_check.py</p>
+    <p>Спрашивает возраст. Если 18 или больше — «Доступ разрешён», иначе — «Доступ запрещён».</p>
+    <p>Обязательно проверь работу на трёх значениях: 17, 18, 19. Это граничные значения, и именно они ловят ошибку со знаком.</p>
+  </div>
+
+  <div class="task">
+    <span class="name">2. Чётное или нечётное</span>
+    <p class="file">even_odd.py</p>
+    <p>Спрашивает число и сообщает, чётное оно или нет.</p>
+    <p>Подсказка: число чётное, если остаток от деления на 2 равен нулю. Оператор остатка — <code>%</code>, он был на третьем дне.</p>
+  </div>
+
+  <div class="task">
+    <span class="name">3. Вход в систему</span>
+    <p class="file">login.py</p>
+    <p>Хранит правильные логин и пароль в переменных. Спрашивает у пользователя логин и пароль. Если совпали оба — «Вход выполнен», иначе — «Неверный логин или пароль».</p>
+    <p>Подумай, почему в реальных системах не пишут отдельно «неверный логин» и «неверный пароль». Ответ связан с безопасностью.</p>
+  </div>
+
+  <div class="task">
+    <span class="name">4. Оценка по баллам</span>
+    <p class="file">grade.py</p>
+    <p>Спрашивает балл от 0 до 100 и выводит оценку: 90 и выше — отлично, 75–89 — хорошо, 60–74 — удовлетворительно, ниже 60 — неудовлетворительно.</p>
+    <p>Проверь на граничных значениях: 89, 90, 74, 75, 59, 60. Все шесть должны дать ожидаемый результат.</p>
+  </div>
+
+  <div class="task">
+    <span class="name">5. Скидка по сумме заказа</span>
+    <p class="file">discount_levels.py</p>
+    <p>Спрашивает сумму заказа. До 1000 — скидки нет, от 1000 до 4999 — 5%, от 5000 до 9999 — 10%, от 10000 — 15%. Выводит процент скидки, размер скидки и итоговую сумму.</p>
+  </div>
+
+  <div class="task">
+    <span class="name">6. Валидатор поля</span>
+    <p class="file">validator.py</p>
+    <p>Спрашивает имя пользователя и проверяет по правилам: не пустое, не короче трёх символов, не длиннее двадцати. Выводит либо «Имя корректно», либо конкретную причину отказа.</p>
+    <p>Подсказка: длина строки — <code>len(name)</code>. Пустая строка проверяется как <code>name == ""</code>.</p>
+    <p>Это задача с точки зрения тестировщика: ты пишешь то, что обычно проверяешь с другой стороны. Прогони её на пустой строке, на двух символах, на трёх, на двадцати, на двадцати одном.</p>
+  </div>
+
+  <div class="example">
+    <span class="name">Заметила закономерность?</span>
+    <p>В четырёх задачах из шести я прошу проверить граничные значения. Это не случайность и не занудство — так работает тест-дизайн, и ты начинаешь применять его раньше, чем формально изучишь.</p>
+  </div>
+
+  <div class="recap">
+    <div class="box paper">
+      <h4>В тетрадь</h4>
+      <ul>
+        <li>Ничего. Сегодня практика, конспект не нужен</li>
+        <li>Записывай только новые ошибки — в <code>notes/errors-log.md</code>, не в тетрадь</li>
+      </ul>
+    </div>
+    <div class="box cards">
+      <h4>Коммит</h4>
+      <div class="qa">После всех задач<span>git add . → git commit -m "Add day 5: conditions practice" → git push</span></div>
+    </div>
+  </div>
+
+  <div class="nav"><button class="btn ghost" data-go="3">Назад</button><button class="btn primary" data-go="5">К тесту</button></div>
+</div>
+</section>
+
+<!-- 6 -->
+<section class="block" data-name="Тест">
+<div class="sheet">
+  <div class="head"><h2>Проверка: читаем код</h2><span class="mins">около 25 минут</span></div>
+  <p class="lead">Восемь вопросов на чтение кода. Отвечай в голове, прежде чем выбирать вариант — не запускай в PyCharm. Умение предсказать поведение кода по тексту важнее умения его написать.</p>
+
+  <div id="quiz">
+
+    <div class="q" data-right="c">
+      <p class="ask"><span class="num">1</span>Что выведет этот код?</p>
+<pre><span class="n">age</span> = 18
+
+<span class="k">if</span> <span class="n">age</span> &gt; 18:
+    <span class="k">print</span>(<span class="s">"Взрослый"</span>)
+<span class="k">else</span>:
+    <span class="k">print</span>(<span class="s">"Несовершеннолетний"</span>)</pre>
+      <label class="opt"><input type="radio" name="q1" value="a">Взрослый</label>
+      <label class="opt"><input type="radio" name="q1" value="b">Ничего не выведет</label>
+      <label class="opt"><input type="radio" name="q1" value="c">Несовершеннолетний</label>
+      <label class="opt"><input type="radio" name="q1" value="d">Ошибку</label>
+      <div class="why">Восемнадцать не больше восемнадцати, поэтому условие ложно и срабатывает else. Классический баг с граничным значением: нужен был оператор <code>&gt;=</code>. Такой код выглядит правильным и ломается ровно на одном значении.</div>
+    </div>
+
+    <div class="q" data-right="b">
+      <p class="ask"><span class="num">2</span>Что выведет этот код?</p>
+<pre><span class="n">score</span> = 95
+
+<span class="k">if</span> <span class="n">score</span> &gt;= 60:
+    <span class="k">print</span>(<span class="s">"Удовлетворительно"</span>)
+<span class="k">elif</span> <span class="n">score</span> &gt;= 90:
+    <span class="k">print</span>(<span class="s">"Отлично"</span>)</pre>
+      <label class="opt"><input type="radio" name="q2" value="a">Отлично</label>
+      <label class="opt"><input type="radio" name="q2" value="b">Удовлетворительно</label>
+      <label class="opt"><input type="radio" name="q2" value="c">Обе строки</label>
+      <label class="opt"><input type="radio" name="q2" value="d">Ничего</label>
+      <div class="why">Проверка идёт сверху вниз и останавливается на первом истинном условии. 95 подошло под <code>&gt;= 60</code>, и до второй ветки дело не дошло. Условия для диапазонов ставят от строгого к мягкому.</div>
+    </div>
+
+    <div class="q" data-right="d">
+      <p class="ask"><span class="num">3</span>Что выведет этот код?</p>
+<pre><span class="n">age</span> = 15
+
+<span class="k">if</span> <span class="n">age</span> &gt;= 18:
+    <span class="k">print</span>(<span class="s">"Первая"</span>)
+<span class="k">print</span>(<span class="s">"Вторая"</span>)</pre>
+      <label class="opt"><input type="radio" name="q3" value="a">Первая</label>
+      <label class="opt"><input type="radio" name="q3" value="b">Первая и Вторая</label>
+      <label class="opt"><input type="radio" name="q3" value="c">Ничего</label>
+      <label class="opt"><input type="radio" name="q3" value="d">Вторая</label>
+      <div class="why">Строка «Первая» сдвинута — она внутри условия и не выполнится. Строка «Вторая» без отступа, она живёт сама по себе и выполняется всегда. Отступ решает, что кому принадлежит.</div>
+    </div>
+
+    <div class="q" data-right="a">
+      <p class="ask"><span class="num">4</span>В чём ошибка?</p>
+<pre><span class="n">name</span> = <span class="s">"Пётр"</span>
+
+<span class="k">if</span> <span class="n">name</span> == <span class="s">"Анна"</span> <span class="k">or</span> <span class="s">"Мария"</span>:
+    <span class="k">print</span>(<span class="s">"Своя"</span>)</pre>
+      <label class="opt"><input type="radio" name="q4" value="a">Условие истинно всегда, потому что непустая строка считается истиной</label>
+      <label class="opt"><input type="radio" name="q4" value="b">Нельзя использовать or со строками</label>
+      <label class="opt"><input type="radio" name="q4" value="c">Ошибки нет, выведется «Своя» только для Анны и Марии</label>
+      <label class="opt"><input type="radio" name="q4" value="d">Не хватает elif</label>
+      <div class="why">Python читает это как два независимых условия: «name равен Анне» или «строка Мария». Вторая часть — просто непустая строка, а она всегда истинна. В результате «Своя» выведется для любого имени. Нужно повторить сравнение: <code>name == "Анна" or name == "Мария"</code>.</div>
+    </div>
+
+    <div class="q" data-right="c">
+      <p class="ask"><span class="num">5</span>Пользователь ввёл <code>25</code>. Что произойдёт?</p>
+<pre><span class="n">age</span> = <span class="k">input</span>(<span class="s">"Возраст: "</span>)
+
+<span class="k">if</span> <span class="n">age</span> &gt;= 18:
+    <span class="k">print</span>(<span class="s">"Ок"</span>)</pre>
+      <label class="opt"><input type="radio" name="q5" value="a">Выведет «Ок»</label>
+      <label class="opt"><input type="radio" name="q5" value="b">Ничего не выведет</label>
+      <label class="opt"><input type="radio" name="q5" value="c">TypeError: нельзя сравнить строку с числом</label>
+      <label class="opt"><input type="radio" name="q5" value="d">Выведет True</label>
+      <div class="why">input() всегда возвращает строку, а сравнивать строку с числом Python не умеет. Нужно <code>age = int(input("Возраст: "))</code>. Та самая ловушка третьего дня — теперь она проявляется в условиях.</div>
+    </div>
+
+    <div class="q" data-right="b">
+      <p class="ask"><span class="num">6</span>Что выведет этот код?</p>
+<pre><span class="n">is_admin</span> = <span class="k">False</span>
+<span class="n">is_owner</span> = <span class="k">False</span>
+
+<span class="k">if</span> <span class="k">not</span> <span class="n">is_admin</span> <span class="k">and</span> <span class="k">not</span> <span class="n">is_owner</span>:
+    <span class="k">print</span>(<span class="s">"Нет прав"</span>)
+<span class="k">else</span>:
+    <span class="k">print</span>(<span class="s">"Есть права"</span>)</pre>
+      <label class="opt"><input type="radio" name="q6" value="a">Есть права</label>
+      <label class="opt"><input type="radio" name="q6" value="b">Нет прав</label>
+      <label class="opt"><input type="radio" name="q6" value="c">Обе строки</label>
+      <label class="opt"><input type="radio" name="q6" value="d">Ошибку</label>
+      <div class="why">not False даёт True для обеих переменных. True and True = True, поэтому выполняется первая ветка. Разбирай такие выражения по шагам, подставляя значения — именно так их и читают.</div>
+    </div>
+
+    <div class="q" data-right="a">
+      <p class="ask"><span class="num">7</span>Какое значение НЕ пройдёт эту проверку, хотя должно по условию задачи «возраст от 18 до 65 включительно»?</p>
+<pre><span class="k">if</span> 18 &lt; <span class="n">age</span> &lt;= 65:
+    <span class="k">print</span>(<span class="s">"Подходит"</span>)</pre>
+      <label class="opt"><input type="radio" name="q7" value="a">18</label>
+      <label class="opt"><input type="radio" name="q7" value="b">65</label>
+      <label class="opt"><input type="radio" name="q7" value="c">19</label>
+      <label class="opt"><input type="radio" name="q7" value="d">64</label>
+      <div class="why">Слева стоит строгое <code>&lt;</code> вместо <code>&lt;=</code>, поэтому ровно 18 не проходит. Верхняя граница задана правильно. Один символ — и целая категория пользователей отсекается. Такие баги ловятся только проверкой границ.</div>
+    </div>
+
+    <div class="q" data-right="d">
+      <p class="ask"><span class="num">8</span>Что выведет этот код?</p>
+<pre><span class="n">password</span> = <span class="s">"Qwerty123"</span>
+<span class="n">entered</span> = <span class="s">"qwerty123"</span>
+
+<span class="k">if</span> <span class="n">password</span> == <span class="n">entered</span>:
+    <span class="k">print</span>(<span class="s">"Вход выполнен"</span>)
+<span class="k">else</span>:
+    <span class="k">print</span>(<span class="s">"Неверный пароль"</span>)</pre>
+      <label class="opt"><input type="radio" name="q8" value="a">Вход выполнен</label>
+      <label class="opt"><input type="radio" name="q8" value="b">Ошибку</label>
+      <label class="opt"><input type="radio" name="q8" value="c">Обе строки</label>
+      <label class="opt"><input type="radio" name="q8" value="d">Неверный пароль</label>
+      <div class="why">Сравнение строк учитывает регистр: «Q» и «q» — разные символы. Для паролей это правильное поведение, а вот для логина или email обычно нет: там регистр приводят к одному виду. Проверка «работает ли вход с логином в другом регистре» есть в любом чек-листе на авторизацию.</div>
+    </div>
+
+  </div>
+
+  <div class="nav">
+    <button class="btn ghost" data-go="4">Назад</button>
+    <button class="btn primary" id="check">Проверить ответы</button>
+  </div>
+
+  <div class="score" id="score"></div>
+
+  <div class="example" style="margin-top:30px">
+    <span class="name">Ретро первой недели</span>
+    <p>Когда закончишь с тестом, ответь себе на три вопроса и запиши ответы одной строкой каждый:</p>
+    <p>1. Что я умею сегодня, чего не умела в понедельник?<br>
+       2. Где я застряла и потеряла больше сорока минут?<br>
+       3. Что перенести или выкинуть из плана следующей недели?</p>
+    <p>Пришли мне ответы — по ним я скорректирую вторую неделю.</p>
+  </div>
+</div>
+</section>
+
+</div>
+
+<script>
+const blocks=[...document.querySelectorAll(".block")];
+const index=document.getElementById("index");
+const seen=new Set([0]);
+let cur=0;
+
+blocks.forEach((b,i)=>{
+  const c=document.createElement("button");
+  c.className="chip"; c.textContent=b.dataset.name;
+  c.onclick=()=>show(i);
+  index.appendChild(c);
+});
+
+function show(i){
+  blocks[cur].classList.remove("show");
+  cur=i; seen.add(i);
+  blocks[cur].classList.add("show");
+  [...index.children].forEach((c,n)=>{
+    c.className="chip"+(seen.has(n)&&n!==cur?" done":"")+(n===cur?" on":"");
+  });
+  window.scrollTo({top:0,behavior:"instant"});
+}
+
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-go]");
+  if(b) show(+b.dataset.go);
+});
+
+document.getElementById("check").onclick=()=>{
+  const qs=[...document.querySelectorAll(".q")];
+  let right=0;
+  qs.forEach(q=>{
+    const picked=q.querySelector("input:checked");
+    q.querySelectorAll(".opt").forEach(o=>o.classList.remove("right","wrong"));
+    q.querySelectorAll(".opt").forEach(o=>{
+      const val=o.querySelector("input").value;
+      if(val===q.dataset.right) o.classList.add("right");
+      else if(picked&&picked.value===val) o.classList.add("wrong");
+    });
+    q.querySelector(".why").classList.add("show");
+    if(picked&&picked.value===q.dataset.right) right++;
+  });
+
+  let verdict;
+  if(right>=7) verdict="Код читаешь уверенно. Это важнее, чем кажется: умение предсказать поведение программы по тексту — половина работы автоматизатора.";
+  else if(right>=5) verdict="Нормальный результат для пятого дня. Перечитай объяснения к ошибкам и вернись к задачам, где споткнулась.";
+  else verdict="Пройди блоки заново, особенно про elif и отступы. Потом попробуй тест ещё раз — сразу, пока объяснения свежие.";
+
+  const s=document.getElementById("score");
+  s.innerHTML="<strong>"+right+" из 8</strong>"+verdict;
+  s.classList.add("show");
+  s.scrollIntoView({behavior:"smooth",block:"center"});
+};
+
+show(0);
+</script>

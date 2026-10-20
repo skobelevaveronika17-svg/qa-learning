@@ -1,0 +1,703 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>День 22 · Куки и сессии</title>
+<style>
+/* Тёмная версия оформления дня 13: вкладки сверху, плашки по роли, блоки кода. Одна тёмная тема по просьбе — «на чёрном фоне». */
+:root{
+  --bg:#0d1116; --paper:#151b22; --ink:#e6ebf0; --soft:#9aa6b2; --line:#2a333d;
+  --blue:#7fb2ee; --blue-bg:#142235;
+  --red:#f0928a; --red-bg:#2b1716;
+  --green:#72c79f; --green-bg:#10251c;
+  --amber:#e7bb62; --amber-bg:#2a2210;
+  --violet:#b8a8ea; --violet-bg:#1e1a2f;
+  --code-bg:#080b0f; --code-fg:#dce7f0; --code-cm:#7d8fa0;
+  --chip:#1d252e; --th:#1a222b; --soft-bg:#10161c; --hover:#1d2731; --btn:#e6ebf0; --btn-fg:#0d1116;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.62;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding-inline:18px;padding-block:0 60px}
+header{padding:34px 0 14px}
+.day{font-size:14px;color:var(--soft)}
+h1{font-size:33px;line-height:1.15;margin:.2em 0 .3em;text-wrap:balance}
+.lead{color:var(--soft);margin:0;max-width:62ch}
+
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);padding:10px 0 8px;
+  display:flex;gap:6px;overflow-x:auto;border-bottom:1px solid var(--line)}
+.tabs button{flex:0 0 auto;background:var(--paper);border:1px solid var(--line);border-radius:8px;
+  padding:8px 13px;font:inherit;font-size:14.5px;color:var(--soft);cursor:pointer;white-space:nowrap}
+.tabs button.on{background:var(--btn);color:var(--btn-fg);border-color:var(--btn);font-weight:600}
+.tabs button .n{opacity:.55;margin-right:6px}
+button:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+.pane{display:none;background:var(--paper);border:1px solid var(--line);border-top:0;
+  border-radius:0 0 12px 12px;padding:28px 30px 34px}
+.pane.on{display:block}
+.pane h2{margin:0 0 6px;font-size:26px;line-height:1.2;text-wrap:balance}
+.pane .sub{color:var(--soft);margin:0 0 20px;font-size:15.5px}
+h3{font-size:19.5px;margin:30px 0 8px;text-wrap:balance}
+h4{font-size:17px;margin:20px 0 6px}
+p{margin:12px 0}
+ul,ol{padding-left:24px}li{margin:6px 0}
+b{color:#fff}
+code.i{background:var(--chip);border:1px solid var(--line);border-radius:4px;padding:1px 5px;
+ font-family:Consolas,monospace;font-size:.92em}
+pre{background:var(--code-bg);color:var(--code-fg);border:1px solid var(--line);border-radius:9px;padding:15px 17px;overflow-x:auto;
+ font-family:Consolas,monospace;font-size:14.5px;line-height:1.55;margin:14px 0}
+pre .cm{color:var(--code-cm)}
+pre.light{background:var(--soft-bg)}
+
+.box{border-left:4px solid;border-radius:0 8px 8px 0;padding:14px 18px;margin:18px 0}
+.box .title{font-weight:700;margin-bottom:4px}
+.def{border-color:var(--blue);background:var(--blue-bg)} .def .title{color:var(--blue)}
+.trap{border-color:var(--red);background:var(--red-bg)} .trap .title{color:var(--red)}
+.note{border-color:var(--green);background:var(--green-bg)} .note .title{color:var(--green)}
+.card{border-color:var(--amber);background:var(--amber-bg)} .card .title{color:var(--amber)}
+.task{border-color:var(--violet);background:var(--violet-bg)} .task .title{color:var(--violet)}
+.box p:first-of-type{margin-top:2px}.box p:last-child{margin-bottom:2px}
+
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15.5px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--th);font-weight:600}
+td{font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto}
+.mono{font-family:Consolas,monospace;white-space:nowrap}
+
+details{border:1px solid var(--line);background:var(--soft-bg);border-radius:8px;padding:10px 14px;margin:10px 0}
+summary{cursor:pointer;font-weight:600;color:var(--violet)}
+details[open] summary{margin-bottom:8px}
+
+.simple{border:1px solid var(--line);background:var(--soft-bg);border-radius:10px;padding:14px 18px;margin:16px 0}
+.simple .title{font-weight:700;margin-bottom:4px}
+.steps{counter-reset:st;list-style:none;padding-left:0}
+.steps>li{counter-increment:st;position:relative;padding-left:38px;margin:12px 0}
+.steps>li::before{content:counter(st);position:absolute;left:0;top:1px;width:26px;height:26px;border-radius:50%;
+  background:var(--btn);color:var(--btn-fg);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.done{border:1px dashed var(--green);border-radius:8px;padding:10px 14px;margin:14px 0;font-size:15.5px}
+.done b{color:var(--green)}
+
+.diary{border:1px solid var(--line);border-radius:12px;background:var(--soft-bg);padding:6px 20px;margin:16px 0}
+.diary .d{display:grid;grid-template-columns:92px 1fr;gap:14px;padding:12px 0;border-top:1px solid var(--line)}
+.diary .d:first-child{border-top:0}
+.diary .when{font-family:Consolas,monospace;font-size:14px;color:var(--amber);padding-top:2px}
+.diary .d p{margin:0}
+@media(max-width:560px){.diary .d{grid-template-columns:1fr;gap:2px}}
+
+.flow{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0;align-items:stretch}
+.flow .st{flex:1 1 120px;min-width:0;background:var(--soft-bg);border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-size:14.5px}
+.flow .st b{display:block;font-size:13px;color:var(--amber);letter-spacing:.03em;margin-bottom:2px}
+
+.q{border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:16px 0}
+.qn{font-weight:700;margin-bottom:6px}
+.opts{display:grid;gap:8px;margin-top:12px}
+.opt{text-align:left;background:var(--soft-bg);border:1px solid var(--line);border-radius:8px;
+ padding:10px 14px;cursor:pointer;font:inherit;font-size:16px;color:var(--ink)}
+.opt:hover{background:var(--hover)}
+.opt.right{background:var(--green-bg);border-color:var(--green);font-weight:600}
+.opt.wrong{background:var(--red-bg);border-color:var(--red)}
+.expl{margin-top:12px;padding:12px 14px;background:var(--soft-bg);border-radius:8px}
+.score{position:sticky;bottom:env(safe-area-inset-bottom,0px);background:var(--paper);border:1px solid var(--line);
+ border-radius:10px;padding:12px 18px;margin-top:18px;font-weight:600;font-variant-numeric:tabular-nums}
+.split{display:flex;align-items:center;gap:12px;margin:28px 0 8px;color:var(--soft);font-size:14.5px;font-weight:600}
+.split::before,.split::after{content:"";flex:1;border-top:1px dashed var(--line)}
+
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:34px;padding-top:18px;border-top:1px solid var(--line)}
+.nav button{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 16px;
+ font:inherit;cursor:pointer;color:var(--ink)}
+.nav .next{background:var(--btn);color:var(--btn-fg);border-color:var(--btn)}
+.nav button[disabled]{opacity:.35;cursor:default}
+@media(max-width:640px){.wrap{padding-inline:16px}.pane{padding:20px 17px 26px}h1{font-size:27px}pre{font-size:13.5px}}
+</style>
+
+<style>
+.cookies{font-family:Consolas,monospace;font-size:14px}
+.cookies td,.cookies th{white-space:nowrap}
+.gloss dt{font-weight:700;margin-top:10px}
+.gloss dd{margin:2px 0 0 0;color:var(--soft)}
+.obs{border:1px solid var(--line);border-radius:10px;background:var(--soft-bg);padding:6px 18px;margin:14px 0}
+.obs .d{display:grid;grid-template-columns:34px 1fr;gap:10px;padding:11px 0;border-top:1px solid var(--line)}
+.obs .d:first-child{border-top:0}
+.obs .n{font-weight:700;color:var(--amber)}
+.obs p{margin:0}
+.fix{display:grid;gap:4px;margin:10px 0 18px}
+.fix .l{font-size:13px;font-weight:700;letter-spacing:.03em;color:var(--soft);margin-top:8px}
+</style>
+
+<div class="wrap">
+
+<header>
+  <div class="day">День 22 · понедельник, 19 октября · Этап 1, тема 1.6 — закрываем этап</div>
+  <h1>Куки, сессии и разные браузеры</h1>
+  <p class="lead">Как сайт «помнит», что ты вошла, и почему галочка «Запомнить меня» — это на самом деле одна строка в куке. Плюс почему один и тот же сайт выглядит по-разному в Chrome, Safari и на телефоне, и что с этим делает тестировщик. После сегодняшнего дня Этап 1 — теория и ручное тестирование — закрыт.</p>
+</header>
+
+<div class="box def">
+  <div class="title">Два захода, около 4:30</div>
+  <p><b>Заход 1 · 2:30</b> — вкладки 0–6. <b>Перерыв — час без экрана.</b> <b>Заход 2 · 2:00</b> — вкладки 7–9.</p>
+  <p>Сегодня охота стоит <b>после</b> короткого словарика, а не перед ним, — чтобы не было, как в дне 21, когда без теории непонятно, что искать.</p>
+</div>
+
+<div class="tabs" id="tabs"></div>
+
+<!-- 0 -->
+<div class="pane" data-title="Карточки и код">
+  <h2>Разминка</h2>
+  <p class="sub">25 минут: карточки 15, чтение кода 10</p>
+
+  <h3>Карточки — два блока</h3>
+  <ol class="steps">
+    <li><b>K · Браузер и сеть</b> — второй прогон, 7 карточек, обычный режим по ядру. Сегодняшняя тема продолжает этот блок, поэтому он сегодня особенно к месту.</li>
+    <li><b>G · Строки</b> — третий прогон, 5 карточек. Во втором заходе понадобится новый метод строк — <code class="i">split</code>, хорошо освежить остальные.</li>
+  </ol>
+  <div class="done"><b>Готово, когда</b> записан счёт K + G из 12.</div>
+
+  <h3>Чтение кода</h3>
+  <p>Словари и функции — подготовка к контрольной. Таблицу на бумаге — обязательно, она дала 4 из 4 три дня подряд.</p>
+  <ol class="steps">
+    <li>Во втором вопросе есть ловушка: подумай, чем пустая строка <code class="i">""</code> отличается от <code class="i">None</code>.</li>
+    <li>В третьем вопросе цикл идёт по словарю. Когда пишешь <code class="i">for name in c</code>, переменная <code class="i">name</code> по очереди принимает <b>ключи</b> словаря — не значения.</li>
+  </ol>
+  <div id="quizA"></div>
+</div>
+
+<!-- 1 -->
+<div class="pane" data-title="Словарик">
+  <h2>Шесть слов перед охотой</h2>
+  <p class="sub">10 минут · без этого охота непонятна. Подробно — на вкладке «Теория»</p>
+
+  <div class="simple">
+    <div class="title">Простыми словами</div>
+    <p>Сервер не помнит тебя между двумя кликами. Поэтому после входа он даёт браузеру «номерок», как в гардеробе, — это <b>кука</b> с идентификатором сессии. Браузер показывает номерок при каждом запросе, и сервер понимает: это снова Анна, она уже вошла.</p>
+  </div>
+
+  <dl class="gloss">
+    <dt>Кука (cookie)</dt>
+    <dd>Маленькая запись «имя = значение», которую сайт сохраняет в браузере. Браузер сам отправляет её обратно на этот сайт при каждом запросе.</dd>
+    <dt>Сессия и session_id</dt>
+    <dd>Сессия — время, пока ты считаешься вошедшей. session_id — номерок этой сессии, длинная случайная строка. Кто знает номерок — тот для сервера и есть ты.</dd>
+    <dt>Expires — срок жизни</dt>
+    <dd>Дата, когда браузер удалит куку. Если вместо даты написано <b>Session</b> — кука удалится, когда закроешь браузер.</dd>
+    <dt>HttpOnly</dt>
+    <dd>Галочка «код страницы на JavaScript не может прочитать эту куку». Защищает номерок от кражи вредным скриптом.</dd>
+    <dt>Secure</dt>
+    <dd>Галочка «отправлять куку только по защищённому соединению https».</dd>
+    <dt>Где это смотреть</dt>
+    <dd>F12 → вкладка <b>Application</b> («Приложение») → слева <b>Cookies</b> → адрес сайта. Откроется таблица, как ниже.</dd>
+  </dl>
+</div>
+
+<!-- 2 -->
+<div class="pane" data-title="Охота">
+  <h2>Что лежит в браузере после входа</h2>
+  <p class="sub">25 минут</p>
+
+  <p>Магазин «Лапка», та же форма входа, для которой ты пишешь кейсы. Тестировщица вошла как anna@gmail.com <b>без</b> галочки «Запомнить меня». Сегодня 19 октября. Вот что она увидела в DevTools и записала.</p>
+
+  <h3>Вкладка Application → Cookies → lapka.shop</h3>
+  <div class="scroll"><table class="cookies">
+    <tr><th>Name</th><th>Value</th><th>Expires</th><th>HttpOnly</th><th>Secure</th></tr>
+    <tr><td>session_id</td><td>8f3a91c2e7…</td><td>2026-11-18</td><td></td><td>✓</td></tr>
+    <tr><td>remember_pwd</td><td>Anna1234</td><td>2026-11-18</td><td></td><td></td></tr>
+    <tr><td>theme</td><td>dark</td><td>Session</td><td></td><td></td></tr>
+  </table></div>
+  <p style="color:var(--soft);font-size:15px">Пустая клетка в HttpOnly или Secure — галочки нет.</p>
+
+  <h3>Записи тестировщицы</h3>
+  <div class="obs">
+    <div class="d"><div class="n">1</div><p>После входа адрес в строке браузера: <code class="i">lapka.shop/cabinet?sid=8f3a91c2e7…</code></p></div>
+    <div class="d"><div class="n">2</div><p>В Console набрала <code class="i">document.cookie</code> — это команда «покажи куки, которые видит код страницы». Ответ: <code class="i">"session_id=8f3a91c2e7…; remember_pwd=Anna1234; theme=dark"</code></p></div>
+    <div class="d"><div class="n">3</div><p>Нажала «Выйти». Открылась форма входа. В Application кука session_id осталась, значение то же. Нажала в браузере «Назад» — снова личный кабинет, кнопка «Мои заказы» работает.</p></div>
+    <div class="d"><div class="n">4</div><p>Скопировала значение session_id и вставила его в куки в другом браузере. Там тоже открылся кабинет Анны.</p></div>
+  </div>
+
+  <div class="box task">
+    <div class="title">Задание</div>
+    <ol class="steps">
+      <li>Создай файл <code class="i">manual/day22-cookies-hunt.md</code>.</li>
+      <li>Пройди по таблице <b>построчно</b>. Для каждой куки спроси себя по словарику:
+        <ul>
+          <li>Срок жизни правильный? Вспомни: галочка «Запомнить меня» <b>не</b> стояла. Что тогда должно быть в Expires?</li>
+          <li>Такое значение вообще можно хранить в браузере?</li>
+          <li>Каких галочек не хватает и чем это опасно для номерка сессии?</li>
+        </ul>
+      </li>
+      <li>Пройди по четырём записям тестировщицы. Для каждой спроси: «это баг или так и должно быть?»</li>
+      <li>На каждую находку — строка в формате: <b>где → что видно → почему это плохо → что должно быть</b>.</li>
+    </ol>
+  </div>
+
+  <div class="box card">
+    <div class="title">Сколько искать</div>
+    <p><b>Пять багов</b> и <b>одна ловушка</b> — запись, которая выглядит страшно, но это нормальное поведение. Если найдёшь ловушку — напиши, почему она не баг. Это ценнее, чем шестая находка.</p>
+    <p>Кука theme — контрольная, с ней всё в порядке. Сверяйся с ней, как с anna в охоте дня 19.</p>
+  </div>
+  <div class="done"><b>Готово, когда</b> в файле 5 строк про баги, в каждой все четыре части, и отдельно — какая запись ловушка и почему.</div>
+</div>
+
+<!-- 3 -->
+<div class="pane" data-title="Разбор">
+  <h2>Пять багов и одна ловушка</h2>
+  <p class="sub">15 минут · открывай после охоты</p>
+
+  <div class="scroll"><table>
+    <tr><th>#</th><th>Где</th><th>Что видно</th><th>Почему плохо</th><th>Что должно быть</th></tr>
+    <tr><td>1</td><td>session_id, Expires</td><td>Галочки «Запомнить меня» не было, а кука живёт до 18 ноября — 30 дней</td><td>Человек вошёл с чужого компьютера, не просил запоминать — а следующий за этим компьютером через неделю окажется в его кабинете</td><td>Без галочки — <b>Session</b>: кука удаляется при закрытии браузера. Ровно твой критерий приёмки 2 из дня 20</td></tr>
+    <tr><td>2</td><td>session_id, HttpOnly</td><td>Галочки нет, и запись 2 это подтверждает: код страницы видит номерок</td><td>Если на сайт попадёт вредный скрипт, он прочитает номерок и отправит злоумышленнику — тот войдёт как Анна</td><td>У куки сессии всегда HttpOnly</td></tr>
+    <tr><td>3</td><td>remember_pwd</td><td>Пароль открытым текстом лежит в куке</td><td>Пароль видно в DevTools любому, кто сел за компьютер; он уходит на сервер с каждым запросом; скрипт его читает (нет HttpOnly). Критический</td><td>Пароль в браузере не хранится никогда. «Запомнить меня» работает через долгую куку сессии, а не через пароль</td></tr>
+    <tr><td>4</td><td>Запись 1, адрес</td><td>Номерок сессии в адресной строке: <code class="i">?sid=…</code></td><td>Адрес сохраняется в истории, его копируют в чат «смотри, что нашла» — и вместе с ним отдают вход в свой аккаунт. Как пароль в GET из дня 13</td><td>Номерок только в куке, в адресе его нет</td></tr>
+    <tr><td>5</td><td>Запись 3, выход</td><td>После «Выйти» номерок остался, и кабинет открывается</td><td>«Выйти» только показал форму, а сессия на сервере жива. На общем компьютере следующий человек нажмёт «Назад»</td><td>При выходе сервер закрывает сессию, кука удаляется, «Назад» ведёт на форму входа</td></tr>
+    <tr><td>—</td><td>Запись 4, <b>ловушка</b></td><td>Номерок в другом браузере открыл кабинет</td><td colspan="2"><b>Не баг.</b> Так сессии и устроены: номерок и есть пропуск. Именно поэтому важны баги 2, 4 и 5 — они про то, чтобы номерок нельзя было украсть и чтобы он умирал при выходе. Тестировщики делают такую подмену нарочно, чтобы проверить права: «а что, если подставить номерок другого пользователя?»</td></tr>
+  </table></div>
+
+  <div class="box note">
+    <div class="title">Связь с твоими кейсами</div>
+    <p>Баг 1 — это твой критерий приёмки 2 для «Запомнить меня» из дня 20. Баг 5 — твой критерий 3 («нажал Выйти — форма входа»). Ты их написала раньше, чем узнала, как это устроено внутри. Сегодня видно, как такой критерий проверяется руками: через Application.</p>
+  </div>
+</div>
+
+<!-- 4 -->
+<div class="pane" data-title="Теория">
+  <h2>Куки, сессии, браузеры и экраны</h2>
+  <p class="sub">35 минут · четыре части</p>
+
+  <h3>1. Куки и сессии — на примере твоей формы</h3>
+  <p>Что происходит, когда Анна входит:</p>
+  <ol>
+    <li>Браузер отправляет email и пароль методом POST.</li>
+    <li>Сервер проверяет, создаёт сессию — запись у себя «номерок 8f3a… = Анна, вошла в 19:05» — и в ответе говорит браузеру: сохрани куку <code class="i">session_id=8f3a…</code>.</li>
+    <li>При каждом следующем запросе — «Мои заказы», «Корзина» — браузер сам прикладывает эту куку.</li>
+    <li>Сервер видит номерок, находит у себя запись и понимает: это Анна.</li>
+    <li>При «Выйти» сервер удаляет запись у себя и говорит браузеру удалить куку. Номерок больше ничего не открывает.</li>
+  </ol>
+
+  <div class="box def">
+    <div class="title">[Бумага] Кука и сессия — в чём разница</div>
+    <p><b>Кука</b> хранится в браузере. Это записка с номерком.</p>
+    <p><b>Сессия</b> хранится на сервере. Это запись «кому принадлежит номерок».</p>
+    <p>Удалить куку в браузере — значит потерять номерок. Закрыть сессию на сервере — значит сделать номерок недействительным. При правильном выходе происходит и то, и другое.</p>
+  </div>
+
+  <div class="box def">
+    <div class="title">[Бумага] Атрибуты куки — что проверяет тестировщик</div>
+    <div class="scroll"><table>
+      <tr><th>Атрибут</th><th>Что значит</th><th>Что проверяем</th></tr>
+      <tr><td><b>Expires / Max-Age</b></td><td>Когда кука умрёт. Session — при закрытии браузера</td><td>Совпадает с требованиями: без «Запомнить меня» — Session, с ней — N дней</td></tr>
+      <tr><td><b>HttpOnly</b></td><td>Код страницы не может прочитать</td><td>У куки сессии стоит. Проверка: <code class="i">document.cookie</code> в Console не показывает session_id</td></tr>
+      <tr><td><b>Secure</b></td><td>Только по https</td><td>У куки сессии стоит</td></tr>
+      <tr><td><b>SameSite</b></td><td>Отправлять ли куку, если запрос пришёл с чужого сайта</td><td>Пока просто знать, что есть. Значения Strict, Lax, None</td></tr>
+      <tr><td><b>Domain / Path</b></td><td>Для какого сайта и какого раздела кука</td><td>Кука не уходит на чужие поддомены без необходимости</td></tr>
+    </table></div>
+  </div>
+
+  <h4>Куки, localStorage и sessionStorage</h4>
+  <p>В той же вкладке Application есть ещё два хранилища. Их часто путают на собеседованиях:</p>
+  <div class="scroll"><table>
+    <tr><th></th><th>Куки</th><th>localStorage</th><th>sessionStorage</th></tr>
+    <tr><td>Уходят на сервер сами</td><td>Да, с каждым запросом</td><td>Нет</td><td>Нет</td></tr>
+    <tr><td>Сколько живут</td><td>До Expires или до закрытия браузера</td><td>Пока не удалят</td><td>Пока открыта вкладка</td></tr>
+    <tr><td>Размер</td><td>Около 4 КБ на куку</td><td>Около 5 МБ</td><td>Около 5 МБ</td></tr>
+    <tr><td>Пример</td><td>Номерок сессии</td><td>Тёмная тема, черновик</td><td>Шаг формы оформления заказа</td></tr>
+  </table></div>
+
+  <div class="box def">
+    <div class="title">[Бумага] Чек-лист сессии — семь проверок</div>
+    <ol>
+      <li>После входа появилась кука сессии с HttpOnly и Secure.</li>
+      <li>Без «Запомнить меня» срок — Session; с ней — как в требованиях.</li>
+      <li>После «Выйти» кука удалена, «Назад» не открывает кабинет.</li>
+      <li>Удаляю куку сессии вручную в Application, обновляю страницу — я разлогинена.</li>
+      <li>Номерка сессии нет в адресной строке.</li>
+      <li>Пароль и личные данные не лежат ни в куках, ни в localStorage.</li>
+      <li>После смены пароля старые сессии закрыты — это твой вопрос 4 аналитику из дня 20.</li>
+    </ol>
+  </div>
+
+  <h3>2. Кросс-браузерное тестирование</h3>
+  <div class="simple">
+    <div class="title">Простыми словами</div>
+    <p>Браузеры рисуют страницу разными «движками». Один и тот же код в них может выглядеть и работать чуть по-разному. Кросс-браузерное тестирование — проверка, что сайт работает во всех браузерах, которыми реально пользуются его посетители.</p>
+  </div>
+  <div class="box def">
+    <div class="title">[Бумага] Три движка</div>
+    <div class="scroll"><table>
+      <tr><th>Движок</th><th>Браузеры</th></tr>
+      <tr><td><b>Blink</b> (Chromium)</td><td>Chrome, Edge, Opera, Яндекс Браузер</td></tr>
+      <tr><td><b>WebKit</b></td><td>Safari; на iPhone и iPad — все браузеры, даже Chrome</td></tr>
+      <tr><td><b>Gecko</b></td><td>Firefox</td></tr>
+    </table></div>
+    <p>Отсюда практический вывод: Chrome, Edge и Яндекс почти всегда ведут себя одинаково. Самые частые расхождения — между Chromium, Safari и Firefox. Поэтому минимальный набор — по одному браузеру на каждый движок.</p>
+  </div>
+  <p><b>Что ломается чаще всего:</b> вёрстка (отступы, шрифты, переносы), поля дат и выпадающие списки — у каждого браузера свои, автозаполнение паролей, поведение кук. Тебе как дизайнеру это знакомо: макет в Figma один, а в Safari кнопка «уехала».</p>
+  <p><b>Как выбрать браузеры:</b> не «все подряд», а по статистике посетителей сайта, которую дают аналитики. Сводят в <b>матрицу</b>: браузеры × устройства, у каждой клетки — приоритет.</p>
+
+  <h3>3. Адаптивность</h3>
+  <p>Адаптивная вёрстка — когда страница перестраивается под ширину экрана. Ширины, на которых она перестраивается, называются <b>брейкпоинтами</b> — ты их знаешь из Figma.</p>
+  <div class="box def">
+    <div class="title">[Бумага] Что проверять на узком экране</div>
+    <ol>
+      <li>Нет горизонтальной прокрутки всей страницы.</li>
+      <li>Текст не обрезается и не налезает на соседний.</li>
+      <li>Кнопки достаточно большие, чтобы попасть пальцем — около 44 × 44 пикселя.</li>
+      <li>Меню превращается в «бургер» и открывается.</li>
+      <li>При появлении клавиатуры поле ввода не закрыто ею.</li>
+      <li>Проверяй ширины <b>на границах</b> брейкпоинтов — это граничные значения, как в дне 7: если брейкпоинт 768, смотри 767, 768 и 769.</li>
+    </ol>
+  </div>
+  <p><b>Инструмент:</b> в DevTools кнопка с телефоном и планшетом слева вверху (Toggle device toolbar, <code class="i">Ctrl+Shift+M</code>). Можно выбрать готовое устройство или вписать ширину руками.</p>
+  <div class="box trap">
+    <div class="title">Эмуляция — не настоящий телефон</div>
+    <p>DevTools меняет размер окна, но движок остаётся Chrome. Баг Safari на iPhone так не поймать. Для этого нужен реальный телефон или сервис с удалёнными устройствами — например, BrowserStack. На собеседовании это различие любят спрашивать.</p>
+  </div>
+
+  <div class="box card">
+    <div class="title">Формулировка для собеседования — выучи вслух</div>
+    <p>Вопрос: «Как вы проверяете авторизацию, кроме ввода логина и пароля?»</p>
+    <p>«Смотрю куки во вкладке Application: что после входа появилась кука сессии с HttpOnly и Secure, что срок жизни соответствует галочке "Запомнить меня". Проверяю, что после выхода кука удалена и кнопка "Назад" не открывает кабинет. Удаляю куку вручную — должна произойти разлогинка. Проверяю, что номерка сессии нет в адресе, а пароля — в куках и localStorage.»</p>
+  </div>
+</div>
+
+<!-- 5 -->
+<div class="pane" data-title="Задание">
+  <h2>Куки и экраны на настоящем сайте</h2>
+  <p class="sub">35 минут · две части</p>
+
+  <p>Сайт для практики — <b>saucedemo.com</b>. Это учебный магазин, специально сделанный для тестировщиков. Ломать его можно. Логин <code class="i">standard_user</code>, пароль <code class="i">secret_sauce</code> — они написаны прямо на странице входа.</p>
+
+  <h3>Часть 1 · Куки · 20 минут</h3>
+  <p>Создай файл <code class="i">manual/day22-cookies-practice.md</code>. Всё, что увидишь, записывай туда.</p>
+  <ol class="steps">
+    <li><b>До входа.</b> Открой saucedemo.com. Нажми F12 → Application → слева Cookies → строка с адресом сайта. Запиши, какие куки есть до входа. Может быть, никаких — это тоже результат.</li>
+    <li><b>Вход.</b> Войди под standard_user. Снова посмотри в Cookies. Должна появиться новая кука. Запиши в таблицу: Name, Value, Expires, HttpOnly, Secure.</li>
+    <li><b>Сравни с чек-листом из теории.</b> Какие из семи проверок этот сайт проходит, какие нет? Напиши по каждой из пунктов 1 и 2 одной строкой: «пункт → что вижу → проходит или нет».</li>
+    <li><b>Удали куку руками.</b> Правый клик по ней → Delete. Обнови страницу (F5). Что произошло? Ты осталась в магазине или попала на форму входа? Запиши.</li>
+    <li><b>Войди снова, потом выйди правильно.</b> Меню слева вверху (три полоски) → Logout. Проверь в Application, осталась ли кука. Нажми в браузере «Назад» — что открылось? Запиши.</li>
+    <li><b>Вывод.</b> Две-три строки: какие проверки сайт проходит и что ты завела бы как баг, если бы это был не учебный, а настоящий магазин. Подумай про HttpOnly: заметь, что у учебного сайта такой выбор может быть нарочным.</li>
+  </ol>
+  <div class="done"><b>Готово, когда</b> в файле таблица куки после входа, результаты шагов 4 и 5 и вывод.</div>
+
+  <h3>Часть 2 · Узкий экран · 15 минут</h3>
+  <ol class="steps">
+    <li>Войди в saucedemo. Нажми <code class="i">Ctrl+Shift+M</code> — включится режим устройств.</li>
+    <li>Сверху выбери ширину вручную: сначала <b>375</b> (обычный телефон), потом <b>768</b> (планшет), потом <b>1280</b> (ноутбук).</li>
+    <li>На каждой ширине пройди по шести пунктам из «[Бумага] Что проверять на узком экране». Особенно: есть ли горизонтальная прокрутка, открывается ли меню, видна ли кнопка корзины.</li>
+    <li>Запиши таблицу: ширина → что в порядке → что не так (если ничего — так и пиши).</li>
+    <li>Найди хотя бы одно место, которое ты как дизайнер сделала бы иначе на 375. Это не обязательно баг — может быть замечание по удобству. Отметь, что это: баг или предложение.</li>
+  </ol>
+  <div class="done"><b>Готово, когда</b> таблица на три ширины и хотя бы одно замечание с пометкой «баг» или «предложение».</div>
+
+  <details><summary>Если сайт не открывается</summary>
+    <p>Возьми любой другой сайт, где ты входишь в аккаунт: например, GitHub. Вход там уже есть. Шаги те же, только кука будет называться иначе — ищи ту, что появилась после входа. Про это напиши в файле одной строкой.</p>
+  </details>
+</div>
+
+<!-- 6 -->
+<div class="pane" data-title="Тест">
+  <h2>Тест</h2>
+  <p class="sub">8 вопросов, 10 минут · конец первого захода</p>
+  <div id="quizB"></div>
+  <div class="score" id="scoreB">Отвечено 0 из 8</div>
+  <div class="split">перерыв — не меньше часа без экрана</div>
+</div>
+
+<!-- 7 -->
+<div class="pane" data-title="Python">
+  <h2>Разбираем строку кук в словарь</h2>
+  <p class="sub">60 минут · новый файл python/day22_cookies.py · подготовка к контрольной: строки, словари, функции</p>
+
+  <p>Ты видела в охоте: <code class="i">document.cookie</code> возвращает все куки одной строкой — <code class="i">"session_id=abc123; theme=dark"</code>. В автотестах её постоянно приходится превращать в словарь, чтобы проверить отдельную куку. Сегодня пишем это сами.</p>
+
+  <h3>Новое: метод split</h3>
+  <p><code class="i">split</code> режет строку на куски по разделителю и возвращает <b>список</b>:</p>
+<pre>print("a=1; b=2".split("; "))    <span class="cm"># ['a=1', 'b=2']</span>
+print("theme=dark".split("="))   <span class="cm"># ['theme', 'dark']</span></pre>
+  <div class="scroll"><table>
+    <tr><th>Вызов</th><th>Режем по</th><th>Получили</th></tr>
+    <tr><td class="mono">"a=1; b=2".split("; ")</td><td>точка с запятой и пробел</td><td>список из двух строк</td></tr>
+    <tr><td class="mono">"theme=dark".split("=")</td><td>знак равно</td><td>список: <code class="i">[0]</code> — имя, <code class="i">[1]</code> — значение</td></tr>
+  </table></div>
+
+  <h3>Разобранный пример — параметры из адреса</h3>
+  <p>В адресе <code class="i">shop.ru/search?q=phone&amp;page=2</code> после знака вопроса — параметры через <code class="i">&amp;</code>. Превратим их в словарь:</p>
+<pre>def parse_params(text):
+    result = {}
+    for part in text.split("&amp;"):
+        pair = part.split("=")
+        result[pair[0]] = pair[1]
+    return result
+
+print(parse_params("q=phone&amp;page=2"))
+<span class="cm"># {'q': 'phone', 'page': '2'}</span></pre>
+  <div class="scroll"><table>
+    <tr><th>Итерация</th><th>part</th><th>pair</th><th>result после</th></tr>
+    <tr><td>до цикла</td><td>—</td><td>—</td><td class="mono">{}</td></tr>
+    <tr><td>1</td><td class="mono">"q=phone"</td><td class="mono">['q', 'phone']</td><td class="mono">{'q': 'phone'}</td></tr>
+    <tr><td>2</td><td class="mono">"page=2"</td><td class="mono">['page', '2']</td><td class="mono">{'q': 'phone', 'page': '2'}</td></tr>
+  </table></div>
+  <div class="simple">
+    <div class="title">Простыми словами</div>
+    <p>Сначала режем всю строку на пары, потом каждую пару — на имя и значение, и кладём в словарь. Два split: внешний по разделителю пар, внутренний по знаку равно. Заметь: <code class="i">'2'</code> — строка, а не число. split всегда возвращает строки.</p>
+  </div>
+
+  <h3>Шаг 1 · parse_cookies · 20 минут</h3>
+  <p><b>Что сделать.</b> Напиши функцию <code class="i">parse_cookies(text)</code>. Она получает строку кук и возвращает словарь.</p>
+  <ol class="steps">
+    <li>Возьми за основу пример выше.</li>
+    <li>Поменяй разделитель пар: у кук это не <code class="i">"&amp;"</code>, а <code class="i">"; "</code> — точка с запятой <b>и пробел</b>.</li>
+    <li>Добавь в самое начало проверку на пустую строку: если <code class="i">text == ""</code>, сразу вернуть пустой словарь. Это ранний выход из дня 20.</li>
+  </ol>
+  <p><b>Зачем шаг 3.</b> Попробуй сначала без него: <code class="i">parse_cookies("")</code> упадёт с ошибкой <code class="i">IndexError</code>. Пустая строка режется в список <code class="i">['']</code>, у куска <code class="i">''</code> нет знака равно, и <code class="i">pair[1]</code> не существует. Пустая строка — граница, на которой падают все такие функции. Посмотри на ошибку своими глазами, потом добавь проверку.</p>
+  <p>Проверки — скопируй в конец файла. Должно быть четыре <code class="i">True</code>:</p>
+<pre class="light">print(parse_cookies("session_id=abc123; theme=dark") == {"session_id": "abc123", "theme": "dark"})
+print(parse_cookies("theme=dark") == {"theme": "dark"})
+print(parse_cookies("") == {})
+print(parse_cookies("cart=3")["cart"] == "3")</pre>
+  <div class="done"><b>Готово, когда</b> четыре True, и ты видела IndexError до того, как добавила проверку на пустую строку.</div>
+
+  <h3>Шаг 2 · is_logged_in · 10 минут</h3>
+  <p><b>Что сделать.</b> Функция <code class="i">is_logged_in(cookies)</code> получает <b>словарь</b> кук и возвращает <code class="i">True</code>, если пользователь вошёл, иначе <code class="i">False</code>.</p>
+  <p><b>Когда пользователь вошёл:</b> в словаре есть ключ <code class="i">"session_id"</code> <b>и</b> его значение не пустая строка. Вспомни второй вопрос чтения кода: кука с пустым значением — не вход.</p>
+  <details><summary>Подсказка</summary>
+    <p>Два условия через <code class="i">and</code>: <code class="i">"session_id" in cookies</code> и <code class="i">cookies["session_id"] != ""</code>. Порядок важен: если ключа нет, вторая часть упала бы с KeyError. Но <code class="i">and</code> не проверяет вторую часть, когда первая уже False, — поэтому так можно.</p>
+  </details>
+  <p>Проверки — четыре <code class="i">True</code>:</p>
+<pre class="light">print(is_logged_in({"session_id": "abc123"}) == True)
+print(is_logged_in({"theme": "dark"}) == False)
+print(is_logged_in({"session_id": ""}) == False)
+print(is_logged_in({}) == False)</pre>
+
+  <h3>Шаг 3 · Проверить все строки разом · 25 минут</h3>
+  <p><b>Что сделать.</b> Data-driven проверка, как в днях 19–21, только теперь данные — строки кук, а проверяем обе функции вместе: строка → <code class="i">parse_cookies</code> → <code class="i">is_logged_in</code>.</p>
+  <ol class="steps">
+    <li>Создай список <code class="i">cases</code> из пяти словарей с ключами <code class="i">"cookie"</code> и <code class="i">"expected"</code>:
+      <div class="scroll"><table>
+        <tr><th>cookie</th><th>expected</th><th>Что проверяем</th></tr>
+        <tr><td class="mono">"session_id=abc123; theme=dark"</td><td class="mono">True</td><td>обычный вход</td></tr>
+        <tr><td class="mono">"theme=dark"</td><td class="mono">False</td><td>куки сессии нет</td></tr>
+        <tr><td class="mono">"session_id=; theme=dark"</td><td class="mono">False</td><td>кука есть, значение пустое</td></tr>
+        <tr><td class="mono">""</td><td class="mono">False</td><td>кук нет вообще</td></tr>
+        <tr><td class="mono">"theme=dark; session_id=xyz"</td><td class="mono">True</td><td>кука сессии не первая</td></tr>
+      </table></div>
+    </li>
+    <li>Цикл по <code class="i">cases</code>. Внутри: получи словарь через <code class="i">parse_cookies</code>, передай его в <code class="i">is_logged_in</code>, сравни результат с <code class="i">expected</code>.</li>
+    <li>Печать на каждый случай: <code class="i">repr</code> строки кук, потом PASSED — или FAILED и что вернулось. Пример строки: <code class="i">'theme=dark' PASSED</code>.</li>
+    <li>Итог словарём-счётчиком. Не забудь <code class="i">status = "FAILED"</code> в ветке else — вчерашний баг.</li>
+    <li><b>Проверка, что проверка умеет падать.</b> Поменяй expected у первого случая на False, запусти — в итоге должен быть 1 FAILED. Верни обратно.</li>
+  </ol>
+  <p>Ожидаемый итог зелёного прогона: <code class="i">Итого: {'PASSED': 5}</code></p>
+
+  <div class="box card">
+    <div class="title">Со звёздочкой — если осталось время</div>
+    <p>Вызови <code class="i">print(parse_cookies("token=abc=="))</code>. Значения кук иногда заканчиваются на <code class="i">=</code>. Что вернула функция и почему значение обрезалось? Подсказка: у split есть второй аргумент — сколько раз резать. Попробуй <code class="i">part.split("=", 1)</code>.</p>
+  </div>
+
+  <div class="box trap">
+    <div class="title">Что прислать по этой вкладке</div>
+    <ol>
+      <li>Запушить файл и написать «запушила».</li>
+      <li>Вставить в сообщение вывод: восемь True из шагов 1–2, сломанный прогон и зелёный прогон шага 3.</li>
+      <li>Текст ошибки IndexError, который ты видела в шаге 1.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- 8 -->
+<div class="pane" data-title="Тест-кейсы">
+  <h2>TC-010 и TC-011 — из дня 21</h2>
+  <p class="sub">30 минут · после них — 10 уникальных кейсов из 20</p>
+
+  <div class="box note">
+    <div class="title">Дубли проверены</div>
+    <p>Я сверила с твоим файлом TC-001…009: правила 4.4 и 4.2 там ещё не проверяются. Можно писать.</p>
+  </div>
+
+  <p>Оба кейса — на правила показа сообщений из требования 4 (справочник дня 13). Их часто забывают, а баги в них видит каждый пользователь.</p>
+
+  <h3>TC-010 · Сообщение исчезает, когда пользователь начинает править поле</h3>
+  <p><b>Какое правило проверяем.</b> 4.4: «Сообщение исчезает, как только пользователь начинает править то поле, к которому оно относится».</p>
+  <p><b>Как написать, по шагам:</b></p>
+  <ol class="steps">
+    <li><b>Предусловие.</b> Пиши про состояние системы, как в TC-009: пользователь не авторизован. Зарегистрирован ли кто-то — здесь не важно, до сервера дело не дойдёт (правило 4.1).</li>
+    <li><b>Тестовые данные.</b> Email — пусто. Пароль — <code class="i">Anna1234</code> (верный формат, чтобы под паролем сообщения не было).</li>
+    <li><b>Шаг 1.</b> Оставить email пустым, ввести пароль, нажать «Войти». Ожидаемый результат: под полем email «Заполните поле» — дословно 3.1.</li>
+    <li><b>Шаг 2.</b> Ввести в поле email один символ — например <code class="i">a</code>. Ожидаемый результат: что стало с сообщением под email? Смотри правило 4.4.</li>
+    <li><b>Шаг 3 — самый важный.</b> Нужно проверить вторую половину правила: «<b>то поле</b>, к которому оно относится». Для этого сначала снова получи сообщение под email (очисти поле email, нажми «Войти»), а потом правь <b>другое</b> поле — пароль: допиши один символ. Ожидаемый результат: что должно быть с сообщением под email? Подумай: правишь пароль, а сообщение относится к email.</li>
+    <li><b>Постусловие.</b> Нужно ли что-то возвращать? Данные в системе не менялись.</li>
+  </ol>
+  <p><b>Почему шаг 3 важен.</b> Разработчики часто пишут «при любом вводе в форму — убрать все сообщения». Тогда пользователь правит пароль, а подсказка про email исчезает, хотя email всё ещё пустой. Шаг 3 ловит именно этот баг.</p>
+  <div class="done"><b>Готово, когда</b> три шага, сообщения дословно и с местом, в шаге 3 правится пароль, а ожидаемый результат — про сообщение под email.</div>
+
+  <h3>TC-011 · Одно сообщение на поле: пароль без цифры и без заглавной</h3>
+  <p><b>Какое правило проверяем.</b> 4.2: «Одно сообщение на поле. Если нарушено несколько правил, показывается первое по порядку».</p>
+  <p><b>Как написать, по шагам:</b></p>
+  <ol class="steps">
+    <li><b>Подбери пароль.</b> Он должен нарушать <b>сразу два</b> правила — 3.5 (нет цифры) и 3.6 (нет заглавной), но <b>проходить</b> 3.4 по длине: от 8 до 20 символов. Например, только маленькие латинские буквы.</li>
+    <li><b>Посчитай длину.</b> В тестовых данных напиши пароль, его длину и какие правила он нарушает. Пример формата: <code class="i">annaanna — 8 символов, нарушает 3.5 и 3.6, проходит 3.4</code>. Используй свой пароль, не этот пример.</li>
+    <li><b>Email</b> — правильный, <code class="i">anna@gmail.com</code>, чтобы под ним сообщений не было.</li>
+    <li><b>Шаги:</b> ввести email, ввести пароль, нажать «Войти».</li>
+    <li><b>Ожидаемый результат — три вещи:</b> какое именно сообщение (дословно; первое по порядку — какое из 3.5 и 3.6 идёт раньше?), где оно (под каким полем), и <b>сколько</b> сообщений под полем пароля.</li>
+    <li><b>Предусловие и постусловие</b> — как в TC-010.</li>
+  </ol>
+  <div class="done"><b>Готово, когда</b> пароль нарушает ровно 3.5 и 3.6, длина посчитана и записана, в ожидаемом результате одно сообщение дословно, с местом и с числом «одно».</div>
+
+<pre class="light">ID:
+Название:
+Приоритет:
+Предусловие:
+Тестовые данные:
+Шаги:
+  1.
+Ожидаемый результат:
+Постусловие:</pre>
+</div>
+
+<!-- 9 -->
+<div class="pane" data-title="Итоги">
+  <h2>Закрываем день — и Этап 1</h2>
+  <p class="sub">5 минут</p>
+
+  <div class="box note">
+    <div class="title">[Бумага]</div>
+    <ol>
+      <li>Кука — в браузере, сессия — на сервере. Номерок и запись о нём.</li>
+      <li>Пять атрибутов куки и что проверяет тестировщик.</li>
+      <li>Куки, localStorage, sessionStorage — таблица различий.</li>
+      <li>Чек-лист сессии из семи пунктов.</li>
+      <li>Три движка браузеров и минимальный набор — по одному на движок.</li>
+      <li>Шесть пунктов проверки узкого экрана. Брейкпоинты проверяем по границам.</li>
+      <li>Эмуляция в DevTools — не настоящий телефон.</li>
+      <li><code class="i">split</code> возвращает список строк. Пустая строка — граница.</li>
+    </ol>
+  </div>
+
+  <div class="box card">
+    <div class="title">[Карточки] Новый блок S · Куки и браузеры</div>
+    <p>Пять карточек уже в колоде. Первый прогон — завтра, в режиме «Знакомство».</p>
+  </div>
+
+  <div class="box task">
+    <div class="title">[Репо]</div>
+<pre>git add manual/day22-cookies-hunt.md manual/day22-cookies-practice.md python/day22_cookies.py manual/test-cases.md
+git commit -m "День 22: куки, сессии, адаптивность, parse_cookies, TC-010 и TC-011"
+git push</pre>
+  </div>
+
+  <div class="box def">
+    <div class="title">Что мне прислать</div>
+    <ol>
+      <li>Счёт карточек K + G из 12.</li>
+      <li>Чтение кода — сколько из 4.</li>
+      <li>Охоту: сколько багов из 5 нашла сама и нашла ли ловушку.</li>
+      <li>Номера вопросов теста, где ошиблась.</li>
+      <li>Python: «запушила» и вывод, как написано на вкладке Python.</li>
+      <li>TC-010 и TC-011 — можно просто запушить в test-cases.md.</li>
+      <li>Задание на saucedemo — тоже можно просто запушить.</li>
+    </ol>
+  </div>
+
+  <h3>Дальше</h3>
+  <p>Этап 1 закрыт. Дальше — Python: модули и виртуальное окружение. Когда проводим CP1 — договоримся в чате.</p>
+</div>
+
+</div>
+
+<script>
+var QA=[
+{q:'cookies = {"session": "abc123", "theme": "dark"}\ncookies["theme"] = "light"\ncookies["lang"] = "ru"\nprint(len(cookies), cookies["theme"])',
+ o:['2 dark','3 light','3 dark','2 light'],a:1,
+ e:'Присваивание по существующему ключу заменяет значение: theme стал light. По новому ключу — добавляет пару: появился lang. Ключей стало три.'},
+{q:'def is_logged_in(c):\n    return c.get("session") is not None\n\nprint(is_logged_in({}), is_logged_in({"session": ""}))',
+ o:['False False','False True','True True','Ошибка'],a:1,
+ e:'В пустом словаре ключа нет — get вернул None, None is not None — False. Во втором случае get вернул пустую строку "". Пустая строка — это не None, поэтому True. Функция считает вошедшим пользователя с пустой кукой — это баг, и во втором заходе ты напишешь правильную проверку.'},
+{q:'c = {"session": "abc", "theme": "dark", "cart": "3"}\ncount = 0\nfor name in c:\n    if name != "session":\n        count += 1\nprint(count)',
+ o:['3','2','1','Ошибка: по словарю нельзя пройти циклом'],a:1,
+ e:'Цикл по словарю идёт по ключам: session, theme, cart. Условие пропускает session, считает два остальных.'},
+{q:'def cart_size(c):\n    if "cart" not in c:\n        return 0\n    return int(c["cart"])\n\nprint(cart_size({"cart": "3"}) + cart_size({}))',
+ o:['3','"30"','Ошибка KeyError','33'],a:0,
+ e:'Первый вызов: ключ есть, int("3") — число 3. Второй: ключа нет — ранний выход, 0. 3 + 0 = 3. Без int получилась бы ошибка: строку "3" нельзя сложить с числом 0.'}
+];
+
+var QB=[
+{q:'Чем кука отличается от сессии?',
+ o:['Это одно и то же','Кука хранится в браузере и несёт номерок, сессия — запись на сервере, кому номерок принадлежит','Сессия хранится в браузере, кука на сервере','Кука — только для рекламы'],a:1,
+ e:'Номерок в браузере и запись о нём на сервере. При правильном выходе удаляется и то, и другое.'},
+{q:'У куки session_id нет атрибута HttpOnly. Чем это опасно?',
+ o:['Ничем','Код страницы на JavaScript может прочитать номерок — вредный скрипт украдёт сессию','Кука не отправится на сервер','Кука удалится при закрытии браузера'],a:1,
+ e:'HttpOnly запрещает скриптам читать куку. Проверка — document.cookie в Console не должен показывать session_id.'},
+{q:'Пользователь вошёл без «Запомнить меня». Какой срок жизни должен быть у куки сессии?',
+ o:['30 дней','Session — до закрытия браузера','Год','Без срока'],a:1,
+ e:'Без галочки браузер не должен помнить вход после закрытия. Долгий срок ставят только с галочкой.'},
+{q:'После «Выйти» кука сессии осталась, «Назад» открывает кабинет. Это:',
+ o:['Норма: браузер кэширует страницы','Баг: выход не закрыл сессию','Особенность Chrome','Не проверяется'],a:1,
+ e:'При выходе сервер закрывает сессию и удаляет куку. Иначе следующий человек за общим компьютером попадёт в чужой кабинет.'},
+{q:'Чем localStorage отличается от кук?',
+ o:['Ничем','localStorage не отправляется на сервер сам и хранится, пока его не удалят','localStorage удаляется при закрытии вкладки','localStorage хранится на сервере'],a:1,
+ e:'Куки уходят с каждым запросом, localStorage — нет. При закрытии вкладки удаляется sessionStorage, а не localStorage.'},
+{q:'Какой минимальный набор браузеров для кросс-браузерной проверки?',
+ o:['Chrome, Edge, Яндекс Браузер','По одному на каждый движок: Chromium, Safari, Firefox','Только Chrome — у него больше всего пользователей','Все браузеры, какие есть'],a:1,
+ e:'Chrome, Edge и Яндекс — один движок Blink, ведут себя почти одинаково. Расхождения чаще всего между тремя движками.'},
+{q:'Брейкпоинт сайта — 768 пикселей. Какие ширины проверить?',
+ o:['Только 768','767, 768 и 769','375 и 1920','Любые три'],a:1,
+ e:'Это граничные значения из дня 7: граница и по соседу с каждой стороны. На границе вёрстка и ломается.'},
+{q:'Вы проверили сайт в режиме устройств DevTools на ширине iPhone. Можно ли сказать, что на iPhone всё работает?',
+ o:['Да, это эмулятор iPhone','Нет: меняется только размер окна, движок остаётся Chrome, баги Safari так не найти','Да, если выбрать iPhone в списке','Только для iOS 17'],a:1,
+ e:'Эмуляция показывает вёрстку на узкой ширине, но не поведение WebKit. Нужен реальный телефон или сервис с удалёнными устройствами.'}
+];
+
+function buildQuiz(host,data,scoreEl,code){
+  var answered=0,right=0;
+  data.forEach(function(item,i){
+    var box=document.createElement('div');box.className='q';
+    var t=document.createElement('div');t.className='qn';t.textContent='Вопрос '+(i+1);box.appendChild(t);
+    if(code){var pre=document.createElement('pre');pre.textContent=item.q;box.appendChild(pre);
+      var hint=document.createElement('div');hint.textContent='Что напечатается?';box.appendChild(hint);}
+    else{var qt=document.createElement('div');qt.textContent=item.q;box.appendChild(qt);}
+    var opts=document.createElement('div');opts.className='opts';
+    var expl=document.createElement('div');expl.className='expl';expl.hidden=true;expl.textContent=item.e;
+    var locked=false;
+    item.o.forEach(function(text,j){
+      var b=document.createElement('button');b.className='opt';b.type='button';b.textContent=text;
+      if(code)b.style.fontFamily='Consolas,monospace';
+      b.onclick=function(){
+        if(locked)return;locked=true;answered++;if(j===item.a)right++;
+        [].forEach.call(opts.children,function(el,k){
+          if(k===item.a)el.classList.add('right');else if(k===j)el.classList.add('wrong');
+        });
+        expl.hidden=false;
+        if(scoreEl)scoreEl.textContent='Отвечено '+answered+' из '+data.length+', верных '+right;
+      };
+      opts.appendChild(b);
+    });
+    box.appendChild(opts);box.appendChild(expl);host.appendChild(box);
+  });
+}
+buildQuiz(document.getElementById('quizA'),QA,null,true);
+buildQuiz(document.getElementById('quizB'),QB,document.getElementById('scoreB'),false);
+
+var panes=[].slice.call(document.querySelectorAll('.pane'));
+var tabs=document.getElementById('tabs');
+panes.forEach(function(p,i){
+  var b=document.createElement('button');b.type='button';
+  b.innerHTML='<span class="n">'+i+'</span>'+p.dataset.title;
+  b.onclick=function(){go(i);};
+  tabs.appendChild(b);
+  var nav=document.createElement('div');nav.className='nav';
+  var prev=document.createElement('button');prev.type='button';prev.textContent='← Назад';
+  prev.onclick=function(){go(i-1);};if(i===0)prev.disabled=true;
+  var next=document.createElement('button');next.type='button';next.className='next';
+  next.textContent=(i===panes.length-1)?'В начало':'Дальше →';
+  next.onclick=function(){go(i===panes.length-1?0:i+1);};
+  nav.appendChild(prev);nav.appendChild(next);p.appendChild(nav);
+});
+function go(i){
+  panes.forEach(function(p,j){p.classList.toggle('on',i===j);});
+  [].forEach.call(tabs.children,function(b,j){b.classList.toggle('on',i===j);});
+  try{tabs.children[i].scrollIntoView({block:'nearest',inline:'center'});}catch(e){}
+  try{localStorage.setItem('d22tab',String(i));}catch(e){}
+  window.scrollTo(0,0);
+}
+var start=0;
+try{var s=parseInt(localStorage.getItem('d22tab'),10);if(s>=0&&s<panes.length)start=s;}catch(e){}
+go(start);
+</script>
+
+</body></html>

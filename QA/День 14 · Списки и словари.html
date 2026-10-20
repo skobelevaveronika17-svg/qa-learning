@@ -1,0 +1,734 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>День 14 · Списки и словари</title>
+<style>
+/* Оформление дня 13: светлая бумага, вкладки сверху, тёмные блоки кода, цветные плашки по роли */
+:root{
+  --bg:#eef1f2; --paper:#fff; --ink:#1b2430; --soft:#4e5a67; --line:#d7dde0;
+  --blue:#1f5fa9; --blue-bg:#e9f1fa;
+  --red:#b0352b; --red-bg:#fbecea;
+  --green:#276f52; --green-bg:#e8f4ee;
+  --amber:#9a6a00; --amber-bg:#fbf2df;
+  --violet:#5e4b8b; --violet-bg:#efebf8;
+  --code-bg:#0f1720; --code-fg:#dce7f0; --code-cm:#8ea2b4;
+  --chip:#eef1f3; --th:#f2f5f6; --soft-bg:#f6f8f9; --hover:#eaf0f3;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.62;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding-inline:18px;padding-block:0 60px}
+header{padding:34px 0 14px}
+.day{font-size:14px;color:var(--soft)}
+h1{font-size:33px;line-height:1.15;margin:.2em 0 .3em;text-wrap:balance}
+.lead{color:var(--soft);margin:0;max-width:62ch}
+
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);padding:10px 0 8px;
+  display:flex;gap:6px;overflow-x:auto;border-bottom:1px solid var(--line)}
+.tabs button{flex:0 0 auto;background:var(--paper);border:1px solid var(--line);border-radius:8px;
+  padding:8px 13px;font:inherit;font-size:14.5px;color:var(--soft);cursor:pointer;white-space:nowrap}
+.tabs button.on{background:var(--ink);color:var(--paper);border-color:var(--ink);font-weight:600}
+.tabs button .n{opacity:.55;margin-right:6px}
+button:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+.pane{display:none;background:var(--paper);border:1px solid var(--line);border-top:0;
+  border-radius:0 0 12px 12px;padding:28px 30px 34px}
+.pane.on{display:block}
+.pane h2{margin:0 0 6px;font-size:26px;line-height:1.2;text-wrap:balance}
+.pane .sub{color:var(--soft);margin:0 0 20px;font-size:15.5px}
+h3{font-size:19.5px;margin:28px 0 8px}
+h4{font-size:17px;margin:20px 0 6px}
+p{margin:12px 0}
+ul,ol{padding-left:24px}li{margin:6px 0}
+code.i{background:var(--chip);border:1px solid var(--line);border-radius:4px;padding:1px 5px;
+ font-family:Consolas,monospace;font-size:.92em}
+pre{background:var(--code-bg);color:var(--code-fg);border-radius:9px;padding:15px 17px;overflow-x:auto;
+ font-family:Consolas,monospace;font-size:14.5px;line-height:1.55;margin:14px 0}
+pre .cm{color:var(--code-cm)}
+pre.light{background:var(--soft-bg);color:var(--ink);border:1px solid var(--line)}
+
+.box{border-left:4px solid;border-radius:0 8px 8px 0;padding:14px 18px;margin:18px 0}
+.box .title{font-weight:700;margin-bottom:4px}
+.def{border-color:var(--blue);background:var(--blue-bg)} .def .title{color:var(--blue)}
+.trap{border-color:var(--red);background:var(--red-bg)} .trap .title{color:var(--red)}
+.note{border-color:var(--green);background:var(--green-bg)} .note .title{color:var(--green)}
+.card{border-color:var(--amber);background:var(--amber-bg)} .card .title{color:var(--amber)}
+.task{border-color:var(--violet);background:var(--violet-bg)} .task .title{color:var(--violet)}
+.box p:first-of-type{margin-top:2px}.box p:last-child{margin-bottom:2px}
+
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15.5px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--th);font-weight:600}
+td{font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto}
+.mono{font-family:Consolas,monospace;white-space:nowrap}
+
+details{border:1px solid var(--line);background:var(--soft-bg);border-radius:8px;padding:10px 14px;margin:10px 0}
+summary{cursor:pointer;font-weight:600;color:var(--violet)}
+details[open] summary{margin-bottom:8px}
+.mark{display:inline-block;font-size:12.5px;font-weight:700;border-radius:99px;padding:1px 9px;margin-left:6px;vertical-align:1px}
+.m-ok{background:var(--green-bg);color:var(--green)}
+.m-half{background:var(--amber-bg);color:var(--amber)}
+.yours{border-left:3px solid var(--line);padding:2px 0 2px 12px;color:var(--soft);font-size:15.5px;margin:8px 0}
+
+.q{border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:16px 0}
+.qn{font-weight:700;margin-bottom:6px}
+.opts{display:grid;gap:8px;margin-top:12px}
+.opt{text-align:left;background:var(--soft-bg);border:1px solid var(--line);border-radius:8px;
+ padding:10px 14px;cursor:pointer;font:inherit;font-size:16px;color:var(--ink)}
+.opt:hover{background:var(--hover)}
+.opt.right{background:var(--green-bg);border-color:var(--green);font-weight:600}
+.opt.wrong{background:var(--red-bg);border-color:var(--red)}
+.expl{margin-top:12px;padding:12px 14px;background:var(--soft-bg);border-radius:8px}
+.score{position:sticky;bottom:env(safe-area-inset-bottom,0px);background:var(--paper);border:1px solid var(--line);
+ border-radius:10px;padding:12px 18px;margin-top:18px;font-weight:600;font-variant-numeric:tabular-nums}
+
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:34px;padding-top:18px;border-top:1px solid var(--line)}
+.nav button{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 16px;
+ font:inherit;cursor:pointer;color:var(--ink)}
+.nav .next{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.nav button[disabled]{opacity:.35;cursor:default}
+@media(max-width:640px){.wrap{padding-inline:16px}.pane{padding:20px 17px 26px}h1{font-size:27px}pre{font-size:13.5px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+
+<div class="wrap">
+
+<header>
+  <div class="day">День 14 · Python, тема 2.2</div>
+  <h1>Списки и словари</h1>
+  <p class="lead">Карточки, чтение кода и охота позади. Здесь — разбор твоих находок, теория, которая из них выросла, два тест-кейса, Python и тест. Словарь — это форма, в которой через три месяца будут приходить ответы API.</p>
+</header>
+
+<div class="tabs" id="tabs"></div>
+
+<!-- 0 -->
+<div class="pane" data-title="Разбор">
+  <h2>Что было в отчёте по прогону</h2>
+  <p class="sub">15 минут. Твоя запись — серым, под ней что на самом деле</p>
+
+  <div class="box def">
+    <div class="title">Счёт охоты: 6½ из 8 → 7/10</div>
+    <p>Пять находок с верной причиной. Три — место найдено, механизм нет или неточно. Оценка не округляется вверх: в реальном репорте «нашла строку, но не поняла, что сломалось» — это половина работы.</p>
+  </div>
+
+  <details><summary>Код охоты — чтобы было перед глазами</summary>
+<pre><span class="cm"> 1</span>  <span class="cm"># Итоги прогона тест-кейсов формы входа</span>
+<span class="cm"> 2</span>  results = ["passed", "failed", "passed", "blocked", "Passed", "failed "]
+<span class="cm"> 3</span>
+<span class="cm"> 4</span>  print("Всего кейсов:", len(results))
+<span class="cm"> 5</span>  print("Первый кейс:", results[1])
+<span class="cm"> 6</span>  print("Последний кейс:", results[len(results)])
+<span class="cm"> 7</span>  print("Упало:", results.count("failed"))
+<span class="cm"> 8</span>  print("Прошло:", results.count("passed"))
+<span class="cm"> 9</span>
+<span class="cm">10</span>  sorted_results = results.sort()
+<span class="cm">11</span>  print("По алфавиту:", sorted_results)
+<span class="cm">12</span>
+<span class="cm">13</span>  <span class="cm"># Тестовый пользователь для кейсов</span>
+<span class="cm">14</span>  user = {"email": "anna@test.ru", "password": "Anna1234", "role": "user"}
+<span class="cm">15</span>  print("Роль:", user["Role"])
+<span class="cm">16</span>
+<span class="cm">17</span>  <span class="cm"># Делаем копию, чтобы проверить вход под админом</span>
+<span class="cm">18</span>  admin = user
+<span class="cm">19</span>  admin["role"] = "admin"
+<span class="cm">20</span>  print("Роль Анны:", user["role"])
+<span class="cm">21</span>
+<span class="cm">22</span>  <span class="cm"># На перезапуск — всё, кроме упавших</span>
+<span class="cm">23</span>  retest = ["failed", "failed", "passed", "blocked"]
+<span class="cm">24</span>  for r in retest:
+<span class="cm">25</span>      if r == "failed":
+<span class="cm">26</span>          retest.remove(r)
+<span class="cm">27</span>  print("На перезапуск:", retest)</pre>
+  </details>
+
+  <details><summary>1 · Строка 5 — первый элемент <span class="mark m-ok">верно</span></summary>
+    <div class="yours">«Отсчёт начинается с 0, а у нас стоит 1»</div>
+    <p>Точно. <code class="i">results[1]</code> — второй элемент, <code class="i">failed</code>. Первый — <code class="i">results[0]</code>. Индексы у списков устроены так же, как у строк из дня 8.</p>
+  </details>
+
+  <details><summary>2 · Строка 6 — последний элемент <span class="mark m-ok">верно</span></summary>
+    <div class="yours">«Считает от 0 до 5 — нужно отнять один»</div>
+    <p>Элементов шесть, индексы 0–5, <code class="i">results[6]</code> не существует → <code class="i">IndexError: list index out of range</code>. Исправление — <code class="i">results[len(results) - 1]</code> или короче <code class="i">results[-1]</code>.</p>
+    <p>Это ошибка на единицу, тот же класс, что граница 4999/5000 в дне 9. Нашла сама — отмечаю в линии границ.</p>
+  </details>
+
+  <details><summary>3 · Строка 7 — «Упало: 1» <span class="mark m-ok">верно</span></summary>
+    <div class="yours">«Выдаёт 1, т.к. в результатах есть пробел, который не считается»</div>
+    <p><code class="i">"failed "</code> и <code class="i">"failed"</code> — разные строки, а <code class="i">count</code> ищет точное совпадение. Лечится нормализацией до подсчёта: <code class="i">strip()</code> из дня 8.</p>
+  </details>
+
+  <details><summary>4 · Строка 8 — «Прошло: 2» <span class="mark m-ok">верно</span></summary>
+    <div class="yours">«Будет 2, так как Passed с большой буквы пишется один раз»</div>
+    <p>Да. Регистр — тоже часть строки. Нормализация целиком: <code class="i">s.strip().lower()</code>. В задаче 1 по Python ты сделаешь её для всего списка.</p>
+  </details>
+
+  <details><summary>5 · Строка 10 — sort() <span class="mark m-half">½</span></summary>
+    <div class="yours">«Выдаёт ошибку, т.к. применена неверная функция» — с объяснением через sorted</div>
+    <p>Ошибки нет. Программа спокойно печатает <code class="i">По алфавиту: None</code>. Это хуже, чем падение: ничего не красное, а результат неверный.</p>
+    <p>Почему <code class="i">None</code>: <code class="i">sort()</code> сортирует сам список <code class="i">results</code> и ничего не возвращает. В <code class="i">sorted_results</code> попадает «ничего». Нужен новый отсортированный список — <code class="i">sorted(results)</code>. Нужно отсортировать этот же — <code class="i">results.sort()</code> отдельной строкой, без присваивания.</p>
+    <p><b>За что половина:</b> фактический результат записан не тот, что выдаёт программа. В баг-репорте «падает» и «показывает пусто» — два разных бага с разной серьёзностью.</p>
+  </details>
+
+  <details><summary>6 · Строка 15 — user["Role"] <span class="mark m-ok">верно</span></summary>
+    <div class="yours">«Роль с большой буквы» (ты записала как строку 14 — сама строка со словарём, обращение строкой ниже)</div>
+    <p><code class="i">KeyError: 'Role'</code>. Ключи чувствительны к регистру. Безопасное чтение — <code class="i">user.get("role")</code>: если ключа нет, вернётся <code class="i">None</code>, а не падение.</p>
+  </details>
+
+  <details><summary>7 · Строки 18–20 — «копия» <span class="mark m-half">½</span></summary>
+    <div class="yours">«Строка 19 — изменил значение роль на админа»</div>
+    <p>Строка 19 делает ровно то, что задумано. Баг виден в строке 20: печатается <code class="i">Роль Анны: admin</code>, хотя Анну никто не трогал. Причина — строка 18.</p>
+    <p><code class="i">admin = user</code> не создаёт второй словарь. Он даёт тому же самому словарю второе имя. Поменяла через <code class="i">admin</code> — поменялось и у <code class="i">user</code>, потому что это один объект. Копия — <code class="i">admin = user.copy()</code>.</p>
+    <p><b>Почему это важно тестировщику:</b> тест «вход под админом» испортил общие данные, и следующий тест «вход под пользователем» упадёт — не из-за бага в продукте, а из-за теста. Это постусловие из дня 12, только в коде.</p>
+  </details>
+
+  <details><summary>8 · Строки 24–26 — удаление в цикле <span class="mark m-half">½</span></summary>
+    <div class="yours">«Удаляет только один раз указанное значение»</div>
+    <p>Результат подмечен верно: один <code class="i">failed</code> остался. Но <code class="i">remove</code> тут ни при чём — он вызвался всего один раз, а не два. Вот что происходит на каждом проходе:</p>
+    <div class="scroll"><table>
+      <tr><th>Проход</th><th>Позиция</th><th><code class="i">r</code></th><th>Список после прохода</th></tr>
+      <tr><td>1</td><td>0</td><td>failed</td><td>[<b>failed</b>, passed, blocked] — первый удалён, всё сдвинулось влево</td></tr>
+      <tr><td>2</td><td>1</td><td>passed</td><td>[failed, passed, blocked] — второй failed встал на позицию 0, цикл его уже прошёл</td></tr>
+      <tr><td>3</td><td>2</td><td>blocked</td><td>[failed, passed, blocked]</td></tr>
+    </table></div>
+    <p>Цикл идёт по номерам позиций. Удалила элемент — соседний съехал на освободившееся место, и цикл через него перешагнул. <b>Правило: не удаляй из списка, по которому идёшь.</b> Собирай новый:</p>
+<pre>retest = []
+for r in results_all:
+    if r != "failed":
+        retest.append(r)</pre>
+  </details>
+
+  <div class="box task">
+    <div class="title">Пять минут руками — для пунктов 5, 7 и 8</div>
+    <p>Открой свой <code class="i">day14_hunt.py</code>, раскомментируй строки и добавь внутрь цикла <code class="i">print("r =", r, "| список:", retest)</code>. Запусти и сверь с таблицей выше. Для пункта 7 убедись глазами, что печатается <code class="i">admin</code>. Фактический результат пишут по экрану, а не по ожиданию.</p>
+  </div>
+
+  <div class="box card">
+    <div class="title">Что из этого общее</div>
+    <p>Три половинки — один и тот же пропуск: ты видишь <b>где</b>, но не дописываешь <b>что именно напечаталось</b>. Это та же структура, что в баг-репорте: шаги, фактический, ожидаемый. С завтрашнего дня находка в охоте записывается тремя частями: строка → что вышло → почему.</p>
+  </div>
+</div>
+
+<!-- 1 -->
+<div class="pane" data-title="Списки">
+  <h2>Списки</h2>
+  <p class="sub">15 минут</p>
+
+  <div class="box def">
+    <div class="title">[Бумага] Что такое список</div>
+    <p>Упорядоченный набор значений в квадратных скобках. Порядок сохраняется, повторы разрешены, менять можно.</p>
+  </div>
+<pre>statuses = ["passed", "failed", "blocked"]
+empty = []
+mixed = ["anna@test.ru", 8, True]   <span class="cm"># можно, но в тестовых данных лучше однотипно</span></pre>
+
+  <h3>Индексы и срезы — как у строк</h3>
+  <div class="scroll"><table>
+    <tr><th>Выражение</th><th>Для <code class="i">x = ["a", "b", "c", "d"]</code></th><th>Заметка</th></tr>
+    <tr><td class="mono">x[0]</td><td>"a"</td><td>первый</td></tr>
+    <tr><td class="mono">x[-1]</td><td>"d"</td><td>последний, длину считать не нужно</td></tr>
+    <tr><td class="mono">x[1:3]</td><td>["b", "c"]</td><td>правая граница не входит, как у <code class="i">range</code></td></tr>
+    <tr><td class="mono">x[:2]</td><td>["a", "b"]</td><td>первые два</td></tr>
+    <tr><td class="mono">x[4]</td><td>IndexError</td><td>индекс за пределами — падение</td></tr>
+    <tr><td class="mono">x[1:10]</td><td>["b", "c", "d"]</td><td>срез за пределами — не падает, молча обрезает</td></tr>
+  </table></div>
+  <p>Последняя пара — частый вопрос на собеседовании. Индекс обещает конкретный элемент, и если его нет — ошибка. Срез обещает «сколько есть в этом диапазоне», и пустой результат для него нормален.</p>
+
+  <h3>Главное отличие от строк: список меняется</h3>
+  <div class="box def">
+    <div class="title">[Бумага] Методы списка</div>
+    <div class="scroll"><table>
+      <tr><th>Действие</th><th>Код</th><th>Что возвращает</th></tr>
+      <tr><td>Заменить элемент</td><td class="mono">x[0] = "z"</td><td>—</td></tr>
+      <tr><td>Добавить в конец</td><td class="mono">x.append("e")</td><td>None</td></tr>
+      <tr><td>Вставить по индексу</td><td class="mono">x.insert(1, "q")</td><td>None</td></tr>
+      <tr><td>Добавить несколько</td><td class="mono">x.extend(["f", "g"])</td><td>None</td></tr>
+      <tr><td>Удалить по значению</td><td class="mono">x.remove("b")</td><td>None; только первое вхождение; нет значения — ValueError</td></tr>
+      <tr><td>Удалить по индексу и забрать</td><td class="mono">x.pop(), x.pop(0)</td><td>удалённый элемент</td></tr>
+      <tr><td>Отсортировать этот же</td><td class="mono">x.sort()</td><td>None</td></tr>
+      <tr><td>Новый отсортированный</td><td class="mono">sorted(x)</td><td>новый список, <code class="i">x</code> не тронут</td></tr>
+      <tr><td>Есть ли значение</td><td class="mono">"a" in x</td><td>True / False</td></tr>
+      <tr><td>Сколько раз встречается</td><td class="mono">x.count("a")</td><td>число</td></tr>
+      <tr><td>Где стоит</td><td class="mono">x.index("a")</td><td>индекс первого; нет — ValueError</td></tr>
+      <tr><td>Длина</td><td class="mono">len(x)</td><td>число</td></tr>
+    </table></div>
+  </div>
+
+  <div class="box note">
+    <div class="title">[Бумага] strip возвращает, sort меняет</div>
+    <p>Строка неизменяема: её методы возвращают <b>новую</b> строку, результат нужно присвоить — <code class="i">s = s.strip()</code>.</p>
+    <p>Список изменяем: его методы меняют <b>его самого</b> и возвращают <code class="i">None</code>. Присваивать не надо, иначе получишь находку 5 — <code class="i">x = x.sort()</code> заменит список на <code class="i">None</code>.</p>
+  </div>
+
+  <h3>Цикл по списку</h3>
+<pre>for status in statuses:
+    print(status)
+
+for i, status in enumerate(statuses, start=1):   <span class="cm"># нужен и номер</span>
+    print(f"TC-{i:03}: {status}")                 <span class="cm"># TC-001: passed</span></pre>
+  <p><code class="i">{i:03}</code> — число дополняется нулями до трёх знаков. Пригодится для номеров кейсов.</p>
+  <p>Нужен новый список из старого — пустой <b>до</b> цикла и <code class="i">append</code> внутри. Это накопитель из дня 6 и 13, только копится не число, а элементы. И правило то же: объявляется там, где начинается то, что он копит.</p>
+
+  <h3>Ссылка, а не копия</h3>
+<pre>a = [1, 2, 3]
+b = a            <span class="cm"># одно и то же, два имени</span>
+c = a.copy()     <span class="cm"># новый список</span>
+b.append(4)
+print(a)         <span class="cm"># [1, 2, 3, 4]</span>
+print(c)         <span class="cm"># [1, 2, 3]</span></pre>
+
+  <div class="box trap">
+    <div class="title">Две ловушки дня — обе из твоей охоты</div>
+    <ul>
+      <li><b><code class="i">b = a</code> не копирует.</b> Ни список, ни словарь. Копия — <code class="i">.copy()</code>.</li>
+      <li><b>Не удаляй из списка, по которому идёшь.</b> Цикл перешагнёт через соседний элемент. Собирай новый список.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 2 -->
+<div class="pane" data-title="Словари">
+  <h2>Словари, множества, кортежи</h2>
+  <p class="sub">20 минут</p>
+
+  <div class="box def">
+    <div class="title">[Бумага] Что такое словарь</div>
+    <p>Набор пар «ключ — значение» в фигурных скобках. Ищет не по номеру, а по имени. Ключи уникальны, значения — любые.</p>
+  </div>
+
+<pre>user = {"email": "anna@test.ru", "password": "Anna1234", "role": "user"}
+
+user["email"]               <span class="cm"># "anna@test.ru"</span>
+user["phone"]               <span class="cm"># KeyError</span>
+user.get("phone")           <span class="cm"># None, без падения</span>
+user.get("phone", "нет")    <span class="cm"># "нет" — значение по умолчанию</span>
+
+user["role"] = "admin"      <span class="cm"># изменить</span>
+user["attempts"] = 0        <span class="cm"># добавить: ключа не было — появится</span>
+del user["attempts"]        <span class="cm"># удалить</span>
+"email" in user             <span class="cm"># True — in проверяет КЛЮЧИ, не значения</span>
+len(user)                   <span class="cm"># 3 — число пар</span></pre>
+
+  <div class="box trap">
+    <div class="title">Запись по несуществующему ключу не падает</div>
+    <p><code class="i">user["Role"] = "admin"</code> молча создаст второй ключ рядом с <code class="i">"role"</code>. Опечатка в ключе при чтении — громкий <code class="i">KeyError</code>, при записи — тихий баг. Громкий лучше: его хотя бы видно.</p>
+  </div>
+
+  <h3>Три способа пройти по словарю</h3>
+<pre>for key in user:                   <span class="cm"># ключи</span>
+    print(key)
+for value in user.values():        <span class="cm"># значения</span>
+    print(value)
+for key, value in user.items():    <span class="cm"># пары — нужен чаще всего</span>
+    print(f"{key}: {value}")</pre>
+
+  <h3>Список словарей — это уже JSON</h3>
+<pre>users = [
+    {"email": "anna@test.ru", "role": "user",  "active": True},
+    {"email": "ivan@test.ru", "role": "admin", "active": False},
+]
+for u in users:
+    print(u["email"], u["role"])</pre>
+  <div class="box note">
+    <div class="title">Мостик к этапу 5</div>
+    <p>Ответ сервера на «дай список пользователей» выглядит ровно так. Автотест по API — это обращения к ключам и сравнение значений: пришёл ли <code class="i">"role"</code>, равен ли он <code class="i">"admin"</code>, сколько элементов в списке. Поэтому словари — фундамент, а не очередная тема.</p>
+  </div>
+
+  <h3>Кортежи, множества, генераторы списков</h3>
+  <div class="box def">
+    <div class="title">[Бумага] Ещё три структуры</div>
+    <div class="scroll"><table>
+      <tr><th>Что</th><th>Пример</th><th>Когда</th></tr>
+      <tr><td>Кортеж</td><td class="mono">size = (1920, 1080)</td><td>Неизменяемый список. Для данных, которые не должны меняться: разрешение экрана, пара логин–пароль в параметрах теста.</td></tr>
+      <tr><td>Множество</td><td class="mono">set(emails)</td><td>Только уникальные, без порядка. Найти дубли: если <code class="i">len(set(x)) != len(x)</code> — в данных есть повторы.</td></tr>
+      <tr><td>Генератор списка</td><td class="mono">[s.strip() for s in raw]</td><td>Короткая запись цикла с <code class="i">append</code>. Сегодня — уметь прочитать. Писать — после функций.</td></tr>
+    </table></div>
+  </div>
+  <p>Как читать генератор: «для каждого <code class="i">s</code> из <code class="i">raw</code> возьми <code class="i">s.strip()</code> и собери в список». То же самое длинно:</p>
+<pre>clean = []
+for s in raw:
+    clean.append(s.strip())</pre>
+
+  <div class="box card">
+    <div class="title">[Бумага] Когда что брать</div>
+    <p>Важен порядок и бывают повторы — <b>список</b>. Ищешь по имени — <b>словарь</b>. Нужны только уникальные — <b>множество</b>. Не должно меняться — <b>кортеж</b>.</p>
+  </div>
+</div>
+
+<!-- 3 -->
+<div class="pane" data-title="Тест-кейсы">
+  <h2>Два кейса к CP1</h2>
+  <p class="sub">30 минут. Было 3 из 20, после сегодня — 5</p>
+
+  <p>Оба на форму входа. Тексты сообщений — только из справочника дня 13, дословно.</p>
+  <div class="scroll"><table>
+    <tr><th>№</th><th>Когда</th><th>Текст</th></tr>
+    <tr><td>3.4</td><td>Пароль короче 8 или длиннее 20</td><td>Пароль должен содержать от 8 до 20 символов</td></tr>
+    <tr><td>3.5</td><td>В пароле нет цифры</td><td>Пароль должен содержать хотя бы одну цифру</td></tr>
+    <tr><td>3.6</td><td>В пароле нет заглавной</td><td>Пароль должен содержать хотя бы одну заглавную букву</td></tr>
+    <tr><td>3.7</td><td>Неверные данные или такого email нет</td><td>Неверный email или пароль</td></tr>
+    <tr><td>3.8</td><td>Пятая неверная попытка подряд</td><td>Слишком много попыток. Попробуйте через 15 минут</td></tr>
+  </table></div>
+  <p style="color:var(--soft);font-size:15.5px">Правила показа: одно сообщение на поле, первое нарушенное. 3.1–3.6 — под полем, 3.7–3.9 — над формой. После неудачи email остаётся, пароль очищается. Счётчика попыток нет.</p>
+
+  <h3>TC-004 · Пароль без цифры</h3>
+  <p>Негативный кейс на 3.5. Главное — данные: пароль ломает <b>ровно одно</b> правило. Прежде чем писать шаги, проверь свой вариант по длине и по заглавной.</p>
+
+  <h3>TC-005 · Блокировка после пятой неверной попытки</h3>
+  <p>Кейс на состояния: система помнит историю. Перед тем как писать — на бумаге:</p>
+  <ol>
+    <li>Какие номера попыток проверить вокруг числа 5 по правилу трёх проверок.</li>
+    <li>Что показывается на каждой из них — дословно и где.</li>
+    <li>Что будет со всеми следующими кейсами на этого пользователя, если блокировку не снять. Это постусловие.</li>
+  </ol>
+  <p>Если на какой-то вопрос в требованиях нет ответа — например, сбрасывается ли счётчик после успешного входа — пиши «уточнить у аналитика».</p>
+
+<pre class="light">ID:
+Название:
+Приоритет:
+Предусловие:
+Тестовые данные:
+Шаги:
+  1.
+  2.
+Ожидаемый результат:
+Постусловие:</pre>
+
+  <div class="box task">
+    <div class="title">Проверь сама перед отправкой</div>
+    <ul>
+      <li>Данные ломают ровно одно правило?</li>
+      <li>Текст сообщения дословно из справочника, и указано, где он появляется?</li>
+      <li>В ожидаемом результате есть состояние полей после попытки?</li>
+      <li>TC-005: граница 5 проверена с обеих сторон, а не только «на пятой заблокировало»?</li>
+      <li>Предусловие не ссылается на другой кейс?</li>
+    </ul>
+  </div>
+
+  <div class="box task">
+    <div class="title">[Репо]</div>
+    <p><code class="i">manual/test-cases.md</code> — дописать к трём существующим.</p>
+  </div>
+</div>
+
+<!-- 4 -->
+<div class="pane" data-title="Python">
+  <h2>Чистка, сводка, валидатор</h2>
+  <p class="sub">60 минут. Функций ещё нет — пишем сверху вниз</p>
+
+  <h3>Добор по чтению кода — 5 минут</h3>
+  <p>Два цикла из нашей переписки, без запуска. Таблица по проходам: номер прохода, значение переменной, сработало ли условие, что выполнилось. Пришли таблицы целиком — мне нужно увидеть, в какой строке разбор расходится с кодом.</p>
+<pre><span class="cm"># А</span>
+x = 1
+while x &lt; 50:
+    x *= 2
+    if x &gt; 10:
+        break
+    x += 1
+print(x)
+
+<span class="cm"># Б</span>
+s = 0
+for n in [5, 0, 3, 0, 2]:
+    if n == 0:
+        continue
+    s += n
+    s += 1
+print(s)</pre>
+
+  <h3>0. Разобранный пример — словарь-счётчик</h3>
+<pre>counts = {}
+for r in ["passed", "failed", "passed"]:
+    if r in counts:
+        counts[r] = counts[r] + 1
+    else:
+        counts[r] = 1
+print(counts)</pre>
+  <div class="scroll"><table>
+    <tr><th>Проход</th><th><code class="i">r</code></th><th><code class="i">r in counts</code></th><th>Ветка</th><th><code class="i">counts</code> после</th></tr>
+    <tr><td>до цикла</td><td>—</td><td>—</td><td>—</td><td class="mono">{}</td></tr>
+    <tr><td>1</td><td>"passed"</td><td>False</td><td>else</td><td class="mono">{'passed': 1}</td></tr>
+    <tr><td>2</td><td>"failed"</td><td>False</td><td>else</td><td class="mono">{'passed': 1, 'failed': 1}</td></tr>
+    <tr><td>3</td><td>"passed"</td><td>True</td><td>if</td><td class="mono">{'passed': 2, 'failed': 1}</td></tr>
+  </table></div>
+  <p>Без ветки <code class="i">else</code> на первом же проходе будет <code class="i">KeyError</code>: к ключу, которого нет, нельзя прибавить единицу.</p>
+
+  <h3>Задача 1 — чистка статусов</h3>
+  <h4>1. Что должно получиться</h4>
+<pre class="light">raw = ["passed", "failed", " passed", "blocked", "Passed", "failed ", "FAILED", "skipped"]
+allowed = ["passed", "failed", "blocked"]</pre>
+  <ol>
+    <li>Новый список <code class="i">clean</code>: каждый статус без пробелов по краям и в нижнем регистре. Циклом с <code class="i">append</code>, не генератором.</li>
+    <li>Сколько passed, failed и blocked — здесь можно <code class="i">count</code>.</li>
+    <li>Список <code class="i">unknown</code> из статусов, которых нет в <code class="i">allowed</code>.</li>
+    <li>В конце — <code class="i">raw</code>. Он должен остаться нетронутым.</li>
+  </ol>
+<pre class="light">passed: 3
+failed: 3
+blocked: 1
+Неизвестные статусы: ['skipped']
+Исходные данные: ['passed', 'failed', ' passed', 'blocked', 'Passed', 'failed ', 'FAILED', 'skipped']</pre>
+
+  <h4>2. Подсказки</h4>
+  <details><summary>Подсказка 1 — мягкая</summary>
+    <p>Два списка-накопителя, оба пустые до цикла. В одном цикле можно наполнять сразу оба: сначала почистить статус и положить в <code class="i">clean</code>, потом проверить <code class="i">not in allowed</code>.</p>
+  </details>
+  <details><summary>Подсказка 2 — скелет</summary>
+<pre>clean = []
+unknown = []
+for s in raw:
+    c = ...
+    clean.append(c)
+    if c not in allowed:
+        ...
+
+print("passed:", clean.count("passed"))
+...</pre>
+  </details>
+
+  <h3>Задача 2 — сводка прогона</h3>
+  <p>Допиши в тот же файл.</p>
+  <ol>
+    <li>Из <code class="i">clean</code> построй словарь <code class="i">counts</code> — циклом, как в примере, без <code class="i">count</code>.</li>
+    <li>Выведи каждую пару через <code class="i">.items()</code> в формате <code class="i">passed — 3</code>.</li>
+    <li>Процент прошедших с одним знаком после запятой. Ключа <code class="i">"passed"</code> может не быть — программа не должна падать.</li>
+    <li>Граничный случай: замени <code class="i">raw</code> на пустой список. Должно напечататься <code class="i">Прогон пуст</code>, а не <code class="i">ZeroDivisionError</code>. Потом верни данные.</li>
+  </ol>
+<pre class="light">passed — 3
+failed — 3
+blocked — 1
+skipped — 1
+Прошло: 37.5%</pre>
+  <details><summary>Подсказка — процент и пустой прогон</summary>
+    <p>Процент: <code class="i">counts.get("passed", 0) / len(clean) * 100</code>, округление — <code class="i">round(x, 1)</code>.</p>
+    <p>Деление на ноль — граница, ради неё пункт 4. Проверку <code class="i">if len(clean) == 0</code> ставят <b>до</b> деления, а не после.</p>
+  </details>
+
+  <h3>Задача 3 — валидатор паролей по справочнику</h3>
+  <h4>1. Что должно получиться</h4>
+<pre class="light">users = [
+    {"email": "anna@test.ru", "password": "Anna1234"},
+    {"email": "ivan@test.ru", "password": "Ivan123"},
+    {"email": "olga@test.ru", "password": "olga12345"},
+    {"email": "petr@test.ru", "password": "Petrpetrpetr"},
+    {"email": "max@test.ru",  "password": "Maxim1234567890123456"},
+    {"email": "lena@test.ru", "password": "Lena1234567890123456"},
+    {"email": "kate@test.ru", "password": "kate"},
+    {"email": "nina@test.ru", "password": ""},
+]</pre>
+  <p>Для каждого — email и одно сообщение: первое нарушенное правило в порядке 3.2 → 3.4 → 3.5 → 3.6. Всё выполнено — <code class="i">OK</code>. Перед запуском посчитай руками длину паролей Макса и Лены.</p>
+<pre class="light">anna@test.ru — OK
+ivan@test.ru — Пароль должен содержать от 8 до 20 символов
+olga@test.ru — Пароль должен содержать хотя бы одну заглавную букву
+petr@test.ru — Пароль должен содержать хотя бы одну цифру
+max@test.ru — Пароль должен содержать от 8 до 20 символов
+lena@test.ru — OK
+kate@test.ru — Пароль должен содержать от 8 до 20 символов
+nina@test.ru — Заполните поле</pre>
+
+  <h4>2. Разбор по шагам</h4>
+  <ol>
+    <li>Цикл по <code class="i">users</code>: на каждом проходе <code class="i">u</code> — целый словарь. Достань пароль в переменную.</li>
+    <li>Два флага до внутреннего цикла: <code class="i">has_digit = False</code>, <code class="i">has_upper = False</code>.</li>
+    <li>Внутренний цикл по символам пароля: <code class="i">isdigit()</code> → первый флаг в <code class="i">True</code>, <code class="i">isupper()</code> → второй.</li>
+    <li>Цепочка <code class="i">if / elif / else</code> в порядке справочника, результат — в переменную <code class="i">message</code>.</li>
+    <li>Одна строка печати после цепочки.</li>
+  </ol>
+  <details><summary>Подсказка — скелет</summary>
+<pre>for u in users:
+    password = u["password"]
+
+    has_digit = False
+    has_upper = False
+    for ch in password:
+        ...
+
+    if password == "":
+        message = "Заполните поле"
+    elif ...:
+        message = "Пароль должен содержать от 8 до 20 символов"
+    elif ...
+    else:
+        message = "OK"
+
+    print(f"{u['email']} — {message}")</pre>
+    <p>Внутри f-строки в двойных кавычках ключ пишется в одинарных: <code class="i">u['email']</code>.</p>
+  </details>
+
+  <h4>3. Что проверить</h4>
+  <div class="scroll"><table>
+    <tr><th>Пароль</th><th>Длина</th><th>Почему он здесь</th></tr>
+    <tr><td>Ivan123</td><td>7</td><td>на единицу ниже нижней границы</td></tr>
+    <tr><td>Anna1234</td><td>8</td><td>нижняя граница, включена</td></tr>
+    <tr><td>Lena1234567890123456</td><td>20</td><td>верхняя граница, включена</td></tr>
+    <tr><td>Maxim1234567890123456</td><td>21</td><td>на единицу выше верхней</td></tr>
+    <tr><td>kate</td><td>4</td><td>ломает три правила — показывается одно, первое</td></tr>
+  </table></div>
+
+  <div class="box trap">
+    <div class="title">Типичные ошибки этой задачи</div>
+    <ul>
+      <li><b>Флаги объявлены до внешнего цикла.</b> Тогда <code class="i">True</code> от Анны переедет к Ольге. Флаги сбрасываются для каждого пароля — значит, внутри внешнего цикла. Накопитель объявляется там, где начинается то, что он копит.</li>
+      <li><b><code class="i">&lt; 20</code> вместо <code class="i">&lt;= 20</code></b> — Лена получит ошибку длины.</li>
+      <li><b>Пустой пароль проверен не первым</b> — Нина получит сообщение про длину.</li>
+      <li><b>Несколько <code class="i">if</code> вместо <code class="i">elif</code></b> — Катя получит три сообщения.</li>
+    </ul>
+  </div>
+
+  <div class="box task">
+    <div class="title">Со звёздочкой</div>
+    <p>Собери словарь <code class="i">report</code>: ключ — email, значение — сообщение. После цикла одной строкой через множество выведи, сколько <b>разных</b> сообщений встретилось.</p>
+  </div>
+
+  <div class="box task">
+    <div class="title">[Репо]</div>
+    <p><code class="i">python/day14_hunt.py</code>, <code class="i">python/day14_clean.py</code> (задачи 1 и 2), <code class="i">python/day14_users.py</code>.</p>
+  </div>
+</div>
+
+<!-- 5 -->
+<div class="pane" data-title="Тест">
+  <h2>Тест</h2>
+  <p class="sub">10 вопросов, 12 минут</p>
+  <div id="quiz"></div>
+  <div class="score" id="score">Отвечено 0 из 10</div>
+</div>
+
+<!-- 6 -->
+<div class="pane" data-title="Итоги">
+  <h2>Закрываем день</h2>
+  <p class="sub">10 минут</p>
+
+  <div class="box note">
+    <div class="title">[Бумага]</div>
+    <ul>
+      <li><code class="i">strip</code> возвращает, <code class="i">sort</code> меняет. Строки неизменяемы, списки изменяемы.</li>
+      <li>Последний элемент — <code class="i">[-1]</code>. <code class="i">[len(x)]</code> — ошибка на единицу.</li>
+      <li><code class="i">b = a</code> — второе имя, не копия. Копия — <code class="i">.copy()</code>.</li>
+      <li>Не удаляю из списка, по которому иду циклом.</li>
+      <li><code class="i">d["key"]</code> падает, <code class="i">d.get("key")</code> — нет. <code class="i">in</code> у словаря проверяет ключи.</li>
+      <li>Словарь-счётчик: <code class="i">if r in counts</code> … <code class="i">else: counts[r] = 1</code>.</li>
+      <li>Когда список, словарь, множество, кортеж.</li>
+      <li>Находка = строка → что вышло → почему.</li>
+    </ul>
+  </div>
+
+  <div class="box card">
+    <div class="title">[Карточка] Новый блок L — списки и словари, 7 карточек</div>
+    <p>«Чем список отличается от кортежа?», «Чем список отличается от словаря и когда что брать?», «Почему <code class="i">x = x.sort()</code> — ошибка?», «Что делает <code class="i">b = a</code> со списком и как сделать копию?», «Чем <code class="i">d["k"]</code> отличается от <code class="i">d.get("k")</code>?», «Почему нельзя удалять из списка в цикле по нему?», «Как быстро проверить, есть ли в списке дубли?»</p>
+    <p>Добавлю в колоду после того, как пришлёшь работу. Первый прогон — день 16, вместе с E.</p>
+  </div>
+
+  <div class="box task">
+    <div class="title">[Репо]</div>
+<pre>git add python/day14_hunt.py python/day14_clean.py python/day14_users.py manual/test-cases.md
+git commit -m "День 14: списки и словари, TC-004 и TC-005"
+git push</pre>
+    <p>И уборка, если ещё не сделана: <code class="i">git rm -r --cached .idea</code>, <code class="i">.idea/</code> в <code class="i">.gitignore</code>, <code class="i">img.png</code> — в <code class="i">notes/images/</code> или удалить.</p>
+  </div>
+
+  <h3>Оценки дня</h3>
+  <div class="scroll"><table>
+    <tr><th>Часть</th><th>Результат</th><th>Оценка</th></tr>
+    <tr><td>Чтение кода</td><td>2 из 4; break — рецидив</td><td>5</td></tr>
+    <tr><td>Охота</td><td>6½ из 8</td><td>7</td></tr>
+    <tr><td>Тест-кейсы</td><td></td><td>—</td></tr>
+    <tr><td>Python</td><td></td><td>—</td></tr>
+    <tr><td>Тест</td><td></td><td>—</td></tr>
+    <tr><td><b>Итог дня</b></td><td></td><td>—</td></tr>
+  </table></div>
+
+  <div class="box def">
+    <div class="title">Что мне прислать</div>
+    <ol>
+      <li>Таблицы по двум циклам А и Б — целиком.</li>
+      <li>Что напечаталось у <code class="i">retest</code> внутри цикла.</li>
+      <li>TC-004 и TC-005.</li>
+      <li>Код трёх задач и вывод, включая вывод на пустом прогоне.</li>
+      <li>Номера вопросов теста, где ошиблась.</li>
+      <li>Сколько карточек из 12 уверенно с первого раза и общее время дня.</li>
+    </ol>
+  </div>
+
+  <h3>Дальше</h3>
+  <p>День 15 — требования, тест-план и ретро третьей недели.</p>
+</div>
+
+</div>
+
+<script>
+var Q=[
+{q:'Что вернёт [10, 20, 30][-1]?',o:['10','30','IndexError','[30]'],a:1,
+ e:'Отрицательный индекс считает с конца: -1 — последний элемент. Возвращается сам элемент, а не список из него.'},
+{q:'a = [3, 1, 2], затем b = a.sort(). Что в b?',o:['[1, 2, 3]','[3, 1, 2]','None','Ошибка'],a:2,
+ e:'sort() сортирует сам список a и возвращает None. Отсортирован теперь a, а в b — «ничего». Новый отсортированный список даёт sorted(a). Это твоя находка 5.'},
+{q:'a = [1, 2, 3], b = a, b.append(4). Чему равна len(a)?',o:['3','4','Ошибка','Зависит от версии Python'],a:1,
+ e:'b = a не создаёт копию: это два имени одного списка. Добавили через b — изменился и a. Это твоя находка 7, только со списком вместо словаря.'},
+{q:'d = {"role": "user"}. Что вернёт d.get("Role")?',o:['"user"','KeyError','None','""'],a:2,
+ e:'Ключи чувствительны к регистру, "Role" не существует. get на отсутствующем ключе возвращает None и не падает. d["Role"] упало бы с KeyError.'},
+{q:'Что вернёт [1, 2, 3, 4, 5][1:3]?',o:['[1, 2, 3]','[2, 3]','[2, 3, 4]','[1, 2]'],a:1,
+ e:'Срез начинается с индекса 1 (значение 2) и заканчивается перед индексом 3. Правая граница не входит — как в range и в срезах строк.'},
+{q:'Что вернёт "failed " in ["passed", "failed"]?',o:['True','False','Ошибка','None'],a:1,
+ e:'in по списку ищет точное совпадение. "failed " с пробелом и "failed" — разные строки. Поэтому данные нормализуют до поиска и подсчёта.'},
+{q:'d = {"email": "a@t.ru"}, затем d["Email"] = "b@t.ru". Сколько пар в d?',o:['1, значение заменилось','2','KeyError','0'],a:1,
+ e:'Запись по несуществующему ключу не падает, а создаёт новую пару. В словаре теперь и "email", и "Email" — тихий баг.'},
+{q:'retest = ["failed", "failed", "passed"]. Цикл for r in retest удаляет каждый "failed" через remove. Что останется?',o:['["passed"]','["failed", "passed"]','[]','Ошибка'],a:1,
+ e:'После удаления первого "failed" второй сдвигается на позицию 0, а цикл переходит к позиции 1 — там уже "passed". Второй "failed" пропущен. Не удаляй из списка, по которому идёшь.'},
+{q:'Пароль должен быть от 8 до 20 символов. Какие длины проверить на границах?',o:['8 и 20','7, 8, 20, 21','7, 8, 9, 19, 20, 21','8, 14, 20'],a:2,
+ e:'Правило трёх проверок у каждого числа из требований: ниже, само, выше. У 8 — 7, 8, 9; у 20 — 19, 20, 21. Вариант «7, 8, 20, 21» — двухточечный подход, его тоже спрашивают, но твоё рабочее правило — три точки.'},
+{q:'emails = ["a@t.ru", "b@t.ru", "a@t.ru"]. Что вернёт len(set(emails))?',o:['3','2','1','Ошибка'],a:1,
+ e:'Множество хранит только уникальные значения, дубль схлопнется. Если длина множества меньше длины списка — в тестовых данных есть повторы.'}
+];
+
+(function(){
+  var host=document.getElementById('quiz'),scoreEl=document.getElementById('score'),answered=0,right=0;
+  Q.forEach(function(item,i){
+    var box=document.createElement('div');box.className='q';
+    var t=document.createElement('div');t.className='qn';t.textContent='Вопрос '+(i+1);box.appendChild(t);
+    var qt=document.createElement('div');qt.textContent=item.q;box.appendChild(qt);
+    var opts=document.createElement('div');opts.className='opts';
+    var expl=document.createElement('div');expl.className='expl';expl.hidden=true;expl.textContent=item.e;
+    var locked=false;
+    item.o.forEach(function(text,j){
+      var b=document.createElement('button');b.className='opt';b.type='button';b.textContent=text;
+      b.onclick=function(){
+        if(locked)return;locked=true;answered++;if(j===item.a)right++;
+        [].forEach.call(opts.children,function(el,k){
+          if(k===item.a)el.classList.add('right');else if(k===j)el.classList.add('wrong');
+        });
+        expl.hidden=false;
+        scoreEl.textContent='Отвечено '+answered+' из '+Q.length+', верных '+right;
+      };
+      opts.appendChild(b);
+    });
+    box.appendChild(opts);box.appendChild(expl);host.appendChild(box);
+  });
+})();
+
+var panes=[].slice.call(document.querySelectorAll('.pane'));
+var tabs=document.getElementById('tabs');
+panes.forEach(function(p,i){
+  var b=document.createElement('button');b.type='button';
+  b.innerHTML='<span class="n">'+i+'</span>'+p.dataset.title;
+  b.onclick=function(){go(i);};
+  tabs.appendChild(b);
+  var nav=document.createElement('div');nav.className='nav';
+  var prev=document.createElement('button');prev.type='button';prev.textContent='← Назад';
+  prev.onclick=function(){go(i-1);};if(i===0)prev.disabled=true;
+  var next=document.createElement('button');next.type='button';next.className='next';
+  next.textContent=(i===panes.length-1)?'В начало':'Дальше →';
+  next.onclick=function(){go(i===panes.length-1?0:i+1);};
+  nav.appendChild(prev);nav.appendChild(next);p.appendChild(nav);
+});
+function go(i){
+  panes.forEach(function(p,j){p.classList.toggle('on',i===j);});
+  [].forEach.call(tabs.children,function(b,j){b.classList.toggle('on',i===j);});
+  try{tabs.children[i].scrollIntoView({block:'nearest',inline:'center'});}catch(e){}
+  try{localStorage.setItem('d14v2tab',String(i));}catch(e){}
+  window.scrollTo(0,0);
+}
+var start=0;
+try{var s=parseInt(localStorage.getItem('d14v2tab'),10);if(s>=0&&s<panes.length)start=s;}catch(e){}
+go(start);
+</script>
+
+</body></html>

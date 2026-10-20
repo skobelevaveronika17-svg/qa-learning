@@ -1,0 +1,224 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Роудмап · новый темп</title>
+<style>
+/* Оформление карты дня 13: светлая бумага, карточки этапов, цветные плашки по роли */
+:root{
+  --bg:#eef1f2; --paper:#fff; --ink:#1b2430; --soft:#4e5a67; --line:#d7dde0; --th:#f2f5f6;
+  --blue:#1f5fa9; --blue-bg:#e9f1fa; --red:#b0352b; --red-bg:#fbecea;
+  --green:#276f52; --green-bg:#e8f4ee; --amber:#9a6a00; --amber-bg:#fbf2df;
+  --violet:#5e4b8b; --violet-bg:#efebf8; --grey-bg:#f4f6f7;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.6;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:920px;margin:0 auto;padding-inline:18px;padding-block:0 70px}
+header{padding:34px 0 10px}
+.kicker{font-size:14px;color:var(--soft)}
+h1{font-size:33px;line-height:1.15;margin:.2em 0 .3em;text-wrap:balance}
+.lead{color:var(--soft);margin:0;max-width:64ch}
+h2{font-size:23px;margin:40px 0 6px;text-wrap:balance}
+h3{font-size:18px;margin:24px 0 6px}
+p{margin:12px 0}
+ul,ol{padding-left:22px}li{margin:5px 0}
+
+.box{border-left:4px solid;border-radius:0 8px 8px 0;padding:14px 18px;margin:18px 0}
+.box .t{font-weight:700;margin-bottom:4px}
+.def{border-color:var(--blue);background:var(--blue-bg)} .def .t{color:var(--blue)}
+.note{border-color:var(--green);background:var(--green-bg)} .note .t{color:var(--green)}
+.warn{border-color:var(--red);background:var(--red-bg)} .warn .t{color:var(--red)}
+.card{border-color:var(--amber);background:var(--amber-bg)} .card .t{color:var(--amber)}
+.box p:first-of-type{margin-top:2px}.box p:last-child{margin-bottom:2px}
+
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15.5px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--th);font-weight:600}
+td{font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto}
+tr.rest td{background:var(--green-bg)}
+tr.cp td{background:var(--amber-bg)}
+tr.sat td:first-child{font-weight:600}
+.pill{display:inline-block;font-size:12.5px;padding:1px 9px;border-radius:99px;font-weight:600;white-space:nowrap}
+.p-cp{background:var(--amber);color:var(--paper)}
+.p-rest{background:var(--green);color:var(--paper)}
+
+.day{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin:16px 0}
+.blk{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px;min-width:0}
+.blk h4{margin:0 0 2px;font-size:17px}
+.blk .when{font-size:14px;color:var(--soft);margin-bottom:8px}
+.blk ul{margin:0;padding-left:18px}
+.blk li{font-size:15.5px}
+.blk li span{color:var(--soft);font-variant-numeric:tabular-nums}
+.gap{grid-column:1/-1;text-align:center;font-size:14.5px;color:var(--soft);border:1px dashed var(--line);border-radius:10px;padding:8px}
+
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+.cmp > div{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px;min-width:0}
+.cmp .lbl{font-size:13.5px;color:var(--soft)}
+.cmp .big{font-size:26px;font-weight:700;line-height:1.2;margin:2px 0 6px}
+.cmp .now{border-color:var(--blue)}
+@media(max-width:640px){h1{font-size:26px}.cmp{grid-template-columns:1fr}}
+</style>
+
+<div class="wrap">
+
+<header>
+  <div class="kicker">Карта по роудмапу · пересобрана после дня 14 · 2 октября 2026</div>
+  <h1>Роудмап в новом темпе</h1>
+  <p class="lead">До 5 часов в будни и занятия по субботам. Ниже — как устроен такой день, что ускоряется, новая карта по неделям до выхода на рынок и первые две недели по дням.</p>
+</header>
+
+<div class="box def">
+  <div class="t">Короткий ответ</div>
+  <p>Было около 16 часов в неделю, станет около <b>26</b>. Выход на рынок сдвигается с <b>лета 2027</b> на <b>конец апреля — май 2027</b>, примерно на 2–3 месяца раньше.</p>
+  <p>Ускорение не в 1,6 раза, хотя часов в 1,6 раза больше. Новой теории в день больше не станет: голова усваивает примерно 2,5 часа нового, дальше читает, но не запоминает. Лишние часы уходят в <b>практику</b>: кейсы, баги, код, проекты, английский. Именно её проверяют на тестовых заданиях и собеседованиях, и именно её сейчас не хватает.</p>
+</div>
+
+<div class="cmp">
+  <div>
+    <div class="lbl">Было</div>
+    <div class="big">≈ 16 ч в неделю</div>
+    <p style="margin:0;font-size:15.5px">5 дней по 3:00–3:30, суббота и воскресенье свободны. Английский — 0 дней из положенных.</p>
+  </div>
+  <div class="now">
+    <div class="lbl">Станет</div>
+    <div class="big">≈ 26 ч в неделю</div>
+    <p style="margin:0;font-size:15.5px">5 будних дней по 4:30–5:00 в два захода, суббота 3:00–3:30, воскресенье — полный выходной.</p>
+  </div>
+</div>
+
+<h2>Как устроен будний день на 5 часов</h2>
+<p>Пять часов подряд — это не пять часов учёбы, а два с половиной и потом усталость. Поэтому день делится на два захода с большим перерывом. Новое — только в первом, на свежую голову.</p>
+
+<div class="day">
+  <div class="blk">
+    <h4>Заход 1 · новое</h4>
+    <div class="when">2:30 · как сейчас, без Python</div>
+    <ul>
+      <li>Карточки <span>15 мин</span></li>
+      <li>Чтение кода <span>10 мин</span></li>
+      <li>Охота на баги <span>25 мин</span></li>
+      <li>Разбор и теория <span>40 мин</span></li>
+      <li>Задание руками <span>30 мин</span></li>
+      <li>Тест <span>10 мин</span></li>
+      <li>Запас <span>20 мин</span></li>
+    </ul>
+  </div>
+  <div class="blk">
+    <h4>Заход 2 · руки</h4>
+    <div class="when">2:00 · практика, ничего нового</div>
+    <ul>
+      <li>Python: задачи по теме <span>60 мин</span></li>
+      <li>Практика к чекпоинту: кейсы, баги, SQL-задачи <span>30 мин</span></li>
+      <li>Английский <span>30 мин</span></li>
+      <li>Записи, коммит, пуш <span>в конце</span></li>
+    </ul>
+  </div>
+  <div class="gap">Между заходами — не меньше часа без экрана: прогулка, еда, дела по дому. Это не потерянное время, а время, когда запоминается.</div>
+</div>
+
+<div class="box note">
+  <div class="t">Почему Python переезжает во второй заход</div>
+  <p>Python — это руки: написать, запустить, исправить. Это лучше идёт после перерыва, чем новая теория. А в первом заходе остаётся место, чтобы разбирать тему без спешки — ты просила писать понятнее, и на это нужно время.</p>
+</div>
+
+<h3>Суббота — день практики, без новых тем</h3>
+<div class="scroll"><table>
+  <tr><th>Что</th><th>Время</th><th>Зачем</th></tr>
+  <tr><td>Карточки</td><td>15 мин</td><td>как в будни</td></tr>
+  <tr><td>Охота на живых сайтах и заведение багов в Jira</td><td>1:15</td><td>15 багов к CP1, потом — портфолио</td></tr>
+  <tr><td>Мини-проект недели</td><td>1:00</td><td>то, что попадёт в GitHub и в резюме</td></tr>
+  <tr><td>Доделки недели</td><td>30 мин</td><td>всё, что не закрылось в будни, — сюда, а не в удвоенный понедельник</td></tr>
+  <tr><td>Ретро недели</td><td>20 мин</td><td>переезжает с пятницы на субботу</td></tr>
+</table></div>
+
+<h2>Правила, без которых 26 часов не выдержать</h2>
+<div class="box warn">
+  <div class="t">Пять правил</div>
+  <ol>
+    <li><b>Воскресенье — полностью свободно.</b> Ни карточек, ни «чуть-чуть кода».</li>
+    <li><b>Новая теория — не дольше 2:30 в день.</b> Остальное время только практика и повторение.</li>
+    <li><b>Неделя разгрузки раз в шесть недель</b>: 2–2,5 часа в день, только повторение и доделки. Первая — 26–31 октября.</li>
+    <li><b>Пропущенный день не догоняется.</b> Он сдвигает карту на день. Пять часов плюс ещё три завтра — это путь к тому, чтобы бросить.</li>
+    <li><b>Сигнал откатиться</b> на прежние 3:30: два дня подряд тест ниже 6 из 10, или чувство «читаю — не запоминаю» три дня подряд. Это не провал, это настройка.</li>
+  </ol>
+</div>
+
+<div class="box card">
+  <div class="t">Пробуем две недели</div>
+  <p>Новый темп — эксперимент до <b>субботы 17 октября</b>. В этот день CP1 и ретро. По оценкам и твоему самочувствию решим: оставляем, режем до 4 часов или возвращаемся к 3:30.</p>
+</div>
+
+<h2>Новая карта по неделям</h2>
+<p>Номер недели считается от начала учёбы. Даты — понедельник–суббота. Зелёные строки — разгрузка, жёлтые — чекпоинты.</p>
+
+<div class="scroll"><table>
+  <tr><th>Неделя</th><th>Даты</th><th>Этап и темы</th><th>Практика</th></tr>
+  <tr><td>4</td><td>3–10 окт</td><td><b>Этап 1 закрываем:</b> требования и тест-план, процессы (SDLC, STLC, Scrum), HTML и CSS для поиска элементов, куки и сессии, кросс-браузерное. <b>Python:</b> функции, JSON</td><td>Тест-кейсы до 10. Jira, перенос репортов, +5 багов. Старт проекта «генератор тестовых данных»</td></tr>
+  <tr class="cp"><td>5</td><td>12–17 окт</td><td><b>Python:</b> модули и окружение, файлы, исключения. <b>Git:</b> ветки, слияние, конфликты, pull request</td><td>Кейсы до 20, баги до 15. <span class="pill p-cp">CP1 · сб 17 окт</span></td></tr>
+  <tr><td>6</td><td>19–24 окт</td><td><b>Python:</b> ООП — классы, объекты, наследование</td><td>Мини-проекты 1–2</td></tr>
+  <tr class="rest"><td>7</td><td>26–31 окт</td><td><span class="pill p-rest">Разгрузка</span> Повторение, карточки, доделки</td><td>Английский — как обычно</td></tr>
+  <tr><td>8</td><td>2–7 ноя</td><td><b>Python:</b> comprehensions, декораторы, генераторы. <b>Этап 2 закрыт</b></td><td>Мини-проекты 3–5</td></tr>
+  <tr><td>9–10</td><td>9–21 ноя</td><td><b>Этап 4 · SQL:</b> SELECT, WHERE, JOIN, GROUP BY, подзапросы</td><td>50 SQL-задач, по 5 в день во втором заходе</td></tr>
+  <tr class="cp"><td>11</td><td>23–28 ноя</td><td>SQL — доделка. Git — свободно</td><td>ООП-проект в портфолио. <span class="pill p-cp">CP2 · сб 28 ноя</span></td></tr>
+  <tr><td>12</td><td>30 ноя – 5 дек</td><td><b>Этап 5 · API:</b> REST, HTTP глубже, Postman</td><td>Коллекция Postman на учебный API</td></tr>
+  <tr class="rest"><td>13</td><td>7–12 дек</td><td><span class="pill p-rest">Разгрузка</span></td><td></td></tr>
+  <tr><td>14–16</td><td>14 дек – 2 янв</td><td><b>API:</b> Swagger, библиотека requests, первые автотесты API. 31 дек – 2 янв — выходные</td><td>Репозиторий API-тестов</td></tr>
+  <tr class="cp"><td>17–18, 20</td><td>4–16 янв, 25–30 янв</td><td><b>Этап 6 · pytest:</b> фикстуры, параметризация, Allure</td><td>API-тесты на pytest. <span class="pill p-cp">CP3 · сб 30 янв</span></td></tr>
+  <tr class="rest"><td>19</td><td>18–23 янв</td><td><span class="pill p-rest">Разгрузка</span></td><td></td></tr>
+  <tr class="cp"><td>21–24, 26</td><td>1–27 фев, 8–13 мар</td><td><b>Этап 7 · UI-автоматизация:</b> Selenium глубоко, Page Object, Playwright обзорно</td><td>UI-фреймворк, 25+ тестов. <span class="pill p-cp">CP4 · сб 13 мар</span></td></tr>
+  <tr class="rest"><td>25</td><td>1–6 мар</td><td><span class="pill p-rest">Разгрузка</span></td><td></td></tr>
+  <tr class="cp"><td>27–28</td><td>15–27 мар</td><td><b>Этап 8:</b> Linux, Docker, CI/CD — GitLab CI, Jenkins, GitHub Actions</td><td>Зелёный CI на своём проекте. <span class="pill p-cp">CP5 · сб 27 мар</span></td></tr>
+  <tr class="cp"><td>29–33</td><td>29 мар – 1 мая</td><td><b>Этап 9:</b> финальный проект UI + API + БД, резюме, мок-интервью. Разгрузка — 12–17 апреля</td><td>Отклики с апреля. <span class="pill p-cp">CP6 · сб 1 мая</span></td></tr>
+</table></div>
+
+<div class="box def">
+  <div class="t">Где запас</div>
+  <p>По часам эта карта собрана с запасом около 20%. Он нужен на болезни, сложные темы и неделю, когда всё пойдёт тяжело. Если запас не понадобится, отклики начнутся раньше — с CP5, в конце марта, когда в портфолио уже будут API- и UI-тесты.</p>
+  <p>Карта пересчитывается на каждом чекпоинте. Даты дальше CP2 — ориентир, а не обещание.</p>
+</div>
+
+<h2>Чекпоинты: было и стало</h2>
+<div class="scroll"><table>
+  <tr><th>Чекпоинт</th><th>Что должно быть</th><th>Было по плану</th><th>Стало</th></tr>
+  <tr><td><b>CP1</b></td><td>20 тест-кейсов, 15 багов в трекере, Python: функции и словари уверенно, контрольная по границам</td><td>конец октября</td><td><b>17 октября</b></td></tr>
+  <tr><td>CP2</td><td>ООП-проект, 50 SQL-задач, свободный Git</td><td>середина января</td><td><b>28 ноября</b></td></tr>
+  <tr><td>CP3</td><td>API-автотесты на pytest с Allure</td><td>середина марта</td><td><b>30 января</b></td></tr>
+  <tr><td>CP4</td><td>UI-фреймворк на Page Object, 25+ тестов</td><td>середина мая</td><td><b>13 марта</b></td></tr>
+  <tr><td>CP5</td><td>Docker и зелёный CI</td><td>середина июня</td><td><b>27 марта</b></td></tr>
+  <tr><td>CP6</td><td>Финальный проект, резюме, отклики</td><td>август</td><td><b>1 мая</b></td></tr>
+</table></div>
+
+<h2>Первые две недели по дням</h2>
+<p>Заход 1 — тема дня. Заход 2 — Python и практика. Английский — каждый будний день во втором заходе.</p>
+
+<div class="scroll"><table>
+  <tr><th>День</th><th>Дата</th><th>Заход 1 · новое</th><th>Заход 2 · руки</th></tr>
+  <tr class="sat"><td>15</td><td>сб 3 окт</td><td colspan="2">Требования, тест-план, ретро недели 3 — файл уже готов, около 3 часов. Суббота в этот раз учебная, а не практическая</td></tr>
+  <tr><td>16</td><td>пн 5 окт</td><td>Python: функции — аргументы, return, область видимости</td><td>Задачи на функции · TC-004 и TC-005</td></tr>
+  <tr><td>17</td><td>вт 6 окт</td><td>HTML и CSS: структура страницы, селекторы, поиск элементов</td><td>Валидатор паролей переписываем функциями · TC-006</td></tr>
+  <tr><td>18</td><td>ср 7 окт</td><td>Python: функции, часть 2, и JSON</td><td>Старт проекта «генератор тестовых данных» · TC-007</td></tr>
+  <tr><td>19</td><td>чт 8 окт</td><td>Процессы: SDLC, STLC, Scrum, shift-left</td><td>Генератор: запись в JSON · TC-008</td></tr>
+  <tr><td>20</td><td>пт 9 окт</td><td>Куки, сессии, кросс-браузерное. <b>Этап 1 закрыт</b></td><td>Задачи на JSON · TC-009, TC-010</td></tr>
+  <tr class="sat"><td>21</td><td>сб 10 окт</td><td colspan="2">Jira: завести, перенести старые репорты, +5 багов на тренировочных сайтах. Генератор — доделка. Ретро недели 4</td></tr>
+  <tr><td>22</td><td>пн 12 окт</td><td>Python: модули, pip, виртуальное окружение</td><td>Генератор — разбить на модули · TC-011, TC-012 · 2 бага</td></tr>
+  <tr><td>23</td><td>вт 13 окт</td><td>Git: ветки, слияние, конфликты</td><td>Ломаем ветку нарочно и чиним · TC-013, TC-014 · 2 бага</td></tr>
+  <tr><td>24</td><td>ср 14 окт</td><td>Python: файлы — чтение и запись</td><td>Генератор читает настройки из файла · TC-015, TC-016 · 2 бага</td></tr>
+  <tr><td>25</td><td>чт 15 окт</td><td>Python: исключения. Git: pull request, stash, reset и revert</td><td>Генератор не падает на плохом файле · TC-017, TC-018 · 2 бага</td></tr>
+  <tr><td>26</td><td>пт 16 окт</td><td>Повторение к CP1: границы, тест-дизайн, словари и функции</td><td>TC-019, TC-020 · 2 бага</td></tr>
+  <tr class="cp sat"><td>27</td><td>сб 17 окт</td><td colspan="2"><span class="pill p-cp">CP1</span> Контрольная по границам и Python. Проверка 20 кейсов и 15 багов. Ретро двух недель нового темпа</td></tr>
+</table></div>
+<p style="color:var(--soft);font-size:15px">Баги: 2 уже есть, +5 в субботу 10 октября, +10 по два в день на неделе 5 — итого 17, с запасом на те, что не примут.</p>
+
+<div class="box card">
+  <div class="t">Карточки в новом темпе</div>
+  <p>Потолок остаётся тем же — 15 минут и 12 карточек в день. Он про внимание, а не про свободное время. Зато теперь шесть прогонов в неделю вместо пяти, и колода не будет отставать от новых блоков. Расписание карточек пересоберу на ретро в субботу.</p>
+</div>
+
+<div class="box warn">
+  <div class="t">Английский — теперь у него есть место</div>
+  <p>30 минут каждый будний день во втором заходе — 2,5 часа в неделю. Формат подберу, когда ответишь на вопрос в ретро дня 15: от того, что мешало, зависит, что именно предложить.</p>
+</div>
+
+</div>
+
+</body></html>

@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>День 8 — Строки в Python</title>
+<style>
+:root{
+  --bg:#eef1f2; --paper:#fff; --ink:#1b2430; --soft:#4e5a67; --line:#d7dde0;
+  --blue:#1f5fa9; --blue-bg:#e9f1fa;
+  --red:#b0352b; --red-bg:#fbecea;
+  --green:#276f52; --green-bg:#e8f4ee;
+  --amber:#9a6a00; --amber-bg:#fbf2df;
+  --violet:#5e4b8b; --violet-bg:#efebf8;
+  --code:#18222c;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.62;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:0 18px 60px}
+header{padding:34px 0 14px}
+.day{font-size:14px;color:var(--soft)}
+h1{font-size:33px;line-height:1.15;margin:.2em 0 .3em}
+.lead{color:var(--soft);margin:0;max-width:62ch}
+
+.tabs{position:sticky;top:0;z-index:30;background:var(--bg);padding:10px 0 8px;
+  display:flex;gap:6px;overflow-x:auto;border-bottom:1px solid var(--line)}
+.tabs button{flex:0 0 auto;background:var(--paper);border:1px solid var(--line);border-radius:8px;
+  padding:8px 13px;font:inherit;font-size:14.5px;color:var(--soft);cursor:pointer;white-space:nowrap}
+.tabs button:hover{background:#f6f9fa}
+.tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink);font-weight:600}
+.tabs button .n{opacity:.55;margin-right:6px}
+
+.pane{display:none;background:var(--paper);border:1px solid var(--line);border-top:0;
+  border-radius:0 0 12px 12px;padding:28px 30px 34px}
+.pane.on{display:block}
+.pane h2{margin:0 0 6px;font-size:26px;line-height:1.2}
+.pane .sub{color:var(--soft);margin:0 0 20px;font-size:15.5px}
+h3{font-size:19.5px;margin:28px 0 8px}
+h4{font-size:17px;margin:20px 0 6px}
+p{margin:12px 0}
+ul,ol{padding-left:24px}li{margin:6px 0}
+code.i{background:#eef1f3;border:1px solid var(--line);border-radius:4px;padding:1px 5px;
+ font-family:Consolas,monospace;font-size:.92em}
+
+.box{border-left:4px solid;border-radius:0 8px 8px 0;padding:14px 18px;margin:18px 0}
+.box .title{font-weight:700;margin-bottom:4px}
+.def{border-color:var(--blue);background:var(--blue-bg)} .def .title{color:var(--blue)}
+.trap{border-color:var(--red);background:var(--red-bg)} .trap .title{color:var(--red)}
+.note{border-color:var(--green);background:var(--green-bg)} .note .title{color:var(--green)}
+.card{border-color:var(--amber);background:var(--amber-bg)} .card .title{color:var(--amber)}
+.box p:first-of-type{margin-top:2px}.box p:last-child{margin-bottom:2px}
+
+pre{background:var(--code);color:#e6edf3;border-radius:8px;padding:15px 17px;overflow-x:auto;margin:14px 0}
+pre code{font-family:Consolas,monospace;font-size:14.5px;line-height:1.55;white-space:pre}
+.kw{color:#ff9db8}.bi{color:#8fd3ff}.st{color:#b6e7a8}.cm{color:#8b98a5;font-style:italic}.nu{color:#ffd28c}
+.out{background:#f4f6f7;border:1px dashed var(--line);border-radius:8px;padding:13px 16px;
+ font-family:Consolas,monospace;font-size:14.5px;white-space:pre-wrap;margin:14px 0;color:#2c3a46}
+
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15.5px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:#f2f5f6;font-weight:600}
+td.v{background:#f2f9f5}td.x{background:#fdf2f1}
+.scroll{overflow-x:auto}
+.mono{font-family:Consolas,monospace}
+
+details{border:1px solid var(--line);background:#fcfcfd;border-radius:8px;padding:10px 14px;margin:8px 0}
+summary{cursor:pointer;font-weight:600;color:var(--violet)}
+details[open] summary{margin-bottom:8px}
+
+.tk{border:1px solid var(--line);border-left:5px solid var(--violet);border-radius:0 12px 12px 0;
+ padding:20px 24px;margin:24px 0;background:#fcfbff}
+.tk h3{margin-top:0;color:var(--violet)}
+.tk .file{font-family:Consolas,monospace;font-size:14px;color:var(--soft)}
+.part{margin:20px 0 0}.part>b{display:block;margin-bottom:2px}
+
+.q{border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:16px 0}
+.qn{font-weight:700;margin-bottom:6px}
+.opts{display:grid;gap:8px;margin-top:12px}
+.opt{text-align:left;background:#f6f8f9;border:1px solid var(--line);border-radius:8px;
+ padding:10px 14px;cursor:pointer;font:inherit;font-size:16px;color:var(--ink)}
+.opt:hover{background:#eaf0f3}
+.opt.right{background:var(--green-bg);border-color:var(--green);font-weight:600}
+.opt.wrong{background:var(--red-bg);border-color:var(--red)}
+.expl{display:none;margin-top:12px;padding:12px 14px;background:#f4f6f7;border-radius:8px}
+.score{position:sticky;bottom:0;background:var(--paper);border:1px solid var(--line);
+ border-radius:10px;padding:12px 18px;margin-top:18px;font-weight:600}
+
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:34px;padding-top:18px;border-top:1px solid var(--line)}
+.nav button{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 16px;
+ font:inherit;cursor:pointer;color:var(--ink)}
+.nav button:hover{background:#f2f5f6}
+.nav button[disabled]{opacity:.35;cursor:default}
+.nav .next{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+.term{background:#0f1720;color:#d6e2ec;border-radius:8px;padding:12px 14px;font-family:Consolas,monospace;
+ font-size:14.5px;display:flex;justify-content:space-between;align-items:center;gap:12px;margin:10px 0}
+.term button{background:#2b3d4d;color:#e7f0f7;border:0;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:13px}
+@media(max-width:640px){.pane{padding:20px 17px 26px}h1{font-size:27px}.tk{padding:16px 18px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="day">День 8 · Python</div>
+  <h1>Строки: где прячется половина багов валидации</h1>
+  <p class="lead">Сегодня начинаем не с теории, а с охоты. Даю код с багами — ищешь. Методы строк появятся как ответ на то, что ты сама найдёшь.</p>
+</header>
+
+<div class="tabs" id="tabs"></div>
+
+<!-- 0 -->
+<div class="pane" data-title="Карточки">
+  <h2>Разминка</h2>
+  <p class="sub">12 минут</p>
+
+  <p>По графику сегодня два блока:</p>
+  <ul>
+    <li><b>D — условия</b>, 2-й прогон. 8 карточек.</li>
+    <li><b>C — тест-дизайн</b>, 1-й прогон. 8 карточек.</li>
+  </ul>
+
+  <p>Блок C прогоняешь впервые, там будут запинки — это нормально и так задумано. Первый проход всегда разведка.</p>
+
+  <div class="box note">
+    <div class="title">Напоминание про метод</div>
+    <p>Отвечать вслух и целиком, до того как открыла ответ. Мысленный ответ не считается: на собеседовании ты будешь говорить ртом.</p>
+  </div>
+
+  <div class="box def">
+    <div class="title">Как устроен сегодняшний день</div>
+    <p>Первая вкладка после карточек — охота на баги в готовом коде. Дальше теория, но уже прицельно: под то, что ты в этом коде найдёшь. Потом четыре задачи и тест.</p>
+    <p>Потолок — <b>2 часа 15 минут</b>. Плюс сорок минут на хвосты дня 7, если они ещё не доделаны.</p>
+  </div>
+</div>
+
+<!-- 1 -->
+<div class="pane" data-title="Охота на баги">
+  <h2>Найди, что сломано</h2>
+  <p class="sub">20 минут. Не запуская код</p>
+
+  <p>Перед тобой валидатор имени. Требование к полю: <b>имя от 2 до 30 символов, не пустое, пробелы по краям недопустимы</b>.</p>
+
+<pre><code>name = input("Введите имя: ")
+
+name.strip()
+
+if name == "":
+    print("Имя не может быть пустым")
+elif len(name) &lt; 2:
+    print("Имя слишком короткое")
+elif len(name) &gt; 30:
+    print("Имя слишком длинное")
+else:
+    print(f"Здравствуйте, {name}!")</code></pre>
+
+  <p>Код выглядит аккуратно. Отступы на месте, цепочка условий выстроена от строгого к мягкому, <code class="i">else</code> в конце есть — всё, чему ты училась на дне 5, соблюдено.</p>
+
+  <p>Прогони его в голове на четырёх входах и запиши свои ответы <b>до того</b>, как откроешь разбор.</p>
+
+  <div class="scroll"><table>
+    <tr><th>Что вводит пользователь</th><th>Что должно быть по требованию</th><th>Что выведет этот код</th></tr>
+    <tr><td class="mono">anna</td><td>Приветствие</td><td>?</td></tr>
+    <tr><td class="mono">&nbsp;&nbsp;&nbsp;anna&nbsp;&nbsp;&nbsp;</td><td>Приветствие, пробелы убраны</td><td>?</td></tr>
+    <tr><td class="mono">(три пробела)</td><td>Отказ: имя пустое</td><td>?</td></tr>
+    <tr><td class="mono">a</td><td>Отказ: слишком короткое</td><td>?</td></tr>
+  </table></div>
+
+  <details>
+    <summary>Разбор — открывать после того, как записала свои ответы</summary>
+    <p><b>Строка 1 — ввод «anna».</b> Отработает правильно. Единственный случай, который работает.</p>
+    <p><b>Строка 2 — ввод с пробелами по краям.</b> Выведет <code class="i">Здравствуйте, &nbsp;&nbsp;anna&nbsp;&nbsp;!</code> — пробелы остались. В базу уйдёт имя с пробелами, и потом при поиске по точному совпадению этот пользователь не найдётся.</p>
+    <p><b>Строка 3 — три пробела.</b> Выведет <code class="i">Здравствуйте, &nbsp;&nbsp;&nbsp;!</code> Строка из трёх пробелов не равна пустой строке, а длина у неё 3 — проходит все проверки. Регистрация с пустым именем.</p>
+    <p><b>Строка 4 — одна буква.</b> Отработает правильно, отказ.</p>
+    <p><b>Причина у всех трёх проблем одна:</b> строка <code class="i">name.strip()</code> не делает ничего.</p>
+  </details>
+
+  <div class="box trap">
+    <div class="title">Вот он, главный баг дня</div>
+    <p><code class="i">name.strip()</code> вычисляет очищенную строку и <b>выбрасывает её</b>. Сама переменная <code class="i">name</code> остаётся прежней.</p>
+    <p>Правильно: <code class="i">name = name.strip()</code></p>
+    <p>Ошибки при этом нет. Программа не падает, PyCharm не подсвечивает красным. Она просто тихо работает неправильно — в точности как обнулённый накопитель внутри цикла на дне 6.</p>
+  </div>
+
+  <p>Ты уже встречала этот баг, просто с другой стороны: на дне 5 в твоём <code class="i">validator.py</code> три пробела проходили как корректное имя. Тогда я сказал «разберём на восьмом дне». Разбираем.</p>
+
+  <div class="box def">
+    <div class="title">Что нужно, чтобы это починить</div>
+    <ol>
+      <li>Понять, почему методы строк не меняют строку — следующая вкладка.</li>
+      <li>Знать, какие методы вообще есть — две вкладки после.</li>
+      <li>Знать, в каком порядке ставить проверки, чтобы очистка сработала до них.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- 2 -->
+<div class="pane" data-title="Строка изнутри">
+  <h2>Как устроена строка</h2>
+  <p class="sub">15 минут</p>
+
+  <div class="box def">
+    <div class="title">Строка</div>
+    <p>Последовательность символов. Каждый символ имеет номер — <b>индекс</b>. Нумерация идёт с нуля.</p>
+  </div>
+
+  <div class="scroll"><table>
+    <tr><th>Символ</th><td class="mono">P</td><td class="mono">y</td><td class="mono">t</td><td class="mono">h</td><td class="mono">o</td><td class="mono">n</td></tr>
+    <tr><th>Индекс</th><td class="mono">0</td><td class="mono">1</td><td class="mono">2</td><td class="mono">3</td><td class="mono">4</td><td class="mono">5</td></tr>
+    <tr><th>С конца</th><td class="mono">-6</td><td class="mono">-5</td><td class="mono">-4</td><td class="mono">-3</td><td class="mono">-2</td><td class="mono">-1</td></tr>
+  </table></div>
+
+<pre><code>word = "Python"
+
+print(word[0])     # P — первый символ
+print(word[5])     # n — последний
+print(word[-1])    # n — последний, короче и надёжнее
+print(len(word))   # 6 — количество символов</code></pre>
+
+  <p>Отрицательные индексы удобны тем, что не нужно знать длину: <code class="i">word[-1]</code> — всегда последний символ, какой бы длины ни была строка.</p>
+
+  <div class="box trap">
+    <div class="title">Ловушка: индекс на единицу больше длины</div>
+    <p>В строке из 6 символов последний индекс — 5, потому что счёт с нуля. Обращение к <code class="i">word[6]</code> даёт <code class="i">IndexError</code>. Та же ошибка на единицу, что и в <code class="i">range</code>, и в границе 4999 — третья её форма за неделю.</p>
+  </div>
+
+  <h3>Срезы</h3>
+  <p>Можно взять не один символ, а кусок:</p>
+
+<pre><code>word = "Python"
+
+print(word[0:3])   # Pyt — с 0 по 3, тройка не включается
+print(word[2:])    # thon — с 2 и до конца
+print(word[:4])    # Pyth — с начала по 4
+print(word[-3:])   # hon — последние три</code></pre>
+
+  <div class="box trap">
+    <div class="title">Правая граница снова не входит</div>
+    <p><code class="i">[0:3]</code> берёт символы 0, 1, 2. Ровно как <code class="i">range(0, 3)</code>. Логика в Python везде одна: левая граница включается, правая нет. Запомнишь один раз — будет работать и для срезов, и для циклов.</p>
+  </div>
+
+  <h3>Перебор символов</h3>
+  <p>Строку можно пройти циклом, ты это уже делала на дне 6:</p>
+
+<pre><code>for letter in "кот":
+    print(letter)</code></pre>
+
+  <p>Это понадобится сегодня в задаче про пароль: чтобы проверить «есть ли в пароле хотя бы одна цифра», нужно пройти по символам и посмотреть каждый.</p>
+
+  <div class="box note">
+    <div class="title">В тетрадь</div>
+    <p>Таблицу индексов для слова Python — с прямыми и отрицательными. И правило: левая граница среза входит, правая нет.</p>
+  </div>
+</div>
+
+<!-- 3 -->
+<div class="pane" data-title="Неизменяемость">
+  <h2>Почему методы не меняют строку</h2>
+  <p class="sub">15 минут. Самая важная вкладка дня</p>
+
+  <div class="box def">
+    <div class="title">Строки неизменяемы</div>
+    <p>Созданную строку нельзя изменить. Любой метод, который «меняет» строку, на самом деле создаёт <b>новую</b> и возвращает её. Исходная остаётся нетронутой.</p>
+  </div>
+
+  <p>Отсюда правило, из которого следует всё остальное:</p>
+
+<pre><code>name = "  anna  "
+
+name.strip()          # результат вычислен и выброшен
+print(name)           # "  anna  " — ничего не изменилось
+
+name = name.strip()   # результат сохранён обратно в переменную
+print(name)           # "anna"</code></pre>
+
+  <div class="box trap">
+    <div class="title">Почему на этом спотыкаются все</div>
+    <p>Потому что запись <code class="i">name.strip()</code> читается как приказ: «имя, очистись». А на самом деле это вопрос: «как выглядело бы имя, если его очистить?» Ответ приходит и, если его никуда не положить, теряется.</p>
+    <p>Правило на каждый день: <b>увидела метод строки без знака <code class="i">=</code> слева — почти наверняка баг.</b></p>
+  </div>
+
+  <p>Попытка изменить символ напрямую тоже не сработает, но здесь Python хотя бы честно ругается:</p>
+
+<pre><code>word = "кот"
+word[0] = "р"        # TypeError: строка не поддерживает присваивание по индексу</code></pre>
+
+  <p>Чтобы получить «рот», нужно собрать новую строку: <code class="i">word = "р" + word[1:]</code></p>
+
+  <h3>Зачем язык так устроен</h3>
+  <p>Неизменяемость даёт предсказуемость. Если ты передала строку в функцию, можно быть уверенной, что функция её не испортила: вернуть она может что угодно, но твоя переменная останется прежней. Для тестировщика это важно: строки не меняются «где-то там» сами по себе.</p>
+
+  <div class="box card">
+    <div class="title">На карточку</div>
+    <p>Что вернёт <code class="i">name.strip()</code>, если не присвоить результат? — Ничего не изменится: строки неизменяемы, метод возвращает новую строку, а старая остаётся. Нужно <code class="i">name = name.strip()</code>.</p>
+  </div>
+
+  <div class="box note">
+    <div class="title">В errors-log.md</div>
+    <p>«Метод строки без присваивания не меняет переменную. Ошибки нет, поведение неверное.» Эта строка сэкономит тебе часы на ближайшие месяцы.</p>
+  </div>
+</div>
+
+<!-- 4 -->
+<div class="pane" data-title="Очистка и регистр">
+  <h2>Методы: очистка и регистр</h2>
+  <p class="sub">20 минут</p>
+
+  <h3>Убрать пробелы</h3>
+  <div class="scroll"><table>
+    <tr><th>Метод</th><th>Что делает</th><th>Пример</th><th>Результат</th></tr>
+    <tr><td class="mono">.strip()</td><td>убирает пробелы с обоих краёв</td><td class="mono">"  anna  ".strip()</td><td class="mono">"anna"</td></tr>
+    <tr><td class="mono">.lstrip()</td><td>только слева</td><td class="mono">"  anna  ".lstrip()</td><td class="mono">"anna  "</td></tr>
+    <tr><td class="mono">.rstrip()</td><td>только справа</td><td class="mono">"  anna  ".rstrip()</td><td class="mono">"  anna"</td></tr>
+  </table></div>
+
+  <div class="box trap">
+    <div class="title">strip чистит только края</div>
+    <p><code class="i">"  a b  ".strip()</code> даёт <code class="i">"a b"</code> — пробел между a и b остаётся. Для внутренних пробелов нужен <code class="i">.replace()</code>.</p>
+    <p>Заодно: <code class="i">.strip()</code> убирает не только пробелы, но и переводы строк и табуляцию — всё, что считается пробельными символами. Это как раз то, что прилетает при копировании из Word или Excel.</p>
+  </div>
+
+  <h3>Регистр</h3>
+  <div class="scroll"><table>
+    <tr><th>Метод</th><th>Что делает</th><th>Пример</th><th>Результат</th></tr>
+    <tr><td class="mono">.lower()</td><td>всё в нижний</td><td class="mono">"Anna".lower()</td><td class="mono">"anna"</td></tr>
+    <tr><td class="mono">.upper()</td><td>всё в верхний</td><td class="mono">"Anna".upper()</td><td class="mono">"ANNA"</td></tr>
+    <tr><td class="mono">.capitalize()</td><td>первая буква заглавная, остальные строчные</td><td class="mono">"аННА".capitalize()</td><td class="mono">"Анна"</td></tr>
+    <tr><td class="mono">.title()</td><td>каждое слово с заглавной</td><td class="mono">"анна петрова".title()</td><td class="mono">"Анна Петрова"</td></tr>
+  </table></div>
+
+  <div class="box def">
+    <div class="title">Зачем это тестировщику: нормализация</div>
+    <p>Сравнение строк в Python чувствительно к регистру: <code class="i">"Anna" == "anna"</code> даёт <code class="i">False</code>. Поэтому перед сравнением логинов и адресов почты их приводят к единому виду — обрезают края и опускают регистр. Это называется <b>нормализацией</b>.</p>
+  </div>
+
+<pre><code>entered = "  Anna@Mail.RU  "
+saved = "anna@mail.ru"
+
+print(entered == saved)                          # False — не войдёт
+print(entered.strip().lower() == saved)          # True — войдёт</code></pre>
+
+  <p>Здесь два метода вызваны подряд: сначала <code class="i">.strip()</code> вернул строку, у неё тут же вызвали <code class="i">.lower()</code>. Так можно — это называется цепочкой вызовов.</p>
+
+  <div class="box trap">
+    <div class="title">Готовый тест-кейс на любую форму входа</div>
+    <p>Ввести логин с пробелом в начале и в другом регистре. Если система не пускает — баг: пользователь не виноват, что скопировал адрес с пробелом. На собеседовании это хороший пример «какой баг вы находили».</p>
+  </div>
+
+  <div class="box card">
+    <div class="title">На карточку</div>
+    <p>Что такое нормализация строки и зачем нужна? — Приведение к единому виду перед сравнением: обрезать пробелы, опустить регистр. Иначе пользователь с лишним пробелом не войдёт в свой аккаунт.</p>
+  </div>
+</div>
+
+<!-- 5 -->
+<div class="pane" data-title="Поиск и проверка">
+  <h2>Методы: поиск, проверка, разбиение</h2>
+  <p class="sub">20 минут</p>
+
+  <h3>Есть ли что-то в строке</h3>
+<pre><code>email = "anna@mail.ru"
+
+print("@" in email)                # True — самый простой способ
+print(email.startswith("anna"))    # True
+print(email.endswith(".ru"))       # True
+print(email.count("a"))            # 3 — сколько раз встречается
+print(email.find("@"))             # 4 — индекс первого вхождения, -1 если нет</code></pre>
+
+  <p>Оператор <code class="i">in</code> ты уже знаешь по циклам — там он означал «из последовательности». Со строками он проверяет вхождение и возвращает <code class="i">True</code> или <code class="i">False</code>.</p>
+
+  <h3>Из чего состоит строка</h3>
+  <div class="scroll"><table>
+    <tr><th>Метод</th><th>True, если строка состоит из</th><th>Пример True</th><th>Пример False</th></tr>
+    <tr><td class="mono">.isdigit()</td><td>только цифр</td><td class="mono">"123"</td><td class="mono">"-5", "3.5", ""</td></tr>
+    <tr><td class="mono">.isalpha()</td><td>только букв</td><td class="mono">"anna"</td><td class="mono">"anna1", "an na"</td></tr>
+    <tr><td class="mono">.isalnum()</td><td>букв и цифр</td><td class="mono">"anna1"</td><td class="mono">"anna_1"</td></tr>
+    <tr><td class="mono">.isspace()</td><td>только пробельных символов</td><td class="mono">"   "</td><td class="mono">"", "a "</td></tr>
+  </table></div>
+
+  <div class="box trap">
+    <div class="title">isdigit врёт чаще, чем кажется</div>
+    <p><code class="i">"-5".isdigit()</code> — False, минус не цифра. <code class="i">"3.5".isdigit()</code> — False, точка не цифра. <code class="i">"".isdigit()</code> — False, пустая строка ничем не состоит.</p>
+    <p>То есть проверка «пользователь ввёл число» через <code class="i">.isdigit()</code> отсекает отрицательные и дробные. Для целых положительных — годится, для остального нужны другие способы.</p>
+  </div>
+
+  <div class="box trap">
+    <div class="title">Три пробела — не пустая строка</div>
+    <p><code class="i">"   " == ""</code> даёт False, а <code class="i">len("   ")</code> даёт 3. Именно поэтому валидатор с первой вкладки пропускал пробелы. Проверять на пустоту нужно <b>после</b> <code class="i">.strip()</code> — тогда три пробела превратятся в пустую строку и отвалятся.</p>
+  </div>
+
+  <h3>Замена и разбиение</h3>
+<pre><code>phone = "+375 (29) 123-45-67"
+
+clean = phone.replace(" ", "")     # убрать все пробелы
+print(clean)                        # +375(29)123-45-67
+
+text = "хлеб молоко сыр"
+words = text.split()                # разбить на части по пробелам
+print(words)                        # ['хлеб', 'молоко', 'сыр']
+print(len(words))                   # 3 — количество слов
+
+date = "16.09.2026"
+parts = date.split(".")             # разбить по точке
+print(parts)                        # ['16', '09', '2026']</code></pre>
+
+  <p><code class="i">.split()</code> возвращает <b>список</b> — новый тип данных. Подробно списки будут отдельным днём, сегодня достаточно знать: по нему можно ходить циклом и считать длину через <code class="i">len()</code>.</p>
+
+  <div class="box trap">
+    <div class="title">split() и split(" ") — разные вещи</div>
+    <p>Без аргумента <code class="i">.split()</code> считает любую группу пробелов одним разделителем и игнорирует края. С аргументом <code class="i">.split(" ")</code> режет строго по каждому пробелу, и два пробела подряд дадут пустой элемент в середине.</p>
+    <p>На строке <code class="i">"a&nbsp;&nbsp;b"</code>: первый вариант даст 2 слова, второй — 3, одно из которых пустое. Классический источник неверного подсчёта слов.</p>
+  </div>
+
+  <div class="box note">
+    <div class="title">В тетрадь</div>
+    <p>Таблицу методов одним списком: <code class="i">strip, lower, upper, replace, split, find, startswith, endswith, isdigit, isalpha</code>. Без подробностей — просто чтобы знать, что искать. Гуглить синтаксис нормально, не знать о существовании метода — нет.</p>
+  </div>
+</div>
+
+<!-- 6 -->
+<div class="pane" data-title="Задачи">
+  <h2>Четыре задачи</h2>
+  <p class="sub">50 минут. Папка <code class="i">python/day08/</code></p>
+
+  <div class="term"><span>mkdir C:\projects\qa-learning\python\day08</span><button onclick="cp(this,'mkdir C:\\projects\\qa-learning\\python\\day08')">Копировать</button></div>
+
+  <div class="box trap">
+    <div class="title">Напоминание</div>
+    <p>Команды терминала копировать, код писать руками.</p>
+  </div>
+
+  <!-- 1 -->
+  <div class="tk">
+    <h3>1. Починить валидатор</h3>
+    <div class="file">validator_fix.py</div>
+
+    <div class="part"><b>Требование</b>
+      <p>Имя: от 2 до 30 символов, не пустое, пробелы по краям обрезаются автоматически.</p>
+    </div>
+
+    <div class="part"><b>Что должно получиться</b>
+      <div class="out">Введите имя:    anna
+Здравствуйте, anna!</div>
+      <div class="out">Введите имя:    (три пробела)
+Имя не может быть пустым</div>
+    </div>
+
+    <div class="part"><b>Разбор по шагам</b>
+      <ol>
+        <li>Взять код с первой вкладки за основу, переписать руками.</li>
+        <li>Починить главный баг: результат <code class="i">.strip()</code> сохранить обратно в переменную.</li>
+        <li>Убедиться, что очистка идёт <b>до</b> всех проверок, а не после.</li>
+        <li>Проверить, что приветствие печатает уже очищенное имя.</li>
+      </ol>
+    </div>
+
+    <div class="part"><b>Подсказки</b>
+      <details><summary>Подсказка 1 — мягкая</summary>
+        <p>Порядок важнее, чем кажется. Если <code class="i">.strip()</code> сделать после проверки на пустоту, три пробела снова пройдут: на момент проверки они ещё три пробела.</p>
+      </details>
+      <details><summary>Подсказка 2 — конкретная</summary>
+        <p>Вторая строка программы: <code class="i">name = name.strip()</code>. Больше ничего менять не нужно — остальная цепочка условий уже правильная.</p>
+      </details>
+    </div>
+
+    <div class="part"><b>Что проверить</b>
+      <table>
+        <tr><th>Ввод</th><th>Ожидание</th></tr>
+        <tr><td class="mono">anna</td><td>Приветствие</td></tr>
+        <tr><td class="mono">&nbsp;&nbsp;&nbsp;anna&nbsp;&nbsp;&nbsp;</td><td>Приветствие без пробелов в имени</td></tr>
+        <tr><td class="mono">(три пробела)</td><td>Имя не может быть пустым</td></tr>
+        <tr><td>Enter без ввода</td><td>Имя не может быть пустым</td></tr>
+        <tr><td class="mono">a</td><td>Слишком короткое</td></tr>
+        <tr><td class="mono">ab</td><td>Приветствие — граница 2</td></tr>
+        <tr><td>30 букв</td><td>Приветствие — граница 30</td></tr>
+        <tr><td>31 буква</td><td>Слишком длинное</td></tr>
+      </table>
+      <p>Последние четыре строки — граничные значения. Вчерашняя техника, сегодняшний код.</p>
+    </div>
+
+    <div class="part"><b>Типичные ошибки</b>
+      <ul>
+        <li><code class="i">name.strip()</code> без присваивания — исходный баг остался.</li>
+        <li>Очистка после проверок — пробелы всё ещё проходят.</li>
+        <li>В приветствие подставляется старая переменная с пробелами.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div class="tk">
+    <h3>2. Вход с нормализацией</h3>
+    <div class="file">login_normalize.py</div>
+
+    <div class="part"><b>Требование</b>
+      <p>Сохранённый логин: <code class="i">anna@mail.ru</code>. Пользователь должен войти, даже если ввёл его с пробелами по краям и в другом регистре.</p>
+    </div>
+
+    <div class="part"><b>Что должно получиться</b>
+      <div class="out">Введите логин:   Anna@Mail.RU
+Вход выполнен</div>
+      <div class="out">Введите логин: petr@mail.ru
+Неверный логин или пароль</div>
+    </div>
+
+    <div class="part"><b>Разбор по шагам</b>
+      <ol>
+        <li>Задать сохранённый логин в переменную.</li>
+        <li>Спросить логин у пользователя.</li>
+        <li>Нормализовать введённое: обрезать края и опустить регистр.</li>
+        <li>Сравнить с сохранённым и вывести результат.</li>
+      </ol>
+    </div>
+
+    <div class="part"><b>Подсказки</b>
+      <details><summary>Подсказка 1 — мягкая</summary>
+        <p>Два метода можно вызвать в одну строку цепочкой. Не забудь присвоить результат обратно.</p>
+      </details>
+      <details><summary>Подсказка 2 — конкретная</summary>
+        <p><code class="i">entered = entered.strip().lower()</code>, дальше обычное <code class="i">if entered == saved:</code>.</p>
+      </details>
+    </div>
+
+    <div class="part"><b>Что проверить</b>
+      <table>
+        <tr><th>Ввод</th><th>Ожидание</th></tr>
+        <tr><td class="mono">anna@mail.ru</td><td>Вход выполнен</td></tr>
+        <tr><td class="mono">ANNA@MAIL.RU</td><td>Вход выполнен</td></tr>
+        <tr><td class="mono">&nbsp;&nbsp;anna@mail.ru&nbsp;&nbsp;</td><td>Вход выполнен</td></tr>
+        <tr><td class="mono">anna @mail.ru</td><td>Отказ — пробел внутри, strip его не уберёт</td></tr>
+        <tr><td>пустая строка</td><td>Отказ</td></tr>
+      </table>
+    </div>
+
+    <div class="part"><b>Типичные ошибки</b>
+      <ul>
+        <li>Сравнение до нормализации.</li>
+        <li>Нормализовали введённое, но забыли, что сохранённый логин тоже стоит хранить уже в нижнем регистре.</li>
+        <li>Раздельные сообщения «нет такого пользователя» и «неверный пароль» — это user enumeration, помнишь с дня 5.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="tk">
+    <h3>3. Проверка пароля</h3>
+    <div class="file">password_checker.py</div>
+
+    <div class="part"><b>Требование</b>
+      <p>Пароль: от 8 до 20 символов, минимум одна цифра, минимум одна буква, без пробелов. Программа выводит <b>все</b> нарушения сразу, а не только первое.</p>
+    </div>
+
+    <div class="part"><b>Что должно получиться</b>
+      <div class="out">Введите пароль: abc
+Пароль слишком короткий
+В пароле нет цифр</div>
+      <div class="out">Введите пароль: python123
+Пароль подходит</div>
+    </div>
+
+    <div class="part"><b>Разбор по шагам</b>
+      <ol>
+        <li>Получить пароль. <b>Не обрезать края</b> — в пароле пробел запрещён, и если его молча убрать, пользователь не поймёт, почему пароль не подходит.</li>
+        <li>Завести два флага до цикла: есть ли цифра, есть ли буква. Оба изначально <code class="i">False</code>.</li>
+        <li>Пройти циклом по символам пароля и поднять флаги там, где нужно.</li>
+        <li>После цикла — четыре отдельных <code class="i">if</code> (не цепочка!), каждый печатает свою претензию.</li>
+        <li>Если претензий не было — сообщить, что пароль подходит.</li>
+      </ol>
+    </div>
+
+    <div class="part"><b>Подсказки</b>
+      <details><summary>Подсказка 1 — мягкая</summary>
+        <p>Флаги — та же схема, что накопитель на дне 6: переменная до цикла, меняется внутри, используется после. Только вместо числа — <code class="i">True</code> / <code class="i">False</code>.</p>
+        <p>Почему не <code class="i">elif</code>: цепочка выполнит только одну ветку, а нужно вывести все нарушения сразу.</p>
+      </details>
+      <details><summary>Подсказка 2 — конкретная</summary>
+<pre><code>has_digit = False
+has_letter = False
+
+for symbol in password:
+    if symbol.isdigit():
+        has_digit = True
+    if symbol.isalpha():
+        has_letter = True</code></pre>
+        <p>Пробел ищется проще: <code class="i">if " " in password:</code>. А чтобы понять, было ли хоть одно нарушение, заведи ещё один флаг или счётчик проблем.</p>
+      </details>
+    </div>
+
+    <div class="part"><b>Что проверить</b>
+      <table>
+        <tr><th>Ввод</th><th>Ожидание</th></tr>
+        <tr><td class="mono">python123</td><td>Подходит</td></tr>
+        <tr><td class="mono">python12</td><td>Подходит — ровно 8, граница</td></tr>
+        <tr><td class="mono">python1</td><td>Слишком короткий — 7</td></tr>
+        <tr><td class="mono">abcdefgh</td><td>Нет цифр</td></tr>
+        <tr><td class="mono">12345678</td><td>Нет букв</td></tr>
+        <tr><td class="mono">abc</td><td>Два сообщения сразу: короткий и без цифр</td></tr>
+        <tr><td class="mono">my pass123</td><td>Пробел недопустим</td></tr>
+        <tr><td>пустая строка</td><td>Короткий, без цифр, без букв — три сообщения</td></tr>
+      </table>
+    </div>
+
+    <div class="part"><b>Типичные ошибки</b>
+      <ul>
+        <li><code class="i">password.isdigit()</code> вместо посимвольной проверки — это спросит, состоит ли <b>весь</b> пароль из цифр.</li>
+        <li>Флаги объявлены внутри цикла — сбрасываются на каждом символе.</li>
+        <li>Использован <code class="i">elif</code> — выводится только первое нарушение.</li>
+        <li>«Пароль подходит» печатается вместе с претензиями.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <div class="tk">
+    <h3>4. Статистика текста <span style="font-weight:400;color:var(--soft)">— со звёздочкой</span></h3>
+    <div class="file">text_stats.py</div>
+
+    <div class="part"><b>Требование</b>
+      <p>Пользователь вводит предложение. Программа выводит: количество символов с пробелами, количество символов без пробелов, количество слов и самое длинное слово.</p>
+    </div>
+
+    <div class="part"><b>Что должно получиться</b>
+      <div class="out">Введите предложение: тестирование это интересно
+Символов с пробелами: 30
+Символов без пробелов: 28
+Слов: 3
+Самое длинное слово: тестирование</div>
+    </div>
+
+    <div class="part"><b>Разбор по шагам</b>
+      <ol>
+        <li>Обрезать края у введённой строки.</li>
+        <li>Длина с пробелами — это просто <code class="i">len()</code>.</li>
+        <li>Длина без пробелов — убрать пробелы через <code class="i">.replace()</code> и измерить.</li>
+        <li>Разбить на слова и посчитать их количество.</li>
+        <li>Самое длинное слово искать циклом: переменная-рекордсмен до цикла, сравнение внутри — та же схема, что поиск максимальной цены в корзине.</li>
+      </ol>
+    </div>
+
+    <div class="part"><b>Подсказки</b>
+      <details><summary>Подсказка 1 — мягкая</summary>
+        <p><code class="i">.split()</code> без аргумента корректно обработает двойные пробелы. С аргументом — нет. Проверь на строке с двумя пробелами подряд и увидишь разницу.</p>
+      </details>
+      <details><summary>Подсказка 2 — конкретная</summary>
+<pre><code>longest = ""
+for word in words:
+    if len(word) &gt; len(longest):
+        longest = word</code></pre>
+        <p>Начальное значение — пустая строка, её длина 0, поэтому первое же слово станет рекордсменом.</p>
+      </details>
+    </div>
+
+    <div class="part"><b>Что проверить</b>
+      <table>
+        <tr><th>Ввод</th><th>Ожидание</th></tr>
+        <tr><td>Обычное предложение</td><td>Все четыре числа верны, пересчитай вручную</td></tr>
+        <tr><td>Одно слово</td><td>Слов 1, оно же самое длинное</td></tr>
+        <tr><td>Два пробела между словами</td><td>Слов по-прежнему столько, сколько реальных слов</td></tr>
+        <tr><td>Пустая строка</td><td>Нули, программа не падает</td></tr>
+        <tr><td>Два слова одинаковой длины</td><td>Выводится первое — реши, устраивает ли это</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- 7 -->
+<div class="pane" data-title="Тест">
+  <h2>Тест: читаем код</h2>
+  <p class="sub">10 вопросов. Отвечать, не запуская</p>
+  <div id="quiz"></div>
+  <div class="score" id="score">Отвечено: 0 из 10</div>
+</div>
+
+<!-- 8 -->
+<div class="pane" data-title="Итоги">
+  <h2>Закрываем день</h2>
+
+  <div class="box note">
+    <div class="title">В тетрадь</div>
+    <ul>
+      <li>Таблица индексов для слова Python, прямые и отрицательные.</li>
+      <li>Правило срезов: левая граница входит, правая нет.</li>
+      <li>Строки неизменяемы: метод возвращает новую строку, старая остаётся.</li>
+      <li>Список методов одной строкой — чтобы знать, что существует.</li>
+      <li>Что такое нормализация и зачем она нужна перед сравнением.</li>
+    </ul>
+  </div>
+
+  <div class="box card">
+    <div class="title">На карточки — пять новых, блок G</div>
+    <ol>
+      <li>Что вернёт <code class="i">name.strip()</code>, если не присвоить результат?</li>
+      <li>Что такое нормализация строки и зачем она нужна?</li>
+      <li>Что вернёт <code class="i">"3.5".isdigit()</code> и почему?</li>
+      <li>Чем отличается <code class="i">.split()</code> от <code class="i">.split(" ")</code>?</li>
+      <li>Чему равна <code class="i">len("   ")</code> и почему это важно для валидации?</li>
+    </ol>
+    <p>Первый прогон блока G — завтра, на дне 9.</p>
+  </div>
+
+  <div class="box note">
+    <div class="title">В errors-log.md</div>
+    <ul>
+      <li>Метод строки без присваивания не меняет переменную. Ошибки нет, результат неверный.</li>
+      <li>Три пробела — не пустая строка: длина 3, проверку на пустоту проходит.</li>
+      <li><code class="i">.isdigit()</code> даёт False для отрицательных и дробных.</li>
+      <li><code class="i">.strip()</code> чистит только края, внутренние пробелы остаются.</li>
+      <li>Индекс последнего символа — длина минус один.</li>
+    </ul>
+  </div>
+
+  <h3>Коммит</h3>
+  <div class="term"><span>cd C:\projects\qa-learning</span><button onclick="cp(this,'cd C:\\projects\\qa-learning')">Копировать</button></div>
+  <div class="term"><span>git add .</span><button onclick="cp(this,'git add .')">Копировать</button></div>
+  <div class="term"><span>git commit -m "day08: strings and their methods"</span><button onclick="cp(this,'git commit -m &quot;day08: strings and their methods&quot;')">Копировать</button></div>
+  <div class="term"><span>git push</span><button onclick="cp(this,'git push')">Копировать</button></div>
+
+  <div class="box def">
+    <div class="title">Что будет завтра</div>
+    <p>День 9 — форма оформления заказа с зашитыми багами. Ты ищешь, я считаю, что нашлось. То, что проскользнёт мимо, покажет, зачем существует таблица решений: она нужна ровно для тех комбинаций, которые голова не держит одновременно.</p>
+  </div>
+
+  <h3>Что прислать</h3>
+  <ul>
+    <li>Сколько ушло времени и сколько из этого — на хвосты дня 7.</li>
+    <li>Код четырёх файлов.</li>
+    <li>Результат теста и номера вопросов, где споткнулась.</li>
+    <li>Совпали ли твои ответы в охоте на баги с разбором — до того, как ты его открыла.</li>
+  </ul>
+</div>
+
+</div>
+
+<script>
+var panes=[].slice.call(document.querySelectorAll('.pane'));
+var tabs=document.getElementById('tabs');
+panes.forEach(function(p,i){
+  var b=document.createElement('button');
+  b.innerHTML='<span class="n">'+i+'</span>'+p.dataset.title;
+  b.onclick=function(){go(i);};
+  tabs.appendChild(b);
+  var nav=document.createElement('div');nav.className='nav';
+  var prev=document.createElement('button');prev.textContent='← Назад';
+  prev.onclick=function(){go(i-1);};if(i===0)prev.disabled=true;
+  var next=document.createElement('button');next.className='next';
+  next.textContent=(i===panes.length-1)?'В начало':'Дальше →';
+  next.onclick=function(){go(i===panes.length-1?0:i+1);};
+  nav.appendChild(prev);nav.appendChild(next);p.appendChild(nav);
+});
+function go(i){
+  panes.forEach(function(p,j){p.classList.toggle('on',i===j);});
+  [].forEach.call(tabs.children,function(b,j){b.classList.toggle('on',i===j);});
+  tabs.children[i].scrollIntoView({block:'nearest',inline:'center'});
+  window.scrollTo(0,0);
+}
+go(0);
+
+function cp(btn,text){
+  navigator.clipboard.writeText(text).then(function(){
+    var o=btn.textContent;btn.textContent='Скопировано';
+    setTimeout(function(){btn.textContent=o;},1200);
+  });
+}
+
+var RE=/('[^'\n]*'|"[^"\n]*"|#[^\n]*|\b(?:if|elif|else|for|while|in|not|and|or|break|continue|return|def|import|True|False|None)\b|\b(?:print|input|int|float|str|len|range|round)\b|\b\d+\.?\d*\b)/g;
+var KW=['if','elif','else','for','while','in','not','and','or','break','continue','return','def','import','True','False','None'];
+function hl(t){
+  return t.replace(RE,function(m){
+    var c;
+    if(m[0]==='#')c='cm';
+    else if(m[0]==='"'||m[0]==="'")c='st';
+    else if(KW.indexOf(m)>-1)c='kw';
+    else if(/^\d/.test(m))c='nu';
+    else c='bi';
+    return '<span class="'+c+'">'+m+'</span>';
+  });
+}
+document.querySelectorAll('pre code').forEach(function(el){el.innerHTML=hl(el.innerHTML);});
+
+var QS=[
+{code:'name = "  anna  "\nname.strip()\nprint(len(name))',
+ q:'Что напечатает код?',
+ o:['4','8','0','Ошибка'],a:1,
+ e:'Результат strip() никуда не сохранён, name осталась прежней: четыре буквы плюс четыре пробела. Главный баг дня.'},
+
+{code:'word = "Python"\nprint(word[-2])',
+ q:'Какой символ выведется?',
+ o:['o','h','n','t'],a:0,
+ e:'Отрицательные индексы считают с конца: -1 это n, -2 это o.'},
+
+{code:'word = "Python"\nprint(word[1:4])',
+ q:'Что напечатает срез?',
+ o:['ytho','yth','Pyth','ythо'],a:1,
+ e:'Срез берёт символы с индексами 1, 2, 3. Правая граница не включается — ровно как в range.'},
+
+{code:'text = "  a b  "\nprint(text.strip())',
+ q:'Что окажется в выводе?',
+ o:['ab','a b','"  a b  " без изменений','ab с пробелом в конце'],a:1,
+ e:'strip() убирает пробелы только по краям. Пробел между a и b остаётся — для него нужен replace().'},
+
+{code:'value = "-5"\nprint(value.isdigit())',
+ q:'Что вернёт проверка?',
+ o:['True','False','Ошибка','None'],a:1,
+ e:'Минус не является цифрой, поэтому вся строка не проходит проверку. То же самое с "3.5" — точка не цифра.'},
+
+{code:'print("Anna" == "anna")',
+ q:'Результат сравнения?',
+ o:['True','False','Ошибка','Зависит от настроек'],a:1,
+ e:'Сравнение строк чувствительно к регистру. Поэтому перед сравнением логинов их нормализуют через .lower().'},
+
+{code:'s = "хлеб"\ns.replace("х", "к")\nprint(s)',
+ q:'Что напечатается?',
+ o:['клеб','хлеб','Ошибка','хклеб'],a:1,
+ e:'Тот же баг, что в первом вопросе: replace вернул новую строку, её выбросили. Правило — метод без знака = слева почти всегда баг.'},
+
+{code:'text = "a  b"\nprint(len(text.split()))',
+ q:'Сколько элементов получится?',
+ o:['2','3','4','1'],a:0,
+ e:'Без аргумента split() считает группу пробелов одним разделителем. Если написать split(" "), получится 3 элемента, один из которых пустой.'},
+
+{code:'password = ""\nprint(password.isdigit())',
+ q:'Что вернёт проверка пустой строки?',
+ o:['True','False','Ошибка','Пустую строку'],a:1,
+ e:'Пустая строка не состоит ни из чего, поэтому все проверки вида is... возвращают False. Ещё одна причина проверять пустоту отдельно.'},
+
+{code:'name = "   "\nif name == "":\n    print("пусто")\nelse:\n    print("не пусто")',
+ q:'Что выведет код?',
+ o:['пусто','не пусто','Ошибка','Ничего'],a:1,
+ e:'Три пробела не равны пустой строке, её длина 3. Именно так пробелы проходили валидацию в твоём validator.py. Лечится strip() перед проверкой.'}
+];
+var answered=0,box=document.getElementById('quiz');
+QS.forEach(function(it,idx){
+  var d=document.createElement('div');d.className='q';
+  var esc=it.code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  d.innerHTML='<div class="qn">Вопрос '+(idx+1)+'</div><pre><code>'+hl(esc)+'</code></pre><div>'+it.q+'</div>';
+  var opts=document.createElement('div');opts.className='opts';
+  it.o.forEach(function(t,i){
+    var b=document.createElement('button');b.className='opt';b.textContent=t;
+    b.onclick=function(){
+      if(d.dataset.done)return;
+      d.dataset.done='1';answered++;
+      opts.querySelectorAll('.opt')[it.a].classList.add('right');
+      if(i!==it.a)b.classList.add('wrong');
+      d.querySelector('.expl').style.display='block';
+      document.getElementById('score').textContent='Отвечено: '+answered+' из '+QS.length;
+    };
+    opts.appendChild(b);
+  });
+  d.appendChild(opts);
+  var e=document.createElement('div');e.className='expl';e.textContent=it.e;
+  d.appendChild(e);box.appendChild(d);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,450 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>День 1. Установка. Фокус-режим</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#DDE1DC; --card:#FBFBF9; --ink:#22282A; --ink-soft:#5C6A6C;
+    --line:#C6CCC5; --deep:#1E4C4A; --signal:#9C6F14; --signal-bg:#F2E6C9;
+    --done:#3E7A54; --radius:4px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:"Space Grotesk",system-ui,sans-serif;
+    font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .shell{max-width:780px;margin:0 auto;padding:28px 20px 90px}
+
+  .rail{display:flex;gap:4px;margin-bottom:10px}
+  .rail span{flex:1;height:5px;background:var(--line);border-radius:2px}
+  .rail span.seen{background:var(--deep)}
+  .rail span.here{background:var(--signal)}
+  .railtext{display:flex;justify-content:space-between;align-items:baseline;
+    font-size:13px;color:var(--ink-soft);margin-bottom:22px}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:34px 34px 30px}
+  .kicker{font-size:13px;color:var(--ink-soft);margin:0 0 6px}
+  h1{font-size:33px;font-weight:500;line-height:1.12;letter-spacing:-0.02em;margin:0 0 14px}
+  .goal{font-size:17px;color:var(--ink-soft);margin:0 0 20px;max-width:60ch}
+  .why{background:#E7EDE7;border-left:3px solid var(--deep);padding:13px 16px;
+    border-radius:3px;font-size:15px;max-width:62ch;margin:0 0 24px}
+  .why b{font-weight:700}
+  .divider{border-bottom:1px solid var(--line);margin-bottom:24px}
+
+  .clock{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+  .clockface{font-family:"JetBrains Mono",monospace;font-size:27px;font-weight:500;
+    font-variant-numeric:tabular-nums;min-width:104px}
+  .clockface.low{color:var(--signal)}
+  .clockface.over{color:var(--done)}
+
+  ol.steps{list-style:none;margin:0;padding:0}
+  ol.steps li{border-top:1px solid var(--line);padding:15px 0 15px 38px;position:relative}
+  ol.steps li:first-child{border-top:none;padding-top:2px}
+  .tick{position:absolute;left:0;top:15px;width:22px;height:22px;border:1.5px solid var(--ink-soft);
+    border-radius:3px;background:transparent;cursor:pointer;padding:0}
+  ol.steps li:first-child .tick{top:2px}
+  .tick:hover{border-color:var(--deep)}
+  .tick[aria-pressed="true"]{background:var(--done);border-color:var(--done)}
+  .tick[aria-pressed="true"]::after{content:"";position:absolute;left:6px;top:2px;width:6px;height:12px;
+    border:solid #fff;border-width:0 2px 2px 0;transform:rotate(42deg)}
+  li.struck .txt{color:var(--ink-soft);text-decoration:line-through;text-decoration-thickness:1px}
+  .txt{max-width:60ch}
+  .txt b{font-weight:700}
+  .txt em{font-style:normal;font-family:"JetBrains Mono",monospace;font-size:14px;
+    background:#EFF0EC;padding:1px 5px;border-radius:2px}
+
+  .cmd{display:flex;margin-top:10px;border:1px solid var(--line);border-radius:3px;
+    overflow:hidden;background:#F1F2EE;max-width:60ch}
+  .cmd code{font-family:"JetBrains Mono",monospace;font-size:14px;padding:11px 13px;flex:1;
+    overflow-x:auto;white-space:pre;line-height:1.5}
+  .copy{border:none;border-left:1px solid var(--line);background:transparent;font-family:inherit;
+    font-size:13px;color:var(--deep);padding:0 15px;cursor:pointer;white-space:nowrap}
+  .copy:hover{background:var(--line)}
+  .copy.ok{color:var(--done)}
+
+  .trap,.expect{max-width:60ch;margin-top:11px;padding:11px 14px;font-size:14.5px;border-radius:3px}
+  .trap{background:var(--signal-bg);border-left:3px solid var(--signal)}
+  .expect{background:#E7EDE7;border-left:3px solid var(--deep)}
+
+  .finishline{margin-top:26px;padding-top:20px;border-top:1px solid var(--line);
+    font-size:15px;color:var(--ink-soft);max-width:60ch}
+  .finishline strong{color:var(--ink);font-weight:500}
+
+  .nav{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-top:28px}
+  button.btn{font-family:inherit;font-size:15px;padding:12px 22px;border-radius:3px;cursor:pointer;border:1px solid var(--deep)}
+  button.primary{background:var(--deep);color:#fff}
+  button.primary:hover{background:#163b39}
+  button.ghost{background:transparent;color:var(--deep)}
+  button.ghost:hover{background:#E7EDE7}
+  button.small{font-family:inherit;font-size:14px;padding:9px 16px;border:1px solid var(--line);
+    background:transparent;color:var(--ink);border-radius:3px;cursor:pointer}
+  button.small:hover{background:#EFF0EC}
+  button:focus-visible,.tick:focus-visible,.copy:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+  .counter{font-size:14px;color:var(--ink-soft)}
+
+  .breakcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:56px 34px;text-align:center}
+  .breakcard h1{font-size:28px;margin-bottom:8px}
+  .breakclock{font-family:"JetBrains Mono",monospace;font-size:64px;font-variant-numeric:tabular-nums;
+    letter-spacing:-0.03em;margin:22px 0 6px}
+  .breaklist{display:inline-block;text-align:left;color:var(--ink-soft);font-size:15.5px;
+    margin:18px 0 26px;max-width:46ch}
+  .breaklist p{margin:6px 0}
+
+  .tools{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line)}
+  .toolsinner{max-width:780px;margin:0 auto;padding:10px 20px;display:flex;gap:10px;align-items:center}
+  .panel{max-width:780px;margin:0 auto;padding:0 20px 18px}
+  .panel textarea{width:100%;min-height:110px;font-family:inherit;font-size:15px;padding:12px;
+    border:1px solid var(--line);border-radius:3px;background:#F1F2EE;color:var(--ink);resize:vertical}
+  .panel p{font-size:14.5px;color:var(--ink-soft);max-width:66ch}
+  .panel h2{font-size:17px;font-weight:500;margin:14px 0 8px}
+  .hide{display:none}
+
+  @media (max-width:560px){
+    .card{padding:24px 20px}
+    h1{font-size:27px}
+    .nav{flex-direction:column-reverse;align-items:stretch}
+    .nav button{width:100%}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="shell">
+  <div class="rail" id="rail"></div>
+  <div class="railtext"><span id="pos"></span><span id="clock-label"></span></div>
+  <div id="stage"></div>
+</div>
+
+<div class="tools">
+  <div class="panel hide" id="park-panel">
+    <h2>Парковка</h2>
+    <p>Вспомнила про несделанное, захотелось загуглить постороннее, пришла идея — запиши строкой и возвращайся к блоку. Разберёшь после финиша.</p>
+    <textarea id="park" placeholder="Например: посмотреть, чем отличается Python от Java&#10;написать Кате про субботу"></textarea>
+  </div>
+  <div class="panel hide" id="stuck-panel">
+    <h2>Застряла</h2>
+    <p>Двадцать минут пробуешь сама: читаешь текст ошибки целиком, перезапускаешь терминал, проверяешь <code>pwd</code>. Не помогло — пишешь мне по шаблону.</p>
+    <div class="cmd">
+      <code id="tpl">Что делала:
+Что ожидала:
+Что получила (полный текст ошибки):
+Что уже пробовала:</code>
+      <button class="copy" data-copy="tpl">Копировать</button>
+    </div>
+  </div>
+  <div class="toolsinner">
+    <button class="small" id="park-btn">Парковка</button>
+    <button class="small" id="stuck-btn">Застряла</button>
+    <span class="counter" id="tally"></span>
+  </div>
+</div>
+
+<script>
+const S = [
+{
+  type:"block", mins:5, title:"Готовим стол",
+  goal:"Убрать всё, что уведёт в сторону в ближайшие два часа.",
+  why:"<b>Зачем этот блок.</b> Установка программ — длинная цепочка мелких действий без интересного результата. Именно на таких отрезках внимание уходит легче всего, и вернуться обратно тяжело. Пять минут подготовки экономят полтора часа.",
+  steps:[
+    {t:"Телефон унеси <b>в другую комнату</b>. Не в беззвучный, не экраном вниз — физически в другое помещение."},
+    {t:"Закрой почту, мессенджеры, Figma, лишние вкладки. Останется два окна: это и папка «Загрузки»."},
+    {t:"Поставь рядом воду и что-нибудь съедобное. Голод и жажда — самая частая настоящая причина «что-то расхотелось»."},
+    {t:"Открой папку «Загрузки». Проверь, что на месте четыре файла: <em>python-3.14.7-amd64.exe</em>, <em>Git-2.55.0.5-64-bit.exe</em>, <em>npp.8.9.8.Installer.x64.exe</em>, <em>pycharm-2026.2.1.exe</em>."},
+    {t:"Скажи вслух: сегодня я ставлю программы. Я не учу Python и не выбираю тему оформления."}
+  ],
+  trap:"Не гугли «Python 3.14 или 3.13, что лучше» и «PyCharm против VS Code». Всё уже скачано, выбор сделан. Любой поиск сейчас — это дорога в сторону на сорок минут.",
+  done:"Стол пустой, телефон в другой комнате, четыре установщика на месте."
+},
+{
+  type:"block", mins:12, title:"Три настройки Windows",
+  goal:"Windows перестанет прятать нужные файлы и разрешит запускать скрипты.",
+  why:"<b>Зачем это.</b> По умолчанию Windows скрывает расширения файлов и блокирует запуск скриптов. Для обычной работы это не мешает, для разработки — мешает постоянно и в самый неподходящий момент. Настраиваем один раз на все годы вперёд.",
+  steps:[
+    {t:"Открой любую папку. Вверху вкладка <b>Вид</b>. В Windows 11: <b>Показать</b> → включи <b>Расширения имён файлов</b> и <b>Скрытые элементы</b>. В Windows 10 обе галочки лежат прямо на панели «Вид».",
+     expect:"После включения имена файлов в «Загрузках» станут полными: не «python-3.14.7-amd64», а «python-3.14.7-amd64.exe». Так и должно быть."},
+    {t:"Открой диск C → папку <b>Пользователи</b> (Users) → посмотри, как называется твоя папка. Если кириллицей — ничего не делай, просто знай: проекты положим в другое место."},
+    {t:"Нажми клавишу <b>Win</b>, напечатай <em>PowerShell</em>, кликни по результату <b>правой кнопкой</b> → <b>Запуск от имени администратора</b> → в окне «Разрешить приложению вносить изменения» нажми <b>Да</b>."},
+    {t:"Вставь команду правым кликом в окно, нажми Enter. На вопрос напечатай <b>Y</b> и снова Enter.", cmd:"Set-ExecutionPolicy -Scope CurrentUser RemoteSigned",
+     expect:"Разрешает запуск скриптов, написанных тобой. Понадобится через две недели для виртуальных окружений Python — без этого они не запустятся, а ошибка будет выглядеть необъяснимо."},
+    {t:"Закрой окно администратора. Дальше всё делаем в обычном PowerShell, без прав администратора."}
+  ],
+  done:"Расширения файлов видны, команда выполнилась без красного текста."
+},
+{
+  type:"block", mins:5, title:"Ставим Notepad++",
+  goal:"Лёгкий текстовый редактор установлен.",
+  why:"<b>Что это и зачем.</b> Notepad++ — простой редактор текста, как блокнот, но понимающий код: подсвечивает синтаксис, показывает номера строк, не портит кодировку. Ставим его первым по одной причине: через два блока установщик Git спросит, каким редактором пользоваться, и мы выберем именно его. Для крупных задач будет PyCharm, а Notepad++ — чтобы быстро глянуть или поправить один файл.",
+  steps:[
+    {t:"В «Загрузках» двойной клик по <em>npp.8.9.8.Installer.x64.exe</em>. На вопрос «Разрешить приложению вносить изменения» → <b>Да</b>."},
+    {t:"Экран выбора языка установщика → <b>OK</b>."},
+    {t:"Приветственный экран → <b>Next</b>. Лицензия → <b>I Agree</b>. Папка установки → <b>Next</b>."},
+    {t:"Экран <b>Choose Components</b> → ничего не трогай → <b>Next</b>."},
+    {t:"Последний экран с галочками: можешь отметить <b>Create Shortcut on Desktop</b>, если хочешь ярлык. Нажми <b>Install</b>."},
+    {t:"<b>Finish</b>. Если стоит галочка «Run Notepad++» — сними её, программа сейчас не нужна."}
+  ],
+  done:"Notepad++ есть в меню «Пуск»."
+},
+{
+  type:"block", mins:15, title:"Ставим Python",
+  goal:"Команда python --version отвечает номером версии.",
+  why:"<b>Что это и зачем.</b> Python — это язык, на котором ты будешь писать автотесты, и одновременно программа-переводчик: она читает твой текстовый файл с кодом и выполняет написанное. Без неё файл с кодом — просто текст. Вместе с Python ставится <em>pip</em> — менеджер, которым позже будем скачивать pytest, Selenium и остальные инструменты.",
+  steps:[
+    {t:"Двойной клик по <em>python-3.14.7-amd64.exe</em> → «Разрешить приложению вносить изменения» → <b>Да</b>."},
+    {t:"Откроется окно <b>Install Python 3.14.7 (64-bit)</b>. Внизу две галочки. Найди <b>Add python.exe to PATH</b> и <b>поставь её</b>. Вторую, про admin privileges, можно оставить как есть.",
+     expect:"Это главная ловушка всего дня. PATH — список папок, где Windows ищет программы по имени. Без галочки Python установится, но терминал его не найдёт, и ты получишь ошибку «python не распознано», которая выглядит как «ничего не установилось»."},
+    {t:"Нажми <b>Install Now</b> — верхний вариант. Не выбирай Customize installation, настраивать нечего."},
+    {t:"Пойдёт полоса <b>Setup Progress</b>, это минуту-две. Не закрывай окно."},
+    {t:"Появится <b>Setup was successful</b>. Если внизу есть кнопка <b>Disable path length limit</b> — нажми её, потом <b>Close</b>. Если кнопки нет — просто <b>Close</b>.",
+     expect:"Кнопка снимает старое ограничение Windows на длину пути к файлу. В будущих проектах папки вкладываются глубоко, и без этого бывают странные сбои."},
+    {t:"Открой <b>обычный</b> PowerShell: Win → напечатай PowerShell → Enter. Закрепи на панели задач правым кликом по иконке."},
+    {t:"Проверь, что Python видно.", cmd:"python --version",
+     expect:"Ожидается: Python 3.14.7. Если написано «не распознано» — открой раздел «Застряла» внизу, там разбор."},
+    {t:"Проверь заодно pip.", cmd:"pip --version"},
+    {t:"Зайди внутрь Python и попробуй его вживую.", cmd:"python"},
+    {t:"Теперь перед курсором три угловые скобки — ты внутри Python. Выполни три строки по одной.", cmd:"2 + 2\nprint(\"Привет, я теперь программист\")\nexit()",
+     expect:"Пока видны скобки >>>, обычные команды вроде cd или git тут не работают. Выход — exit(). Это первое место, где люди думают, что терминал завис."}
+  ],
+  done:"python --version показывает 3.14.7, ты умеешь войти в Python и выйти."
+},
+{
+  type:"block", mins:15, title:"Ставим Git",
+  goal:"Git установлен и знает, как тебя зовут.",
+  why:"<b>Что это и зачем.</b> Git хранит историю изменений твоих файлов: когда что менялось и можно ли откатиться. Похоже на историю версий в Figma, но сохраняешь точки ты сама и подписываешь каждую. Он живёт на твоём компьютере. GitHub — отдельная вещь, это сайт, куда Git отправляет копию. Установщик задаст много вопросов; значимых пять, остальные просто Next.",
+  steps:[
+    {t:"Двойной клик по <em>Git-2.55.0.5-64-bit.exe</em> → <b>Да</b> на запрос разрешения."},
+    {t:"Экран с лицензией GNU → <b>Next</b>. Папка установки → <b>Next</b>. Список компонентов → ничего не меняй → <b>Next</b>. Папка в меню «Пуск» → <b>Next</b>."},
+    {t:"<b>Экран 1 из важных: Choosing the default editor used by Git.</b> В выпадающем списке выбери <b>Use Notepad++ as Git's default editor</b> → Next.",
+     expect:"Ради этого мы ставили Notepad++ первым. Если оставить вариант по умолчанию (Vim), однажды откроется чёрный экран, из которого невозможно выйти обычными способами — классическая история каждого новичка."},
+    {t:"<b>Экран 2: Adjusting the name of the initial branch.</b> Выбери нижний вариант <b>Override the default branch name for new repositories</b>, в поле оставь <em>main</em> → Next.",
+     expect:"Ветка — это отдельная линия истории проекта. Главную раньше называли master, сейчас везде main. Ставим сразу правильно, чтобы потом не путаться."},
+    {t:"<b>Экран 3: Adjusting your PATH environment.</b> Выбери <b>средний</b> вариант — Git from the command line and also from 3rd-party software. Он помечен как recommended → Next."},
+    {t:"Дальше несколько экранов подряд, на всех оставляй то, что предложено, и жми <b>Next</b>: SSH executable (Use bundled OpenSSH), HTTPS transport (Use the OpenSSL library), Line ending conversions (Checkout Windows-style), Terminal emulator (Use MinTTY), git pull behavior, Credential helper (Git Credential Manager), Extra options."},
+    {t:"<b>Экран 4: Configuring experimental options.</b> Ничего не отмечай → <b>Install</b>."},
+    {t:"<b>Finish</b>. Сними галочки про release notes, если они стоят."},
+    {t:"<b>Закрой PowerShell полностью и открой заново.</b> Без этого он не увидит новую программу — так работает PATH, это не суеверие."},
+    {t:"Проверь.", cmd:"git --version", expect:"Ожидается git version 2.55.0.windows.1 или похожее."},
+    {t:"<b>Экран 5, последний важный:</b> представься Git. Он подписывает этим каждое твоё сохранение. Замени имя и почту на свои — почту бери ту, на которую заведёшь GitHub в следующем блоке.",
+     cmd:"git config --global user.name \"Anna Ivanova\"\ngit config --global user.email \"anna@example.com\"",
+     expect:"Обе команды выполнятся молча. В терминале молчание — это успех: нет текста значит нет ошибок. Не жди подтверждения."},
+    {t:"Проверь, что записалось.", cmd:"git config --global --list",
+     expect:"В длинном списке должны быть строки user.name= и user.email= с твоими данными."}
+  ],
+  done:"git --version показывает версию, в списке настроек видно твоё имя и почту."
+},
+{
+  type:"block", mins:12, title:"Ставим PyCharm",
+  goal:"Программа для написания кода установлена и открывается.",
+  why:"<b>Что это и зачем.</b> PyCharm — рабочее место программиста. Технически код можно писать хоть в блокноте, но PyCharm подсказывает при вводе, подсвечивает опечатки до запуска, показывает структуру проекта слева и умеет запускать код одной кнопкой. Примерно как Figma против рисования в Paint: результат тот же, скорость несопоставима.",
+  steps:[
+    {t:"Двойной клик по <em>pycharm-2026.2.1.exe</em> → <b>Да</b>."},
+    {t:"Приветственный экран → <b>Next</b>. Папка установки → <b>Next</b>."},
+    {t:"<b>Installation Options</b> — экран с галочками. Отметь: <b>Create Desktop Shortcut</b>, <b>Update PATH Variable</b>, <b>Add \"Open Folder as Project\"</b>, <b>Create Associations: .py</b> → Next."},
+    {t:"Папка в меню «Пуск» → <b>Install</b>. Установка идёт несколько минут."},
+    {t:"В конце предложат перезагрузить компьютер. Выбери <b>I want to manually reboot later</b> — сегодня перезагрузка не нужна."},
+    {t:"Запусти PyCharm с ярлыка. На вопрос про импорт настроек → <b>Do not import settings</b> → OK."},
+    {t:"Если спросит про отправку статистики — выбирай любой вариант, это ни на что не влияет. Если попросит войти в аккаунт или выбрать лицензию — выбери бесплатный вариант; аккаунт JetBrains заводится бесплатно на ту же почту."},
+    {t:"Дошла до стартового экрана со списком проектов — <b>закрывай PyCharm</b>. Вернёмся к нему в последнем блоке."}
+  ],
+  trap:"Не выбирай тему, шрифт, схему цветов и плагины. Открылась — закрывай. Настройка редактора ощущается как продуктивная работа, но кода в ней ноль: можно провести полтора часа и не написать ни строчки. Оформлением займёмся в среду, когда будет что писать.",
+  done:"PyCharm запускается и показывает стартовый экран."
+},
+{type:"break", mins:10, title:"Большой перерыв",
+ lines:["Четыре программы установлены. Самая нудная часть дня позади.","Встань, походи, разомни шею и запястья.","Если внимание кончилось — останови день здесь. Остальное сделаешь вечером или завтра, это не сорвёт план.","Если ресурс есть — дальше пойдёт интереснее, там начнётся живая работа."]},
+{
+  type:"block", mins:20, title:"Обживаем терминал",
+  goal:"Перестать бояться чёрного окна и всегда понимать, в какой ты папке.",
+  why:"<b>Зачем это.</b> Дальше вся работа идёт через терминал: запуск тестов, git, установка библиотек. Главное, что нужно усвоить сегодня, — терминал всегда «стоит» внутри какой-то папки, и все команды выполняются относительно неё. Половина ошибок новичков — это команда, запущенная не из той папки.",
+  steps:[
+    {t:"Открой PowerShell. Строка перед курсором — это <b>приглашение</b>, оно показывает текущую папку. <em>PS C:\\Users\\Anna></em> значит, что ты находишься в папке Anna."},
+    {t:"Выполни по одной команде и после каждой смотри, как меняется строка приглашения.", cmd:"pwd\nls\ncd Desktop\npwd\ncd ..\ncd ~",
+     expect:"pwd показывает текущую папку, ls — что в ней лежит, cd заходит внутрь, cd .. поднимает на уровень выше, cd ~ возвращает домой из любого места."},
+    {t:"Создай и удали папку.", cmd:"mkdir test-folder\nls\nrmdir test-folder"},
+    {t:"Три приёма, экономящие часы. Напечатай <em>cd Docu</em> и нажми <b>Tab</b> — терминал сам допишет название. Нажми <b>стрелку вверх</b> — вернётся прошлая команда. Напечатай <em>cls</em> — экран очистится. Попробуй все три прямо сейчас."},
+    {t:"Мини-задание, без подглядывания в шпаргалку: перейди домой, создай папку qa-test, зайди внутрь, создай там папку inside, выведи список, поднимись выше, удали обе."},
+    {t:"<b>[Бумага]</b> Выпиши в тетрадь шпаргалку на один разворот: восемь команд с переводом на русский плюс три приёма. Она будет лежать раскрытой рядом с ноутбуком ближайший месяц."}
+  ],
+  trap:"Не настраивай цвета, шрифт и прозрачность терминала. Совсем. Это отдельная кроличья нора на полтора часа, а работать он будет ровно так же.",
+  done:"Мини-задание прошло без ошибок, шпаргалка в тетради."
+},
+{
+  type:"block", mins:25, title:"GitHub и ключ доступа",
+  goal:"GitHub узнаёт твой компьютер без пароля.",
+  why:"<b>Что это и зачем.</b> GitHub — сайт, где хранятся копии твоих проектов. Это и резервная копия, и портфолио: через год именно туда пойдёт смотреть работодатель. Чтобы отправлять туда код, компьютер должен как-то доказывать, что это ты. Пароль для этого больше не используется, вместо него — пара файлов-ключей: публичный отдаём GitHub, приватный не показываем никому и никогда, включая меня.",
+  steps:[
+    {t:"Открой <b>github.com</b> → <b>Sign up</b>. Почта та же, что ты указала в настройках Git."},
+    {t:"Имя пользователя выбирай осознанно: оно попадёт в резюме и в ссылки на все проекты. Годится anna-ivanova или annaivanova-qa, не годится kotik2000.",
+     expect:"Зависла над выбором больше двух минут — бери имя-фамилию через дефис и иди дальше. Идеального варианта тут нет, а время уходит."},
+    {t:"Подтверди почту по письму, которое придёт от GitHub."},
+    {t:"Вернись в PowerShell. Создай ключ, подставив свою почту. На все три вопроса просто жми <b>Enter</b>.", cmd:"ssh-keygen -t ed25519 -C \"anna@example.com\"",
+     expect:"Второй вопрос — про пароль на ключ. Жми Enter, оставляем пустым. Учти: пока печатаешь пароль, на экране не появляется ничего, даже звёздочек. Это не зависание. В конце нарисуется картинка из символов — так и должно быть."},
+    {t:"Скопируй публичный ключ в буфер обмена. Команда сработает молча.", cmd:"Get-Content ~/.ssh/id_ed25519.pub | Set-Clipboard",
+     expect:"Расширение .pub принципиально: это публичная половина. Файл без .pub — приватный ключ, его не копируют и не выкладывают никуда."},
+    {t:"На github.com: аватар в правом верхнем углу → <b>Settings</b> → в левом меню <b>SSH and GPG keys</b> → кнопка <b>New SSH key</b>."},
+    {t:"Title — любое понятное, например Home laptop. Key type — <b>Authentication Key</b>. В большое поле Key вставь скопированное через Ctrl+V. Нажми <b>Add SSH key</b>. Может попросить пароль от аккаунта."},
+    {t:"Проверь связь. На вопрос напечатай полностью <b>yes</b> — просто буква y не подойдёт.", cmd:"ssh -T git@github.com",
+     expect:"Ожидается: Hi твоё-имя! You've successfully authenticated, but GitHub does not provide shell access. Вторая половина фразы — не ошибка, так и должно быть. Важно только successfully authenticated."}
+  ],
+  trap:"Не заполняй профиль, не ставь аватар, не пиши bio. Займёмся этим в конце обучения, когда будет что показывать.",
+  done:"В ответе есть successfully authenticated."
+},
+{
+  type:"block", mins:25, title:"Первый репозиторий",
+  goal:"Твои файлы уехали на GitHub. Это финиш дня.",
+  why:"<b>Что происходит в этом блоке.</b> Ты создашь на GitHub проект, скачаешь его на компьютер, добавишь файлы и отправишь обратно. Это полный круг, который дальше будет повторяться каждый учебный день: изменила файлы → add → commit → push. Сегодня разберём медленно, через неделю будешь делать не задумываясь.",
+  steps:[
+    {t:"На github.com кнопка <b>+</b> справа вверху → <b>New repository</b>."},
+    {t:"Repository name: <em>qa-learning</em>. Description: любое. Видимость — <b>Public</b>. Поставь галочку <b>Add a README file</b>. В поле <b>Add .gitignore</b> найди и выбери шаблон <b>Python</b>. Нажми <b>Create repository</b>.",
+     expect:"Файл .gitignore — список того, что Git не должен отправлять на GitHub: служебный мусор, кэш, файлы с паролями. Шаблон Python уже знает, что именно прятать."},
+    {t:"На странице репозитория: зелёная кнопка <b>Code</b> → вкладка <b>SSH</b> (не HTTPS) → скопируй строку иконкой справа. Она вида git@github.com:твоё-имя/qa-learning.git"},
+    {t:"В PowerShell создай место для проектов. Кладём в корень диска, чтобы не мешали кириллица в пути и синхронизация OneDrive.", cmd:"cd C:\\\nmkdir projects\ncd projects"},
+    {t:"Скачай репозиторий на компьютер. Вместо строки из примера вставь свою, скопированную с GitHub.", cmd:"git clone git@github.com:anna-ivanova/qa-learning.git",
+     expect:"Ожидается несколько строк, заканчивающихся словом done. В папке projects появилась папка qa-learning."},
+    {t:"Зайди внутрь и создай структуру папок.", cmd:"cd qa-learning\nmkdir notes\nmkdir python\nmkdir manual"},
+    {t:"Положи в каждую папку файл-заглушку.", cmd:"New-Item notes/.gitkeep -ItemType File\nNew-Item python/.gitkeep -ItemType File\nNew-Item manual/.gitkeep -ItemType File",
+     expect:"Git не умеет отслеживать пустые папки — без заглушек они просто не уедут на GitHub. На этом спотыкаются все без исключения."},
+    {t:"Перенеси файл роудмапа из «Загрузок» в папку <em>C:\\projects\\qa-learning\\notes</em> — обычным перетаскиванием мышью. Пусть план лежит внутри проекта."},
+    {t:"Открой PyCharm → <b>Open</b> → выбери папку <em>C:\\projects\\qa-learning</em> → Open. Спросит про доверие → <b>Trust Project</b>. Слева появится дерево файлов, кликни README.md."},
+    {t:"Перепиши README: что это за репозиторий, три строки про папки, список технологий, дата старта. <b>Пять-семь строк, не больше.</b> Сохрани через Ctrl+S.",
+     expect:"README — первое, что видит человек, открывший твой репозиторий. За год он будет переписан ещё сто раз. Сегодня он должен просто существовать."},
+    {t:"Вернись в PowerShell и посмотри, что изменилось.", cmd:"git status",
+     expect:"Git перечислит изменённый README и новые папки. Красный цвет здесь означает «изменения есть, но Git пока не взял их в работу», а не ошибку."},
+    {t:"Сохрани точку истории и отправь на GitHub. Три команды по одной.", cmd:"git add .\ngit commit -m \"Add project structure and README\"\ngit push",
+     expect:"add берёт изменения в работу, commit создаёт точку истории с подписью, push отправляет всё на сайт. Текст после -m — описание того, что ты сделала; пиши по-английски, коротко."},
+    {t:"Обнови страницу репозитория на github.com. Видишь README и три папки — <b>день закрыт</b>."},
+    {t:"<b>[Схема]</b> Нарисуй от руки: рабочая папка → add → коммит → push → GitHub, и обратная стрелка clone. Четыре элемента, пять минут. Сфотографируй и положи в notes/images."}
+  ],
+  trap:"Не переписывай README четыре раза и не ищи для него красивые бейджики. Пять строк, коммит, финиш.",
+  done:"На github.com видно README и папки notes, python, manual."
+},
+{type:"end"}
+];
+
+let i=0, checks=S.map(s=>s.steps?s.steps.map(()=>false):[]), parkText="";
+let timer=null,left=0,running=false;
+const stage=document.getElementById("stage"),rail=document.getElementById("rail"),
+      posEl=document.getElementById("pos"),clockLabel=document.getElementById("clock-label"),
+      tally=document.getElementById("tally");
+const blockIdx=S.map((s,n)=>s.type==="block"?n:-1).filter(n=>n>=0);
+const totalBlocks=blockIdx.length;
+
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+function fmt(sec){const neg=sec<0,a=Math.abs(sec);
+  return (neg?"+":"")+String(Math.floor(a/60)).padStart(2,"0")+":"+String(a%60).padStart(2,"0")}
+function stopTimer(){clearInterval(timer);timer=null;running=false}
+function startTimer(){if(running)return;running=true;timer=setInterval(()=>{left--;paintClock()},1000)}
+function paintClock(){const f=document.getElementById("face");if(!f)return;
+  f.textContent=fmt(left);
+  f.className="clockface"+(left<0?" over":(left<=60?" low":""));
+  const c=document.getElementById("break-go");
+  if(c&&left<=0){c.disabled=false;c.textContent="Продолжаем"}}
+
+function renderRail(){
+  rail.innerHTML="";
+  const cur=blockIdx.filter(n=>n<=i).length;
+  for(let k=0;k<totalBlocks;k++){
+    const sp=document.createElement("span"),bi=blockIdx[k];
+    if(bi<i)sp.className="seen"; else if(bi===i)sp.className="here";
+    rail.appendChild(sp);
+  }
+  const s=S[i];
+  posEl.textContent = s.type==="block" ? "Блок "+cur+" из "+totalBlocks
+    : (s.type==="break" ? "Перерыв" : "Готово");
+}
+function renderTally(){const s=S[i];
+  if(s.type!=="block"){tally.textContent="";return}
+  tally.textContent="Отмечено "+checks[i].filter(Boolean).length+" из "+checks[i].length}
+
+function render(){
+  stopTimer();
+  const s=S[i];
+  renderRail();
+
+  if(s.type==="end"){
+    clockLabel.textContent="";
+    stage.innerHTML='<div class="card">'+
+      '<p class="kicker">День 1 закрыт</p>'+
+      '<h1>Окружение готово</h1>'+
+      '<p class="goal">Утром ты не умела открыть терминал. Сейчас на твоём компьютере стоят четыре программы, настроен ключ доступа, а твой первый код лежит на GitHub с публичной ссылкой.</p>'+
+      '<div class="finishline"><strong>Пришли мне</strong><br>Ссылку на репозиторий и вывод трёх команд: python --version, git --version, ssh -T git@github.com. Проверю, что всё встало корректно.</div>'+
+      '<div class="finishline"><strong>[Репо] Заведи notes/errors-log.md</strong><br>Запиши туда каждую сегодняшнюю ошибку и чем она лечилась. Через месяц это твоя личная база знаний.</div>'+
+      '<div class="finishline"><strong>Разбери парковку</strong><br>Открой её внизу и посмотри, что накопилось. Часть окажется ерундой, часть — вопросами ко мне.</div>'+
+      '<div class="finishline"><strong>Завтра</strong><br>Теория тестирования: чтение и конспект, без установок и терминала. День будет заметно легче этого.</div>'+
+      '<div class="nav"><button class="btn ghost" id="prev">Назад</button><span></span></div></div>';
+    document.getElementById("prev").onclick=()=>{i--;render()};
+    renderTally();return;
+  }
+
+  if(s.type==="break"){
+    left=s.mins*60; clockLabel.textContent="";
+    stage.innerHTML='<div class="breakcard"><h1>'+s.title+'</h1>'+
+      '<div class="breakclock" id="face">'+fmt(left)+'</div>'+
+      '<div class="breaklist">'+s.lines.map(l=>"<p>"+l+"</p>").join("")+'</div>'+
+      '<div><button class="btn primary" id="break-go" disabled>Ещё идёт</button></div>'+
+      '<div style="margin-top:14px"><button class="small" id="skip">Пропустить перерыв</button></div></div>';
+    document.getElementById("break-go").onclick=()=>{i++;render()};
+    document.getElementById("skip").onclick=()=>{i++;render()};
+    startTimer(); renderTally(); return;
+  }
+
+  left=s.mins*60;
+  clockLabel.textContent="на блок "+s.mins+" мин";
+  let h='<div class="card"><p class="kicker">Блок '+(blockIdx.indexOf(i)+1)+'</p>'+
+    '<h1>'+s.title+'</h1><p class="goal">'+s.goal+'</p>';
+  if(s.why) h+='<div class="why">'+s.why+'</div>';
+  h+='<div class="divider"></div>'+
+    '<div class="clock"><span class="clockface" id="face">'+fmt(left)+'</span>'+
+    '<button class="small" id="tstart">Запустить таймер</button></div><ol class="steps">';
+  s.steps.forEach((st,n)=>{
+    h+='<li'+(checks[i][n]?' class="struck"':'')+' data-n="'+n+'">'+
+       '<button class="tick" aria-pressed="'+(checks[i][n]?'true':'false')+'" aria-label="Отметить шаг"></button>'+
+       '<div class="txt">'+st.t+'</div>';
+    if(st.cmd)h+='<div class="cmd"><code id="c'+i+'_'+n+'">'+esc(st.cmd)+'</code>'+
+       '<button class="copy" data-copy="c'+i+'_'+n+'">Копировать</button></div>';
+    if(st.expect)h+='<div class="expect">'+st.expect+'</div>';
+    h+='</li>';
+  });
+  h+='</ol>';
+  if(s.trap)h+='<div class="trap" style="margin-top:18px"><b>Кроличья нора.</b> '+s.trap+'</div>';
+  h+='<div class="finishline"><strong>Блок закрыт, когда:</strong> '+s.done+'</div>'+
+     '<div class="nav">'+(i>0?'<button class="btn ghost" id="prev">Назад</button>':'<span></span>')+
+     '<button class="btn primary" id="next">Блок пройден</button></div></div>';
+  stage.innerHTML=h;
+
+  stage.querySelectorAll(".tick").forEach(b=>{
+    b.onclick=()=>{const li=b.closest("li"),n=+li.dataset.n;
+      checks[i][n]=!checks[i][n];
+      b.setAttribute("aria-pressed",checks[i][n]?"true":"false");
+      li.classList.toggle("struck",checks[i][n]); renderTally()};
+  });
+  document.getElementById("tstart").onclick=e=>{
+    if(running){stopTimer();e.target.textContent="Продолжить"}
+    else{startTimer();e.target.textContent="Пауза"}};
+  document.getElementById("next").onclick=()=>{i++;render()};
+  const p=document.getElementById("prev"); if(p)p.onclick=()=>{i--;render()};
+  renderTally();
+}
+
+document.addEventListener("click",e=>{
+  const b=e.target.closest(".copy"); if(!b)return;
+  const txt=document.getElementById(b.dataset.copy).textContent;
+  const ok=()=>{b.textContent="Скопировано";b.classList.add("ok");
+    setTimeout(()=>{b.textContent="Копировать";b.classList.remove("ok")},1400)};
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(ok).catch(()=>{});
+  }else{const ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);
+    ta.select();try{document.execCommand("copy");ok()}catch(err){}ta.remove()}
+});
+
+const parkPanel=document.getElementById("park-panel"),stuckPanel=document.getElementById("stuck-panel"),
+      parkArea=document.getElementById("park");
+parkArea.addEventListener("input",()=>{parkText=parkArea.value});
+document.getElementById("park-btn").onclick=()=>{
+  stuckPanel.classList.add("hide"); parkPanel.classList.toggle("hide");
+  if(!parkPanel.classList.contains("hide")){parkArea.value=parkText;parkArea.focus()}};
+document.getElementById("stuck-btn").onclick=()=>{
+  parkPanel.classList.add("hide"); stuckPanel.classList.toggle("hide")};
+
+render();
+</script>

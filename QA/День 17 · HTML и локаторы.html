@@ -1,0 +1,654 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>День 17 · HTML и локаторы</title>
+<style>
+/* Оформление дня 13: светлая бумага, вкладки сверху, тёмные блоки кода, цветные плашки по роли */
+:root{
+  --bg:#eef1f2; --paper:#fff; --ink:#1b2430; --soft:#4e5a67; --line:#d7dde0;
+  --blue:#1f5fa9; --blue-bg:#e9f1fa;
+  --red:#b0352b; --red-bg:#fbecea;
+  --green:#276f52; --green-bg:#e8f4ee;
+  --amber:#9a6a00; --amber-bg:#fbf2df;
+  --violet:#5e4b8b; --violet-bg:#efebf8;
+  --code-bg:#0f1720; --code-fg:#dce7f0; --code-cm:#8ea2b4;
+  --chip:#eef1f3; --th:#f2f5f6; --soft-bg:#f6f8f9; --hover:#eaf0f3;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.62;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding-inline:18px;padding-block:0 60px}
+header{padding:34px 0 14px}
+.day{font-size:14px;color:var(--soft)}
+h1{font-size:33px;line-height:1.15;margin:.2em 0 .3em;text-wrap:balance}
+.lead{color:var(--soft);margin:0;max-width:62ch}
+
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);padding:10px 0 8px;
+  display:flex;gap:6px;overflow-x:auto;border-bottom:1px solid var(--line)}
+.tabs button{flex:0 0 auto;background:var(--paper);border:1px solid var(--line);border-radius:8px;
+  padding:8px 13px;font:inherit;font-size:14.5px;color:var(--soft);cursor:pointer;white-space:nowrap}
+.tabs button.on{background:var(--ink);color:var(--paper);border-color:var(--ink);font-weight:600}
+.tabs button .n{opacity:.55;margin-right:6px}
+button:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+.pane{display:none;background:var(--paper);border:1px solid var(--line);border-top:0;
+  border-radius:0 0 12px 12px;padding:28px 30px 34px}
+.pane.on{display:block}
+.pane h2{margin:0 0 6px;font-size:26px;line-height:1.2;text-wrap:balance}
+.pane .sub{color:var(--soft);margin:0 0 20px;font-size:15.5px}
+h3{font-size:19.5px;margin:28px 0 8px}
+h4{font-size:17px;margin:20px 0 6px}
+p{margin:12px 0}
+ul,ol{padding-left:24px}li{margin:6px 0}
+code.i{background:var(--chip);border:1px solid var(--line);border-radius:4px;padding:1px 5px;
+ font-family:Consolas,monospace;font-size:.92em}
+pre{background:var(--code-bg);color:var(--code-fg);border-radius:9px;padding:15px 17px;overflow-x:auto;
+ font-family:Consolas,monospace;font-size:14.5px;line-height:1.55;margin:14px 0}
+pre .cm{color:var(--code-cm)}
+pre.light{background:var(--soft-bg);color:var(--ink);border:1px solid var(--line)}
+
+.box{border-left:4px solid;border-radius:0 8px 8px 0;padding:14px 18px;margin:18px 0}
+.box .title{font-weight:700;margin-bottom:4px}
+.def{border-color:var(--blue);background:var(--blue-bg)} .def .title{color:var(--blue)}
+.trap{border-color:var(--red);background:var(--red-bg)} .trap .title{color:var(--red)}
+.note{border-color:var(--green);background:var(--green-bg)} .note .title{color:var(--green)}
+.card{border-color:var(--amber);background:var(--amber-bg)} .card .title{color:var(--amber)}
+.task{border-color:var(--violet);background:var(--violet-bg)} .task .title{color:var(--violet)}
+.box p:first-of-type{margin-top:2px}.box p:last-child{margin-bottom:2px}
+
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15.5px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--th);font-weight:600}
+td{font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto}
+.mono{font-family:Consolas,monospace;white-space:nowrap}
+
+details{border:1px solid var(--line);background:var(--soft-bg);border-radius:8px;padding:10px 14px;margin:10px 0}
+summary{cursor:pointer;font-weight:600;color:var(--violet)}
+details[open] summary{margin-bottom:8px}
+.mark{display:inline-block;font-size:12.5px;font-weight:700;border-radius:99px;padding:1px 9px;margin-left:6px;vertical-align:1px}
+.m-ok{background:var(--green-bg);color:var(--green)}
+.m-half{background:var(--amber-bg);color:var(--amber)}
+.yours{border-left:3px solid var(--line);padding:2px 0 2px 12px;color:var(--soft);font-size:15.5px;margin:8px 0}
+
+.q{border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:16px 0}
+.qn{font-weight:700;margin-bottom:6px}
+.opts{display:grid;gap:8px;margin-top:12px}
+.opt{text-align:left;background:var(--soft-bg);border:1px solid var(--line);border-radius:8px;
+ padding:10px 14px;cursor:pointer;font:inherit;font-size:16px;color:var(--ink)}
+.opt:hover{background:var(--hover)}
+.opt.right{background:var(--green-bg);border-color:var(--green);font-weight:600}
+.opt.wrong{background:var(--red-bg);border-color:var(--red)}
+.expl{margin-top:12px;padding:12px 14px;background:var(--soft-bg);border-radius:8px}
+.score{position:sticky;bottom:env(safe-area-inset-bottom,0px);background:var(--paper);border:1px solid var(--line);
+ border-radius:10px;padding:12px 18px;margin-top:18px;font-weight:600;font-variant-numeric:tabular-nums}
+
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:34px;padding-top:18px;border-top:1px solid var(--line)}
+.nav button{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 16px;
+ font:inherit;cursor:pointer;color:var(--ink)}
+.nav .next{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.nav button[disabled]{opacity:.35;cursor:default}
+@media(max-width:640px){.wrap{padding-inline:16px}.pane{padding:20px 17px 26px}h1{font-size:27px}pre{font-size:13.5px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+<style>
+.simple{border:1px solid var(--line);background:var(--soft-bg);border-radius:10px;padding:14px 18px;margin:16px 0}
+.simple .title{font-weight:700;margin-bottom:4px;color:var(--ink)}
+.steps{counter-reset:st;list-style:none;padding-left:0}
+.steps>li{counter-increment:st;position:relative;padding-left:38px;margin:12px 0}
+.steps>li::before{content:counter(st);position:absolute;left:0;top:1px;width:26px;height:26px;border-radius:50%;
+  background:var(--ink);color:var(--paper);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.done{border:1px dashed var(--green);border-radius:8px;padding:10px 14px;margin:14px 0;font-size:15.5px}
+.done b{color:var(--green)}
+.req{border:1px solid var(--line);border-radius:10px;background:var(--soft-bg);padding:16px 20px;margin:16px 0}
+.req p{margin:9px 0}
+.req .rn{font-weight:700;font-family:Consolas,monospace;margin-right:6px}
+.ask{display:grid;gap:8px;margin:10px 0}
+.ask label{display:flex;gap:8px;align-items:flex-start;font-size:16px;cursor:pointer}
+.ask input{margin-top:5px}
+</style>
+<style>
+.split{display:flex;align-items:center;gap:12px;margin:28px 0 8px;color:var(--soft);font-size:14.5px;font-weight:600}
+.split::before,.split::after{content:"";flex:1;border-top:1px dashed var(--line)}
+.shop{border:1px solid var(--line);border-radius:12px;background:var(--soft-bg);padding:22px 24px;margin:18px 0}
+.shop .logo{display:block;width:120px;height:36px;margin-bottom:14px}
+.shop h4{margin:0 0 14px;font-size:18px}
+.fld{margin:12px 0}
+.fld label{display:block;font-size:14.5px;color:var(--soft);margin-bottom:5px}
+.fld input[type="text"],.fld input[type="email"]{width:100%;max-width:340px;padding:9px 12px;border:1px solid var(--line);border-radius:7px;font:inherit;font-size:16px;background:var(--paper);color:var(--ink)}
+.chk{display:flex;gap:8px;align-items:center;font-size:15px;margin:12px 0}
+.btnlike{display:inline-block;background:var(--ink);color:var(--paper);border-radius:8px;padding:11px 22px;font-size:16px;cursor:pointer;user-select:none}
+.shop a{color:var(--blue);font-size:15px;margin-left:14px}
+#f-msg{margin-top:14px;font-size:15px;color:var(--soft);min-height:1.4em}
+</style>
+
+<div class="wrap">
+
+<header>
+  <div class="day">День 17 · пятница, 9 октября · техминимум, тема 1.6</div>
+  <h1>HTML, CSS и поиск элементов</h1>
+  <p class="lead">Автотест видит страницу не глазами, а через разметку: «найди поле с таким-то признаком и введи текст». Признак называется локатором. Сегодня учимся читать разметку и писать локаторы — это фундамент UI-автоматизации.</p>
+</header>
+
+<div class="box def">
+  <div class="title">Два захода, около 4:00</div>
+  <p><b>Заход 1 · 2:20</b> — вкладки 0–5. <b>Перерыв — час без экрана.</b> <b>Заход 2 · 1:40</b> — Python, тест-кейсы, итоги.</p>
+</div>
+
+<div class="tabs" id="tabs"></div>
+
+<!-- 0 -->
+<div class="pane" data-title="Карточки и код">
+  <h2>Разминка</h2>
+  <p class="sub">25 минут: карточки 15, чтение кода 10</p>
+
+  <h3>Карточки — два отдельных прогона</h3>
+  <ol class="steps">
+    <li><b>N · Требования и тест-план</b> — галочка «Знакомство» включена. Читаешь ядро, отводишь взгляд, пересказываешь. 4 карточки.</li>
+    <li><b>I · Баг-репорты</b> — галочка выключена, обычная проверка по ядру. 6 карточек.</li>
+  </ol>
+  <div class="done"><b>Готово, когда</b> записала счёт I: сколько ядер из 6 сказала уверенно. N не считаем — это знакомство.</div>
+
+  <h3>Чтение кода</h3>
+  <p>Функции и одна проверка на правило про новый ключ. Таблица на бумаге, по строкам.</p>
+  <div id="quizA"></div>
+</div>
+
+<!-- 1 -->
+<div class="pane" data-title="Охота">
+  <h2>Что не так с этой формой</h2>
+  <p class="sub">25 минут · форма настоящая, её можно трогать и смотреть через F12</p>
+
+  <p>На экране обычная форма входа. Но часть проблем видна только в разметке. Ищи двумя способами: <b>руками</b> — кликай, нажимай Tab, вводи текст — и <b>через F12</b>: правый клик по элементу → «Просмотреть код».</p>
+
+  <div class="shop" id="hunt-form">
+    <img class="logo" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='36'%3E%3Crect width='120' height='36' rx='6' fill='%231f5fa9'/%3E%3Ctext x='60' y='24' font-family='Arial' font-size='15' fill='white' text-anchor='middle'%3EShop%3C/text%3E%3C/svg%3E">
+    <h4>Вход в личный кабинет</h4>
+    <div class="fld">
+      <label>Email</label>
+      <input type="email" id="field" class="field" data-testid="login-email">
+    </div>
+    <div class="fld">
+      <label>Пароль</label>
+      <input type="text" id="field" class="field">
+    </div>
+    <div class="chk">
+      <input type="checkbox" id="cb-00000"> <label for="cb-00000">Запомнить меня</label>
+    </div>
+    <div class="btnlike" onclick="document.getElementById('f-msg').textContent='Отправка формы...'">Войти</div>
+    <a href="#">Забыли пароль?</a>
+    <div id="f-msg"></div>
+  </div>
+
+  <div class="box task">
+    <div class="title">Задание</div>
+    <ol class="steps">
+      <li>Введи что-нибудь в поле «Пароль». Что видишь?</li>
+      <li>Кликни по слову «Email» над полем. Что произошло с курсором? Теперь кликни по «Запомнить меня» — есть разница?</li>
+      <li>Пройди форму клавишей Tab: щёлкни в поле email и жми Tab. На какие элементы встаёт фокус, а какие пропускаются? Получится ли нажать «Войти» с клавиатуры, клавишей Enter?</li>
+      <li>Открой разметку полей email и пароля. Сравни их атрибуты.</li>
+      <li>Посмотри id у галочки «Запомнить меня». Обнови страницу и посмотри ещё раз.</li>
+      <li>Посмотри разметку логотипа и ссылки «Забыли пароль?». Куда ведёт ссылка?</li>
+    </ol>
+  </div>
+
+  <div class="box card">
+    <div class="title">Сколько искать</div>
+    <p>Семь проблем. У одного элемента есть атрибут, который сделан правильно и очень удобен автотестам, — это контрольный.</p>
+  </div>
+  <div class="done"><b>Готово, когда</b> каждая находка записана в три части: <b>элемент → что вышло → почему это плохо</b>. Записью, а не исправленной разметкой.</div>
+</div>
+
+<!-- 2 -->
+<div class="pane" data-title="Разбор">
+  <h2>Семь проблем формы</h2>
+  <p class="sub">15 минут. После охоты</p>
+
+  <details><summary>1 · Поле пароля показывает пароль</summary>
+    <p><b>Что вышло:</b> введённые символы видны на экране.</p>
+    <p><b>Почему:</b> у поля <code class="i">type="text"</code> вместо <code class="i">type="password"</code>. Пароль увидит любой, кто стоит рядом или смотрит запись экрана. Баг безопасности, и одновременно автотест не найдёт поле по <code class="i">[type="password"]</code>.</p>
+  </details>
+
+  <details><summary>2 · Два элемента с одним id</summary>
+    <p><b>Что вышло:</b> у email и у пароля <code class="i">id="field"</code>.</p>
+    <p><b>Почему плохо:</b> id по правилам HTML должен быть <b>уникальным</b> на странице. Локатор <code class="i">#field</code> найдёт два элемента, и автотест введёт пароль не туда — или возьмёт первый попавшийся. Проверь: в Elements нажми Ctrl+F и введи <code class="i">#field</code> — справа будет «1 of 2».</p>
+  </details>
+
+  <details><summary>3 · Подписи не связаны с полями</summary>
+    <p><b>Что вышло:</b> клик по слову «Email» ничего не делает. А клик по «Запомнить меня» ставит галочку.</p>
+    <p><b>Почему:</b> у подписи галочки есть <code class="i">for="cb-…"</code> — она связана с полем. У подписей Email и Пароль атрибута <code class="i">for</code> нет. Для пользователя это неудобство, а для экранных читалок у незрячих — поле без названия. Это доступность — тоже вид тестирования.</p>
+  </details>
+
+  <details><summary>4 · «Войти» — не кнопка</summary>
+    <p><b>Что вышло:</b> Tab пропускает «Войти», Enter её не нажимает. Нажать можно только мышью.</p>
+    <p><b>Почему:</b> это <code class="i">&lt;div&gt;</code> с обработчиком клика, оформленный под кнопку. Настоящая кнопка — <code class="i">&lt;button&gt;</code>: она получает фокус и нажимается с клавиатуры. Автотесту тоже сложнее: локатор <code class="i">button</code> её не найдёт.</p>
+    <p>Тебе как дизайнеру: на макете они одинаковые. Разница — только в разметке. Поэтому тестировщик смотрит и в разметку тоже.</p>
+  </details>
+
+  <details><summary>5 · id галочки меняется при каждой загрузке</summary>
+    <p><b>Что вышло:</b> <code class="i">id="cb-48213"</code>, после обновления — другое число.</p>
+    <p><b>Почему плохо:</b> такой id генерирует фреймворк. Локатор <code class="i">#cb-48213</code> сработает один раз и сломается при следующем запуске. Это частая причина флакающих тестов — карточка B.</p>
+  </details>
+
+  <details><summary>6 · Ссылка «Забыли пароль?» ведёт никуда</summary>
+    <p><b>Что вышло:</b> <code class="i">href="#"</code> — клик просто прокручивает страницу наверх.</p>
+    <p><b>Почему:</b> функциональный баг — восстановления пароля нет. Хотя тут есть оправдание: требования к восстановлению на уточнении. Это ты сама записала в тест-план.</p>
+  </details>
+
+  <details><summary>7 · У логотипа нет alt</summary>
+    <p><b>Что вышло:</b> у <code class="i">&lt;img&gt;</code> нет атрибута <code class="i">alt</code>.</p>
+    <p><b>Почему плохо:</b> если картинка не загрузится, на её месте пусто. Экранная читалка не знает, что это. Тоже доступность.</p>
+  </details>
+
+  <details><summary>Контрольный · data-testid у поля email — это хорошо</summary>
+    <p><code class="i">data-testid="login-email"</code> — атрибут, который разработчики добавляют <b>специально для автотестов</b>. Он не меняется при редизайне, не зависит от стилей и уникален. Лучший локатор, какой бывает. Если ты записала его в баги — посмотри теорию.</p>
+  </details>
+</div>
+
+<!-- 3 -->
+<div class="pane" data-title="HTML и CSS">
+  <h2>Как устроена страница и как найти элемент</h2>
+  <p class="sub">40 минут</p>
+
+  <div class="simple">
+    <div class="title">Простыми словами</div>
+    <p>HTML — это дерево вложенных элементов, как слои и фреймы в Figma. CSS-селектор — способ сказать «вот этот элемент» по его признакам: тегу, id, классу, атрибуту. Автотест находит элементы ровно этими селекторами.</p>
+  </div>
+
+  <h3>Элемент: тег, атрибуты, содержимое</h3>
+<pre>&lt;input type="email" id="email" class="field" data-testid="login-email"&gt;
+ │      │            │          │             │
+ тег    атрибут      атрибут    атрибут       атрибут для автотестов</pre>
+<pre>&lt;button class="btn primary"&gt;Войти&lt;/button&gt;
+                          └────┘ └─────┘
+                    содержимое   закрывающий тег</pre>
+  <p>У <code class="i">input</code> нет закрывающего тега и нет содержимого — только атрибуты. У <code class="i">button</code>, <code class="i">a</code>, <code class="i">div</code> — есть.</p>
+
+  <h3>Вложенность — дерево</h3>
+<pre>&lt;form id="login"&gt;
+    &lt;div class="fld"&gt;
+        &lt;label for="email"&gt;Email&lt;/label&gt;
+        &lt;input id="email"&gt;
+    &lt;/div&gt;
+    &lt;button&gt;Войти&lt;/button&gt;
+&lt;/form&gt;</pre>
+  <p><code class="i">form</code> — родитель. <code class="i">div</code> и <code class="i">button</code> — его дети. <code class="i">input</code> — внук формы и ребёнок <code class="i">div</code>. В Figma это выглядело бы как фрейм с вложенными группами — Elements в DevTools показывает ровно это дерево.</p>
+
+  <div class="box def">
+    <div class="title">[Бумага] Теги, которые встречаются в формах</div>
+    <div class="scroll"><table>
+      <tr><th>Тег</th><th>Что это</th><th>Важное</th></tr>
+      <tr><td class="mono">form</td><td>форма</td><td>всё, что отправляется вместе</td></tr>
+      <tr><td class="mono">input</td><td>поле ввода</td><td><code class="i">type</code> решает, какое: text, email, password, checkbox</td></tr>
+      <tr><td class="mono">label</td><td>подпись поля</td><td><code class="i">for</code> связывает с полем по его id</td></tr>
+      <tr><td class="mono">button</td><td>кнопка</td><td>получает фокус, нажимается Enter</td></tr>
+      <tr><td class="mono">a</td><td>ссылка</td><td><code class="i">href</code> — куда ведёт</td></tr>
+      <tr><td class="mono">img</td><td>картинка</td><td><code class="i">alt</code> — текст вместо картинки</td></tr>
+      <tr><td class="mono">div, span</td><td>контейнеры без смысла</td><td>для группировки и оформления</td></tr>
+    </table></div>
+  </div>
+
+  <h3>Атрибуты, по которым ищут</h3>
+  <div class="scroll"><table>
+    <tr><th>Атрибут</th><th>Правило</th></tr>
+    <tr><td class="mono">id</td><td>уникален на странице. Один id — один элемент</td></tr>
+    <tr><td class="mono">class</td><td>общий для многих элементов, может быть из нескольких слов через пробел: <code class="i">class="btn primary"</code> — это два класса</td></tr>
+    <tr><td class="mono">name</td><td>имя поля, с которым данные уйдут на сервер</td></tr>
+    <tr><td class="mono">data-testid</td><td>специально для автотестов. Лучший вариант, если есть</td></tr>
+  </table></div>
+
+  <h3>CSS-селекторы</h3>
+  <div class="box def">
+    <div class="title">[Бумага] Пять базовых селекторов</div>
+    <div class="scroll"><table>
+      <tr><th>Селектор</th><th>Что найдёт</th></tr>
+      <tr><td class="mono">input</td><td>все элементы <code class="i">input</code></td></tr>
+      <tr><td class="mono">#email</td><td>элемент с <code class="i">id="email"</code> — решётка значит id</td></tr>
+      <tr><td class="mono">.field</td><td>все элементы с классом <code class="i">field</code> — точка значит класс</td></tr>
+      <tr><td class="mono">[type="password"]</td><td>элементы, у которых атрибут type равен password</td></tr>
+      <tr><td class="mono">[data-testid="login-email"]</td><td>то же, для любого атрибута</td></tr>
+    </table></div>
+  </div>
+
+  <div class="box def">
+    <div class="title">[Бумага] Как их соединять</div>
+    <div class="scroll"><table>
+      <tr><th>Запись</th><th>Смысл</th><th>Пример</th></tr>
+      <tr><td>слитно</td><td>один элемент, у которого всё сразу</td><td class="mono">input.field[type="email"]</td></tr>
+      <tr><td>через пробел</td><td>внутри, на любой глубине</td><td class="mono">form input</td></tr>
+      <tr><td>через &gt;</td><td>прямой ребёнок</td><td class="mono">.fld &gt; input</td></tr>
+    </table></div>
+    <p>Самая частая ошибка — лишний пробел: <code class="i">input .field</code> — это «элемент с классом field <b>внутри</b> input», такого не бывает. А <code class="i">input.field</code> — «input с классом field».</p>
+  </div>
+
+  <h3>Как проверить селектор</h3>
+  <ol class="steps">
+    <li>F12 → вкладка Elements.</li>
+    <li>Ctrl+F (на Mac — Cmd+F). Внизу появится строка поиска.</li>
+    <li>Вставь селектор. Справа — счётчик: «1 of 1» значит найден ровно один элемент. Он подсветится.</li>
+  </ol>
+
+  <h3>Какой локатор хороший</h3>
+  <div class="simple">
+    <div class="title">Простыми словами</div>
+    <p>Хороший локатор находит <b>ровно один</b> элемент и <b>не ломается</b>, когда меняют дизайн.</p>
+  </div>
+  <div class="scroll"><table>
+    <tr><th>Порядок выбора</th><th>Пример</th><th>Почему</th></tr>
+    <tr><td>1. data-testid</td><td class="mono">[data-testid="login-email"]</td><td>создан для тестов, не меняется</td></tr>
+    <tr><td>2. id, если постоянный</td><td class="mono">#email</td><td>уникальный, короткий</td></tr>
+    <tr><td>3. name или атрибут по смыслу</td><td class="mono">[name="password"]</td><td>связан с логикой, а не с видом</td></tr>
+    <tr><td>4. класс плюс тег</td><td class="mono">button.primary</td><td>может сломаться при редизайне</td></tr>
+  </table></div>
+  <div class="box trap">
+    <div class="title">Плохие локаторы</div>
+    <ul>
+      <li><b>Цепочка по положению:</b> <code class="i">div &gt; div &gt; div:nth-child(3) &gt; input</code> — сломается, как только добавят один блок.</li>
+      <li><b>Динамический id:</b> <code class="i">#cb-48213</code> — другой при каждой загрузке.</li>
+      <li><b>Класс оформления:</b> <code class="i">.blue-big</code> — дизайнер поменяет цвет, тест упадёт.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 4 -->
+<div class="pane" data-title="Задание">
+  <h2>Локаторы для формы охоты</h2>
+  <p class="sub">30 минут</p>
+
+  <p>Представь, что форму из охоты <b>уже исправили</b>: у пароля <code class="i">id="password"</code> и <code class="i">type="password"</code>, у email <code class="i">id="email"</code>, «Войти» стала <code class="i">&lt;button&gt;</code>. Но проверить в DevTools ты можешь только то, что на странице сейчас.</p>
+
+  <div class="box task">
+    <div class="title">Задание</div>
+    <ol class="steps">
+      <li>Создай <code class="i">manual/locators-login.md</code> с таблицей: <b>элемент → локатор → сколько нашёл в DevTools сейчас → оценка</b>.</li>
+      <li>Напиши локаторы для шести элементов: поле email, поле пароля, галочка, подпись «Запомнить меня», кнопка «Войти», ссылка «Забыли пароль?».</li>
+      <li>Каждый проверь через Ctrl+F в Elements и запиши счётчик.</li>
+      <li>В столбце «оценка» — хороший / плохой и одним словом почему. Где на текущей странице нельзя написать хороший локатор, так и напиши и объясни, чего не хватает.</li>
+    </ol>
+  </div>
+
+<pre class="light">| Элемент | Локатор | Найдено сейчас | Оценка |
+|---|---|---|---|
+| Поле email | [data-testid="login-email"] | 1 of 1 | хороший — создан для тестов |</pre>
+
+  <div class="done"><b>Готово, когда</b> шесть строк, у каждой счётчик из DevTools. Хотя бы для двух элементов объяснено, почему хороший локатор сейчас невозможен.</div>
+</div>
+
+<!-- 5 -->
+<div class="pane" data-title="Тест">
+  <h2>Тест</h2>
+  <p class="sub">8 вопросов, 10 минут · конец первого захода</p>
+  <div id="quizB"></div>
+  <div class="score" id="scoreB">Отвечено 0 из 8</div>
+  <div class="split">перерыв — не меньше часа без экрана</div>
+</div>
+
+<!-- 6 -->
+<div class="pane" data-title="Python">
+  <h2>Функции для локаторов</h2>
+  <p class="sub">60 минут · файл python/day17_locators.py</p>
+
+  <p>Сегодня сделаем на Python маленькую модель того, что делает браузер, когда ищет элемент по селектору. Страница — это список словарей, каждый словарь — элемент с атрибутами.</p>
+
+  <h3>0. Разобранный пример</h3>
+<pre>def by_tag(tag):
+    return tag
+
+def count_tags(elements):
+    counts = {}
+    for e in elements:
+        t = e["tag"]
+        counts[t] = counts.get(t, 0) + 1
+    return counts
+
+page = [{"tag": "input"}, {"tag": "input"}, {"tag": "button"}]
+print(by_tag("input"))       <span class="cm"># input</span>
+print(count_tags(page))      <span class="cm"># {'input': 2, 'button': 1}</span></pre>
+  <div class="scroll"><table>
+    <tr><th>Проход</th><th><code class="i">t</code></th><th><code class="i">counts.get(t, 0)</code></th><th><code class="i">counts</code> после</th></tr>
+    <tr><td>1</td><td>"input"</td><td>0 — ключа нет</td><td class="mono">{'input': 1}</td></tr>
+    <tr><td>2</td><td>"input"</td><td>1</td><td class="mono">{'input': 2}</td></tr>
+    <tr><td>3</td><td>"button"</td><td>0 — ключа нет</td><td class="mono">{'input': 2, 'button': 1}</td></tr>
+  </table></div>
+  <p>Это словарь-счётчик в одну строку через <code class="i">get</code> с нулём — без <code class="i">if/else</code>. Выбирай один способ, не смешивай.</p>
+
+  <p>Данные для всех задач — скопируй в начало файла:</p>
+<pre class="light">elements = [
+    {"tag": "input", "id": "email", "type": "email", "class": "field", "data-testid": "login-email"},
+    {"tag": "input", "id": "password", "type": "password", "class": "field"},
+    {"tag": "input", "type": "checkbox", "class": "check"},
+    {"tag": "button", "id": "submit", "type": "submit", "class": "btn primary"},
+    {"tag": "a", "class": "link", "href": "#"},
+]</pre>
+
+  <h3>Задача 1 — собрать селектор · 15 минут</h3>
+  <p>Три функции, каждая <b>возвращает</b> строку-селектор:</p>
+  <ul>
+    <li><code class="i">by_id(element_id)</code> → <code class="i">#email</code></li>
+    <li><code class="i">by_class(name)</code> → <code class="i">.field</code></li>
+    <li><code class="i">by_attr(attr, value)</code> → <code class="i">[type="password"]</code> — с двойными кавычками вокруг значения</li>
+  </ul>
+  <p>Проверки — все должны напечатать <code class="i">True</code>:</p>
+<pre class="light">print(by_id("email") == "#email")
+print(by_class("field") == ".field")
+print(by_attr("type", "password") == '[type="password"]')
+print(by_attr("data-testid", "login-email") == '[data-testid="login-email"]')</pre>
+  <details><summary>Подсказка — кавычки</summary>
+    <p>Внутри строки нужны двойные кавычки — значит, саму f-строку пиши в одинарных: <code class="i">f'[{attr}="{value}"]'</code>.</p>
+  </details>
+
+  <h3>Задача 2 — найти элементы · 25 минут</h3>
+  <p><code class="i">find_by_attr(elements, attr, value)</code> возвращает <b>список id</b> всех элементов, у которых атрибут <code class="i">attr</code> равен <code class="i">value</code>. Если у найденного элемента нет id — вместо него в список кладётся строка <code class="i">"без id"</code>.</p>
+<pre class="light">print(find_by_attr(elements, "class", "field") == ["email", "password"])
+print(find_by_attr(elements, "type", "checkbox") == ["без id"])
+print(find_by_attr(elements, "name", "login") == [])</pre>
+  <details><summary>Подсказка — у элементов разные атрибуты</summary>
+    <p>У галочки нет id, ни у кого нет name. <code class="i">e["name"]</code> упадёт с KeyError. Что вернёт <code class="i">e.get("name")</code>, если ключа нет? А <code class="i">e.get("id", "без id")</code>?</p>
+    <p>Третья проверка — граница: ничего не найдено. Функция должна вернуть пустой список, а не упасть.</p>
+  </details>
+
+  <h3>Задача 3 — уникален ли локатор · 15 минут</h3>
+  <p>Хороший локатор находит ровно один элемент. Функция <code class="i">is_unique(elements, attr, value)</code> возвращает <code class="i">True</code>, если нашёлся ровно один элемент. Используй внутри <code class="i">find_by_attr</code> — не пиши поиск заново.</p>
+<pre class="light">print(is_unique(elements, "id", "email") == True)
+print(is_unique(elements, "class", "field") == False)
+print(is_unique(elements, "name", "login") == False)</pre>
+
+  <div class="box task">
+    <div class="title">Со звёздочкой</div>
+    <p>У кнопки <code class="i">class="btn primary"</code> — два класса. <code class="i">find_by_attr(elements, "class", "btn")</code> её не найдёт: строки не равны. Напиши <code class="i">has_class(element, name)</code>, которая вернёт <code class="i">True</code>, если <code class="i">name</code> — один из классов элемента. Вспомни <code class="i">split()</code> из дня 8.</p>
+  </div>
+
+  <div class="box trap">
+    <div class="title">Правило дня — запусти проверки до того, как присылать</div>
+    <p>Все проверки уже написаны в задании. Скопируй их как есть, запусти и пришли вывод вместе с кодом. Если где-то <code class="i">False</code> — ищи баг сама, это и есть работа тестировщика. Не убирай <code class="i">== ...</code> из проверок.</p>
+  </div>
+
+  <div class="done"><b>Готово, когда</b> все десять проверок печатают <code class="i">True</code> и ты прислала код вместе с выводом.</div>
+</div>
+
+<!-- TC -->
+<div class="pane" data-title="Тест-кейсы">
+  <h2>TC-004 и TC-005</h2>
+  <p class="sub">30 минут · к CP1: было 3 из 20, станет 5</p>
+
+  <p>Оба — на форму входа. Тексты сообщений — дословно из справочника дня 13.</p>
+
+  <h3>TC-004 · Пароль без цифры</h3>
+  <p>Негативный кейс на правило 3.5. Пароль ломает <b>только</b> отсутствие цифры: длина в норме, заглавная есть. Сегодняшнее задание — та же мысль.</p>
+
+  <h3>TC-005 · Блокировка после пятой неверной попытки</h3>
+  <p>Перед тем как писать, ответь на бумаге:</p>
+  <ol class="steps">
+    <li>Какие номера попыток проверить вокруг числа 5? Правило трёх проверок. Вспомни is_blocked из охоты дня 16.</li>
+    <li>Что показывается после 4-й попытки и после 5-й — дословно и где (над формой или под полем)?</li>
+    <li>Постусловие: что будет со следующими кейсами на этого пользователя, если блокировку не снять? Как снять?</li>
+  </ol>
+
+<pre class="light">ID:
+Название:
+Приоритет:
+Предусловие:
+Тестовые данные:
+Шаги:
+  1.
+Ожидаемый результат:
+Постусловие:</pre>
+
+  <div class="done"><b>Готово, когда</b> данные ломают ровно одно правило. Тексты — дословно, с местом показа. В TC-005 проверены 4-я и 5-я попытки, а не только 5-я. Есть постусловие. Предусловие не ссылается на другой кейс.</div>
+  <div class="box task">
+    <div class="title">[Репо]</div>
+    <p><code class="i">manual/test-cases.md</code> — дописать к трём существующим.</p>
+  </div>
+</div>
+
+<!-- 7 -->
+<div class="pane" data-title="Итоги">
+  <h2>Закрываем день</h2>
+  <p class="sub">5 минут</p>
+
+  <div class="box note">
+    <div class="title">[Бумага]</div>
+    <ul>
+      <li>Элемент: тег, атрибуты, содержимое. Страница — дерево.</li>
+      <li>Семь тегов формы и главный атрибут каждого.</li>
+      <li>id уникален, class — общий и бывает из нескольких слов.</li>
+      <li>Пять селекторов: тег, #id, .class, [атрибут="значение"], data-testid.</li>
+      <li>Слитно — один элемент; пробел — внутри; &gt; — прямой ребёнок.</li>
+      <li>Как проверить селектор: Elements → Ctrl+F → счётчик.</li>
+      <li>Хороший локатор: один элемент, не ломается при редизайне. Порядок: data-testid → id → name → класс с тегом.</li>
+    </ul>
+  </div>
+
+  <div class="box task">
+    <div class="title">[Репо]</div>
+<pre>git add manual/locators-login.md python/day17_locators.py manual/test-cases.md
+git commit -m "День 17: HTML, CSS-селекторы, локаторы формы входа, TC-004 и TC-005"
+git push</pre>
+  </div>
+
+  <div class="box def">
+    <div class="title">Что мне прислать</div>
+    <ol>
+      <li>Счёт карточек I из 6.</li>
+      <li>Находки охоты — в три части.</li>
+      <li>Таблицу локаторов.</li>
+      <li>Код и вывод Python — все проверки.</li>
+      <li>Номера вопросов теста, где ошиблась.</li>
+      <li>TC-004 и TC-005.</li>
+    </ol>
+  </div>
+
+  <h3>Дальше</h3>
+  <p>Суббота, день 18 — практика: Jira и баги на живых сайтах, без новой темы. Понедельник, день 19 — функции, часть 2, и JSON, старт генератора тестовых данных.</p>
+</div>
+
+</div>
+
+<script>
+/* динамический id галочки — меняется при каждой загрузке */
+(function(){
+  var cb=document.querySelector('#hunt-form input[type="checkbox"]');
+  var lb=document.querySelector('#hunt-form .chk label');
+  var n='cb-'+Math.floor(10000+Math.random()*89999);
+  cb.id=n; lb.setAttribute('for',n);
+})();
+
+var QA=[
+{q:'def f(a, b=2):\n    return a * b\n\nprint(f(3), f(3, 4))',
+ o:['6 6','6 12','3 12','Ошибка: не хватает аргумента'],a:1,
+ e:'В первом вызове b не передан — берётся 2, получаем 6. Во втором b = 4, получаем 12.'},
+{q:'def g(x):\n    if x > 0:\n        return "плюс"\n\nprint(g(-1))',
+ o:['плюс','None','Ошибка','Ничего не напечатается'],a:1,
+ e:'Для -1 условие не выполнилось, до return дело не дошло. Функция закончилась без return — значит, вернула None. Вопрос к себе: на всех ли путях есть return?'},
+{q:'d = {}\nd["a"] = d.get("a", 0) + 1\nd["b"] = 5\nprint(len(d), d)',
+ o:["1 {'a': 1}","2 {'a': 1, 'b': 5}","2 {'a': 0, 'b': 5}","KeyError"],a:1,
+ e:'get("a", 0) вернул 0, стало 1 — и запись по новому ключу создала пару "a". Потом запись по новому ключу "b" создала вторую пару. Две пары.'},
+{q:'def check(s):\n    for ch in s:\n        if ch == "!":\n            return True\n    return False\n\nprint(check("ab!"), check(""))',
+ o:['True True','True False','False False','True None'],a:1,
+ e:'В "ab!" цикл доходит до "!" и возвращает True. В пустой строке цикл не выполняется ни разу — срабатывает return False после цикла. Это правильное устройство, в отличие от has_digit джуна.'}
+];
+
+var QB=[
+{q:'Что найдёт селектор #email?',
+ o:['Все элементы с классом email','Элемент с id="email"','Все поля типа email','Элемент с name="email"'],a:1,
+ e:'Решётка — это id. Точка — класс. Квадратные скобки — любой атрибут.'},
+{q:'Что найдёт селектор .field?',
+ o:['Элемент с id="field"','Все элементы с классом field','Все поля ввода','Только первый элемент с классом field'],a:1,
+ e:'Точка — класс. Класс общий, поэтому найдёт все элементы, у которых он есть.'},
+{q:'Чем отличается input.field от input .field?',
+ o:['Ничем','input.field — input с классом field; input .field — элемент с классом field внутри input','Первый ищет по id, второй по классу','Второй — синтаксическая ошибка'],a:1,
+ e:'Слитно — один элемент с обоими признаками. Пробел — «внутри». Внутри input ничего не бывает, поэтому input .field не найдёт ничего.'},
+{q:'Какой локатор лучше для поля email?',
+ o:['div > div:nth-child(2) > input','[data-testid="login-email"]','.blue-input','input'],a:1,
+ e:'data-testid создан для автотестов: уникален и не меняется при редизайне. Цепочка по положению ломается от любого нового блока, класс оформления — от смены цвета, input найдёт все поля.'},
+{q:'На странице два элемента с одинаковым id. Это проблема?',
+ o:['Нет, так можно','Да: id должен быть уникальным, локатор по нему найдёт два элемента','Только если элементы разных типов','Только для кнопок'],a:1,
+ e:'По правилам HTML id уникален. Два одинаковых — баг разметки, а автотест по такому id может взять не тот элемент.'},
+{q:'У галочки id="cb-48213", после перезагрузки — id="cb-90517". Можно ли использовать его как локатор?',
+ o:['Да, id — лучший локатор','Нет: id генерируется заново, тест сломается на следующем запуске','Да, если запускать тест быстро','Нет, потому что это галочка'],a:1,
+ e:'Динамический id меняется при каждой загрузке. Тест с ним сработает один раз. Это частая причина флакающих тестов.'},
+{q:'Кнопка «Войти» сделана через <div> с обработчиком клика. Что не так?',
+ o:['Ничего, выглядит так же','Её нельзя нажать с клавиатуры и сложнее найти локатором button','Она не будет отправлять форму мышью','Это только проблема дизайна'],a:1,
+ e:'<button> получает фокус по Tab и нажимается Enter. <div> — нет. Пользователь без мыши не войдёт, а локатор button её не найдёт.'},
+{q:'Как проверить, сколько элементов находит селектор?',
+ o:['Посмотреть на страницу глазами','F12 → Elements → Ctrl+F → вставить селектор и посмотреть счётчик','Перезагрузить страницу','Открыть Network'],a:1,
+ e:'Строка поиска в Elements понимает CSS-селекторы. Счётчик «1 of 1» — найден ровно один, это то, что нужно хорошему локатору.'}
+];
+
+function buildQuiz(host,data,scoreEl,code){
+  var answered=0,right=0;
+  data.forEach(function(item,i){
+    var box=document.createElement('div');box.className='q';
+    var t=document.createElement('div');t.className='qn';t.textContent='Вопрос '+(i+1);box.appendChild(t);
+    if(code){var pre=document.createElement('pre');pre.textContent=item.q;box.appendChild(pre);
+      var hint=document.createElement('div');hint.textContent='Что напечатается?';box.appendChild(hint);}
+    else{var qt=document.createElement('div');qt.textContent=item.q;box.appendChild(qt);}
+    var opts=document.createElement('div');opts.className='opts';
+    var expl=document.createElement('div');expl.className='expl';expl.hidden=true;expl.textContent=item.e;
+    var locked=false;
+    item.o.forEach(function(text,j){
+      var b=document.createElement('button');b.className='opt';b.type='button';b.textContent=text;
+      if(code)b.style.fontFamily='Consolas,monospace';
+      b.onclick=function(){
+        if(locked)return;locked=true;answered++;if(j===item.a)right++;
+        [].forEach.call(opts.children,function(el,k){
+          if(k===item.a)el.classList.add('right');else if(k===j)el.classList.add('wrong');
+        });
+        expl.hidden=false;
+        if(scoreEl)scoreEl.textContent='Отвечено '+answered+' из '+data.length+', верных '+right;
+      };
+      opts.appendChild(b);
+    });
+    box.appendChild(opts);box.appendChild(expl);host.appendChild(box);
+  });
+}
+buildQuiz(document.getElementById('quizA'),QA,null,true);
+buildQuiz(document.getElementById('quizB'),QB,document.getElementById('scoreB'),false);
+
+var panes=[].slice.call(document.querySelectorAll('.pane'));
+var tabs=document.getElementById('tabs');
+panes.forEach(function(p,i){
+  var b=document.createElement('button');b.type='button';
+  b.innerHTML='<span class="n">'+i+'</span>'+p.dataset.title;
+  b.onclick=function(){go(i);};
+  tabs.appendChild(b);
+  var nav=document.createElement('div');nav.className='nav';
+  var prev=document.createElement('button');prev.type='button';prev.textContent='← Назад';
+  prev.onclick=function(){go(i-1);};if(i===0)prev.disabled=true;
+  var next=document.createElement('button');next.type='button';next.className='next';
+  next.textContent=(i===panes.length-1)?'В начало':'Дальше →';
+  next.onclick=function(){go(i===panes.length-1?0:i+1);};
+  nav.appendChild(prev);nav.appendChild(next);p.appendChild(nav);
+});
+function go(i){
+  panes.forEach(function(p,j){p.classList.toggle('on',i===j);});
+  [].forEach.call(tabs.children,function(b,j){b.classList.toggle('on',i===j);});
+  try{tabs.children[i].scrollIntoView({block:'nearest',inline:'center'});}catch(e){}
+  try{localStorage.setItem('d17tab',String(i));}catch(e){}
+  window.scrollTo(0,0);
+}
+var start=0;
+try{var s=parseInt(localStorage.getItem('d17tab'),10);if(s>=0&&s<panes.length)start=s;}catch(e){}
+go(start);
+</script>
+
+</body></html>

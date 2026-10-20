@@ -1,0 +1,705 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>День 1. Фокус-режим</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#DDE1DC;
+    --card:#FBFBF9;
+    --ink:#22282A;
+    --ink-soft:#5C6A6C;
+    --line:#C6CCC5;
+    --deep:#1E4C4A;
+    --signal:#9C6F14;
+    --signal-bg:#F2E6C9;
+    --done:#3E7A54;
+    --radius:4px;
+  }
+
+  *{box-sizing:border-box}
+
+  html,body{margin:0;padding:0}
+
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Space Grotesk",system-ui,sans-serif;
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .shell{
+    max-width:760px;
+    margin:0 auto;
+    padding:28px 20px 90px;
+  }
+
+  /* ---- rail ---- */
+  .rail{
+    display:flex;
+    gap:5px;
+    margin-bottom:10px;
+  }
+  .rail span{
+    flex:1;
+    height:5px;
+    background:var(--line);
+    border-radius:2px;
+  }
+  .rail span.seen{background:var(--deep)}
+  .rail span.here{background:var(--signal)}
+
+  .railtext{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:22px;
+  }
+
+  /* ---- card ---- */
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:34px 34px 30px;
+  }
+
+  .kicker{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0 0 6px;
+  }
+
+  h1{
+    font-size:33px;
+    font-weight:500;
+    line-height:1.12;
+    letter-spacing:-0.02em;
+    margin:0 0 14px;
+  }
+
+  .goal{
+    font-size:17px;
+    color:var(--ink-soft);
+    margin:0 0 26px;
+    padding-bottom:22px;
+    border-bottom:1px solid var(--line);
+    max-width:60ch;
+  }
+
+  /* ---- timer ---- */
+  .clock{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:26px;
+  }
+  .clockface{
+    font-family:"JetBrains Mono",monospace;
+    font-size:27px;
+    font-weight:500;
+    font-variant-numeric:tabular-nums;
+    min-width:104px;
+  }
+  .clockface.low{color:var(--signal)}
+  .clockface.over{color:var(--done)}
+
+  /* ---- steps ---- */
+  ol.steps{
+    list-style:none;
+    margin:0;
+    padding:0;
+  }
+  ol.steps li{
+    border-top:1px solid var(--line);
+    padding:15px 0 15px 38px;
+    position:relative;
+  }
+  ol.steps li:first-child{border-top:none;padding-top:2px}
+
+  .tick{
+    position:absolute;
+    left:0;
+    top:15px;
+    width:22px;
+    height:22px;
+    border:1.5px solid var(--ink-soft);
+    border-radius:3px;
+    background:transparent;
+    cursor:pointer;
+    padding:0;
+  }
+  ol.steps li:first-child .tick{top:2px}
+  .tick:hover{border-color:var(--deep)}
+  .tick[aria-pressed="true"]{
+    background:var(--done);
+    border-color:var(--done);
+  }
+  .tick[aria-pressed="true"]::after{
+    content:"";
+    position:absolute;
+    left:6px;top:2px;
+    width:6px;height:12px;
+    border:solid #fff;
+    border-width:0 2px 2px 0;
+    transform:rotate(42deg);
+  }
+  li.struck .txt{color:var(--ink-soft);text-decoration:line-through;text-decoration-thickness:1px}
+
+  .txt{max-width:58ch}
+  .txt b{font-weight:700}
+
+  /* ---- command ---- */
+  .cmd{
+    display:flex;
+    align-items:stretch;
+    gap:0;
+    margin-top:10px;
+    border:1px solid var(--line);
+    border-radius:3px;
+    overflow:hidden;
+    background:#F1F2EE;
+    max-width:58ch;
+  }
+  .cmd code{
+    font-family:"JetBrains Mono",monospace;
+    font-size:14px;
+    padding:11px 13px;
+    flex:1;
+    overflow-x:auto;
+    white-space:pre;
+    line-height:1.5;
+  }
+  .copy{
+    border:none;
+    border-left:1px solid var(--line);
+    background:transparent;
+    font-family:inherit;
+    font-size:13px;
+    color:var(--deep);
+    padding:0 15px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .copy:hover{background:var(--line)}
+  .copy.ok{color:var(--done)}
+
+  /* ---- callouts ---- */
+  .trap,.expect{
+    max-width:58ch;
+    margin-top:11px;
+    padding:11px 14px;
+    font-size:14.5px;
+    border-radius:3px;
+  }
+  .trap{
+    background:var(--signal-bg);
+    border-left:3px solid var(--signal);
+  }
+  .expect{
+    background:#E7EDE7;
+    border-left:3px solid var(--deep);
+  }
+
+  .finishline{
+    margin-top:26px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-size:15px;
+    color:var(--ink-soft);
+    max-width:58ch;
+  }
+  .finishline strong{color:var(--ink);font-weight:500}
+
+  /* ---- buttons ---- */
+  .nav{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:14px;
+    margin-top:28px;
+  }
+  button.btn{
+    font-family:inherit;
+    font-size:15px;
+    padding:12px 22px;
+    border-radius:3px;
+    cursor:pointer;
+    border:1px solid var(--deep);
+  }
+  button.primary{background:var(--deep);color:#fff}
+  button.primary:hover{background:#163b39}
+  button.ghost{background:transparent;color:var(--deep)}
+  button.ghost:hover{background:#E7EDE7}
+  button.small{
+    font-family:inherit;
+    font-size:14px;
+    padding:9px 16px;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--ink);
+    border-radius:3px;
+    cursor:pointer;
+  }
+  button.small:hover{background:#EFF0EC}
+  button:focus-visible,.tick:focus-visible,.copy:focus-visible{
+    outline:2px solid var(--signal);
+    outline-offset:2px;
+  }
+
+  .counter{font-size:14px;color:var(--ink-soft)}
+
+  /* ---- break screen ---- */
+  .breakcard{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:56px 34px;
+    text-align:center;
+  }
+  .breakcard h1{font-size:28px;margin-bottom:8px}
+  .breakclock{
+    font-family:"JetBrains Mono",monospace;
+    font-size:64px;
+    font-weight:400;
+    font-variant-numeric:tabular-nums;
+    letter-spacing:-0.03em;
+    margin:22px 0 6px;
+  }
+  .breaklist{
+    display:inline-block;
+    text-align:left;
+    color:var(--ink-soft);
+    font-size:15.5px;
+    margin:18px 0 26px;
+    max-width:44ch;
+  }
+  .breaklist p{margin:6px 0}
+
+  /* ---- bottom bar ---- */
+  .tools{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    background:var(--card);
+    border-top:1px solid var(--line);
+  }
+  .toolsinner{
+    max-width:760px;
+    margin:0 auto;
+    padding:10px 20px;
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
+  .panel{
+    max-width:760px;
+    margin:0 auto;
+    padding:0 20px 18px;
+  }
+  .panel textarea{
+    width:100%;
+    min-height:110px;
+    font-family:inherit;
+    font-size:15px;
+    padding:12px;
+    border:1px solid var(--line);
+    border-radius:3px;
+    background:#F1F2EE;
+    color:var(--ink);
+    resize:vertical;
+  }
+  .panel p{font-size:14.5px;color:var(--ink-soft);max-width:64ch}
+  .panel h2{font-size:17px;font-weight:500;margin:14px 0 8px}
+  .hide{display:none}
+
+  @media (max-width:560px){
+    .card{padding:24px 20px}
+    h1{font-size:27px}
+    .nav{flex-direction:column-reverse;align-items:stretch}
+    .nav button{width:100%}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important;animation:none!important}
+  }
+</style>
+
+<div class="shell">
+  <div class="rail" id="rail"></div>
+  <div class="railtext">
+    <span id="pos"></span>
+    <span id="clock-label"></span>
+  </div>
+  <div id="stage"></div>
+</div>
+
+<div class="tools">
+  <div class="panel hide" id="park-panel">
+    <h2>Парковка</h2>
+    <p>Вспомнила про несделанное, захотелось загуглить что-то постороннее, пришла идея — запиши сюда одной строкой и возвращайся к блоку. Разберёшь после финиша.</p>
+    <textarea id="park" placeholder="Например: посмотреть, чем Python отличается от Java&#10;написать Кате про субботу"></textarea>
+  </div>
+
+  <div class="panel hide" id="stuck-panel">
+    <h2>Застряла</h2>
+    <p>Двадцать минут пробуешь сама: читаешь текст ошибки целиком, перезапускаешь терминал, проверяешь <code>pwd</code>. Не помогло — пишешь мне по шаблону. Сидеть в тупике час не надо, это не про упорство.</p>
+    <div class="cmd">
+      <code id="tpl">Что делала:
+Что ожидала:
+Что получила (полный текст ошибки):
+Что уже пробовала:</code>
+      <button class="copy" data-copy="tpl">Копировать</button>
+    </div>
+  </div>
+
+  <div class="toolsinner">
+    <button class="small" id="park-btn">Парковка</button>
+    <button class="small" id="stuck-btn">Застряла</button>
+    <span class="counter" id="tally"></span>
+  </div>
+</div>
+
+<script>
+const S = [
+  {
+    type:"block", mins:5,
+    title:"Готовим стол",
+    goal:"Убрать всё, что уведёт в сторону в ближайшие два часа.",
+    steps:[
+      {t:"Телефон унеси <b>в другую комнату</b>. Не в беззвучный режим, не экраном вниз — физически в другое помещение."},
+      {t:"Закрой почту, мессенджеры, Figma, все вкладки. Останется два окна: это и PowerShell."},
+      {t:"Поставь рядом воду и что-нибудь съедобное. Голод и жажда — самая частая настоящая причина «что-то расхотелось»."},
+      {t:"Произнеси вслух: сегодня я только ставлю программы. Я не учу Python и не выбираю тему оформления."},
+      {t:"Если парень дома — попроси посидеть рядом первые двадцать минут. Присутствие человека реально удерживает за столом, это не самовнушение."}
+    ],
+    trap:"Не начинай с чтения статей «какой Python выбрать» и «PyCharm или VS Code». Все решения на сегодня уже приняты за тебя, выбирать не нужно.",
+    done:"Стол пустой, телефон в другой комнате, вода налита."
+  },
+  {
+    type:"block", mins:15,
+    title:"Три настройки Windows",
+    goal:"Windows перестанет прятать нужные файлы и разрешит запускать скрипты.",
+    steps:[
+      {t:"Открой любую папку. Вкладка <b>Вид</b> → включи <b>Расширения имён файлов</b> и <b>Скрытые элементы</b>."},
+      {t:"Зайди на диск C, в папку <b>Пользователи</b>. Посмотри, как называется твоя папка. Если кириллицей — ничего не делай, просто знай: проекты положим в другое место."},
+      {t:"Нажми Win, напечатай PowerShell, кликни <b>правой кнопкой</b> → <b>Запуск от имени администратора</b> → Да."},
+      {t:"Выполни команду. На вопрос напечатай <b>Y</b> и нажми Enter.", cmd:"Set-ExecutionPolicy -Scope CurrentUser RemoteSigned",
+       expect:"Разрешает запускать скрипты, написанные тобой. Понадобится через две недели для виртуальных окружений — без этого они просто не запустятся, а ошибка будет выглядеть необъяснимо."},
+      {t:"Закрой окно администратора. Дальше всё делаем в обычном PowerShell."}
+    ],
+    done:"Команда выполнилась и не выдала красный текст."
+  },
+  {
+    type:"block", mins:20,
+    title:"Обживаем терминал",
+    goal:"Перестать бояться чёрного окна и понимать, в какой папке ты находишься.",
+    steps:[
+      {t:"Win → PowerShell → открой. Закрепи на панели задач: правой кнопкой по иконке → Закрепить."},
+      {t:"Строка перед курсором показывает, <b>в какой папке ты сейчас</b>. Это главная идея терминала: он всегда стоит внутри какой-то папки."},
+      {t:"Выполни по одной. Между командами смотри, что изменилось в строке приглашения.", cmd:"pwd\nls\ncd Desktop\npwd\ncd ..\ncd ~"},
+      {t:"Теперь создай и удали папку.", cmd:"mkdir test-folder\nls\nrmdir test-folder"},
+      {t:"Три приёма, которые экономят часы: <b>Tab</b> дописывает название за тебя, <b>стрелка вверх</b> достаёт прошлые команды, <b>cls</b> очищает экран. Попробуй все три прямо сейчас."},
+      {t:"Мини-задание без подсказок: перейди домой, создай папку qa-test, зайди внутрь, создай там папку inside, выведи список, поднимись выше, удали обе."}
+    ],
+    trap:"Не настраивай цвета, шрифт и прозрачность терминала. Совсем. Это отдельная кроличья нора на полтора часа, а выглядеть он будет ровно так же полезно.",
+    done:"Мини-задание прошло без ошибок."
+  },
+  {type:"break", mins:5, title:"Перерыв",
+   lines:["Встань. Именно встань, а не «дочитаю ещё один абзац».","Пройди до кухни и обратно.","Выпей воды.","Телефон не берём — иначе перерыв станет часовым."]},
+  {
+    type:"block", mins:20,
+    title:"Ставим Python",
+    goal:"Команда python --version отвечает номером версии.",
+    steps:[
+      {t:"Открой <b>python.org</b> → раздел Downloads. Сайт сам предложит кнопку для Windows. Скачай."},
+      {t:"Запусти установщик. В первом окне внизу поставь галочку <b>Add python.exe to PATH</b>.",
+       expect:"Это ловушка номер один за весь день. Без этой галочки терминал не найдёт Python, и ты потратишь час на ошибку, которая выглядит как «python не распознано»."},
+      {t:"Нажми <b>Install Now</b>, дождись конца. Если в конце предложат Disable path length limit — нажми."},
+      {t:"<b>Закрой PowerShell полностью и открой заново.</b> Без этого он не увидит новую программу — это не суеверие, так работает PATH."},
+      {t:"Проверь версию.", cmd:"python --version", expect:"Ожидается строка вида Python 3.13.x. Главное — тройка в начале."},
+      {t:"Зайди внутрь Python и попробуй его вживую.", cmd:"python"},
+      {t:"Теперь ты внутри Python, перед курсором три угловые скобки. Обычные команды тут не работают.", cmd:"2 + 2\nprint(\"Привет, я теперь программист\")\nexit()"}
+    ],
+    done:"python --version показывает версию, ты умеешь войти в Python и выйти через exit()."
+  },
+  {type:"break", mins:10, title:"Большой перерыв",
+   lines:["Самая нудная треть позади.","Встань, походи, разомни шею и запястья.","Если чувствуешь, что внимание кончилось — останови день здесь. Оставшееся сделаешь вечером или завтра, это не сорвёт план.","Если ресурс есть — продолжаем, дальше пойдёт быстрее."]},
+  {
+    type:"block", mins:15,
+    title:"Ставим PyCharm",
+    goal:"Программа для написания кода установлена и открывается.",
+    steps:[
+      {t:"Сайт <b>jetbrains.com</b> → раздел PyCharm → Download → версия для Windows."},
+      {t:"В установщике отметь три галочки: Create Desktop Shortcut, Add «bin» folder to the PATH, Add «Open Folder as Project»."},
+      {t:"Install. Если попросит перезагрузку — согласись."},
+      {t:"Запусти. На вопрос про настройки выбери <b>Do not import settings</b>. Если попросит лицензию — выбирай бесплатный вариант, аккаунт JetBrains заводится бесплатно на ту же почту."},
+      {t:"Закрой PyCharm. Сегодня он больше не нужен, вернёмся к нему в последнем блоке."}
+    ],
+    trap:"Не выбирай тему, шрифт, иконки и плагины. Открылась — закрывай. Настройка редактора ощущается как продуктивная работа, но это подмена: кода ты не написала ни строчки. Займёмся этим в среду, когда будет что писать.",
+    done:"PyCharm запускается и показывает стартовый экран."
+  },
+  {
+    type:"block", mins:15,
+    title:"Ставим Git",
+    goal:"Git установлен и знает, как тебя зовут.",
+    steps:[
+      {t:"Сайт <b>git-scm.com</b> → Download for Windows. Запусти установщик."},
+      {t:"Установщик задаст много вопросов подряд. Значимых три, остальные — Next без раздумий."},
+      {t:"Экран про редактор: выбери <b>Use Notepad as Git's default editor</b>. Не оставляй Vim — из него потом не выйдешь без гугла."},
+      {t:"Экран про ветку: выбери <b>Override the default branch name</b>, значение main оставь как есть."},
+      {t:"Экран про PATH: средний вариант, <b>Git from the command line and also from 3rd-party software</b>. Он помечен как рекомендованный."},
+      {t:"Install → Finish. <b>Закрой PowerShell и открой заново.</b>"},
+      {t:"Проверь.", cmd:"git --version"},
+      {t:"Представься Git — он подписывает этим каждое твоё сохранение. Почту бери ту, на которую заведёшь GitHub.", cmd:"git config --global user.name \"Anna Ivanova\"\ngit config --global user.email \"anna@example.com\"",
+       expect:"Обе команды выполнятся молча. В терминале молчание — это успех: нет текста значит нет ошибок. Не жди подтверждений."},
+      {t:"Проверь, что записалось.", cmd:"git config --global --list"}
+    ],
+    done:"В выводе последней команды видно твоё имя и почту."
+  },
+  {type:"break", mins:5, title:"Перерыв",
+   lines:["Встань из-за стола.","Посмотри в окно на что-нибудь дальше десяти метров — глазам нужно.","Осталось два блока."]},
+  {
+    type:"block", mins:25,
+    title:"GitHub и ключ",
+    goal:"GitHub узнаёт твой компьютер без пароля.",
+    steps:[
+      {t:"Зайди на <b>github.com</b> → Sign up. Почта та же, что в прошлом блоке."},
+      {t:"Имя пользователя выбирай осознанно: оно попадёт в резюме и в ссылки на все твои проекты. Годится anna-ivanova, не годится kotik2000.",
+       expect:"Если зависла над выбором больше двух минут — бери имя-фамилию через дефис и иди дальше. Это ровно тот случай, когда идеального варианта нет."},
+      {t:"Подтверди почту по письму."},
+      {t:"Создай ключ. Подставь свою почту. На все три вопроса просто жми Enter.", cmd:"ssh-keygen -t ed25519 -C \"anna@example.com\"",
+       expect:"В конце появится картинка из символов. Это нормально, так задумано. Ключ — это замена паролю: публичную половину отдаём GitHub, приватную не показываем никому и никогда, даже мне."},
+      {t:"Скопируй публичный ключ в буфер обмена. Команда сработает молча.", cmd:"Get-Content ~/.ssh/id_ed25519.pub | Set-Clipboard"},
+      {t:"На github.com: аватар справа вверху → <b>Settings</b> → в левом меню <b>SSH and GPG keys</b> → <b>New SSH key</b>."},
+      {t:"Title — любое понятное, например Home laptop. Key type — Authentication Key. В поле Key вставь скопированное. Нажми Add SSH key."},
+      {t:"Проверь связь. На вопрос напечатай полностью <b>yes</b> — просто y не подойдёт.", cmd:"ssh -T git@github.com",
+       expect:"Ожидается: Hi имя! You've successfully authenticated, but GitHub does not provide shell access. Вторая половина фразы — не ошибка. Важно только successfully authenticated."}
+    ],
+    trap:"Не заполняй профиль, не ставь аватар, не пиши bio. Этим займёмся в конце обучения, когда будет что показывать.",
+    done:"Ответ содержит successfully authenticated."
+  },
+  {
+    type:"block", mins:25,
+    title:"Первый репозиторий",
+    goal:"Твои файлы уехали на GitHub. Это финиш дня.",
+    steps:[
+      {t:"На github.com кнопка <b>+</b> справа вверху → New repository. Имя <b>qa-learning</b>, видимость <b>Public</b>, галочка Add a README file, в поле Add .gitignore выбери шаблон <b>Python</b>. Create repository."},
+      {t:"На странице репозитория: зелёная кнопка <b>Code</b> → вкладка <b>SSH</b> (не HTTPS) → скопируй строку иконкой справа."},
+      {t:"Создай место для проектов. Кладём в корень диска, чтобы не мешали кириллица в пути и синхронизация OneDrive.", cmd:"cd C:\\\nmkdir projects\ncd projects"},
+      {t:"Скачай репозиторий. Вместо строки в примере вставь свою, скопированную из GitHub.", cmd:"git clone git@github.com:anna-ivanova/qa-learning.git"},
+      {t:"Зайди внутрь и создай структуру папок.", cmd:"cd qa-learning\nmkdir notes\nmkdir python\nmkdir manual"},
+      {t:"Положи в каждую папку файл-заглушку.", cmd:"New-Item notes/.gitkeep -ItemType File\nNew-Item python/.gitkeep -ItemType File\nNew-Item manual/.gitkeep -ItemType File",
+       expect:"Git не умеет отслеживать пустые папки — без заглушек они просто не попадут на GitHub. На этом спотыкаются все."},
+      {t:"Открой PyCharm → Open → выбери папку C:\\projects\\qa-learning. Если спросит про доверие — Trust Project. Слева кликни README.md."},
+      {t:"Перепиши README: что это за репозиторий, три строки про структуру папок, список технологий. <b>Пять-семь строк, не больше.</b> Сохрани через Ctrl+S.",
+       expect:"README будет переписан ещё сто раз за год. Сегодня он должен просто существовать."},
+      {t:"Посмотри, что изменилось. Красный цвет тут означает «Git видит изменения, но пока не взял их в работу», а не ошибку.", cmd:"git status"},
+      {t:"Сохрани точку истории и отправь на GitHub.", cmd:"git add .\ngit commit -m \"Add project structure and README\"\ngit push"},
+      {t:"Обнови страницу репозитория на github.com. Видишь README и три папки — день закрыт."}
+    ],
+    trap:"Не переписывай README четыре раза и не ищи красивые бейджики для него. Пять строк, коммит, финиш.",
+    done:"На github.com видно README и папки notes, python, manual."
+  },
+  {type:"end"}
+];
+
+let i = 0;
+let checks = S.map(s => s.steps ? s.steps.map(()=>false) : []);
+let parkText = "";
+let timer = null, left = 0, running = false;
+
+const stage = document.getElementById("stage");
+const rail  = document.getElementById("rail");
+const posEl = document.getElementById("pos");
+const clockLabel = document.getElementById("clock-label");
+const tally = document.getElementById("tally");
+
+const blockIdx = S.map((s,n)=>s.type==="block"?n:-1).filter(n=>n>=0);
+const totalBlocks = blockIdx.length;
+
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+
+function fmt(sec){
+  const neg = sec < 0;
+  const a = Math.abs(sec);
+  const m = String(Math.floor(a/60)).padStart(2,"0");
+  const s = String(a%60).padStart(2,"0");
+  return (neg?"+":"") + m + ":" + s;
+}
+
+function stopTimer(){ clearInterval(timer); timer=null; running=false; }
+
+function startTimer(){
+  if(running) return;
+  running = true;
+  timer = setInterval(()=>{
+    left--;
+    paintClock();
+  },1000);
+}
+
+function paintClock(){
+  const face = document.getElementById("face");
+  if(!face) return;
+  face.textContent = fmt(left);
+  face.className = "clockface" + (left<0 ? " over" : (left<=60 ? " low" : ""));
+  const cont = document.getElementById("break-go");
+  if(cont && left<=0){ cont.disabled=false; cont.textContent="Продолжаем"; }
+}
+
+function renderRail(){
+  rail.innerHTML = "";
+  const cur = blockIdx.filter(n=>n<=i).length;
+  for(let k=0;k<totalBlocks;k++){
+    const sp = document.createElement("span");
+    const bi = blockIdx[k];
+    if(bi < i) sp.className = "seen";
+    else if(bi === i) sp.className = "here";
+    rail.appendChild(sp);
+  }
+  const s = S[i];
+  if(s.type==="block") posEl.textContent = "Блок " + cur + " из " + totalBlocks;
+  else if(s.type==="break") posEl.textContent = "Перерыв";
+  else posEl.textContent = "Готово";
+}
+
+function renderTally(){
+  const s = S[i];
+  if(s.type!=="block"){ tally.textContent=""; return; }
+  const d = checks[i].filter(Boolean).length;
+  tally.textContent = "Отмечено " + d + " из " + checks[i].length;
+}
+
+function render(){
+  stopTimer();
+  const s = S[i];
+  renderRail();
+
+  if(s.type==="end"){
+    clockLabel.textContent = "";
+    stage.innerHTML =
+      '<div class="card">'+
+      '<p class="kicker">День 1 закрыт</p>'+
+      '<h1>Окружение готово</h1>'+
+      '<p class="goal">За сегодня ты установила четыре программы, разобралась с терминалом, настроила ключ доступа и отправила первый код на GitHub. Ни одна из этих вещей не была тебе знакома утром.</p>'+
+      '<div class="finishline"><strong>Прежде чем закрыть ноутбук</strong><br>Пришли мне ссылку на репозиторий и вывод трёх команд: python --version, git --version, ssh -T git@github.com. Проверю, что всё встало корректно.</div>'+
+      '<div class="finishline"><strong>Заведи файл notes/errors-log.md</strong><br>Записывай туда каждую ошибку и то, чем она лечилась. Через месяц это будет твоя личная база знаний и наглядное доказательство, сколько ты уже разобрала.</div>'+
+      '<div class="finishline"><strong>Разбери парковку</strong><br>Открой её внизу и посмотри, что там накопилось. Что-то окажется ерундой, что-то — вопросом ко мне.</div>'+
+      '<div class="finishline"><strong>Завтра</strong><br>Теория тестирования. Читать и конспектировать, без установок и терминала — день будет заметно легче.</div>'+
+      '<div class="nav"><button class="btn ghost" id="prev">Назад</button><span></span></div>'+
+      '</div>';
+    document.getElementById("prev").onclick = ()=>{ i--; render(); };
+    renderTally();
+    return;
+  }
+
+  if(s.type==="break"){
+    left = s.mins*60;
+    clockLabel.textContent = "";
+    stage.innerHTML =
+      '<div class="breakcard">'+
+      '<h1>'+s.title+'</h1>'+
+      '<div class="breakclock" id="face">'+fmt(left)+'</div>'+
+      '<div class="breaklist">'+ s.lines.map(l=>"<p>"+l+"</p>").join("") +'</div>'+
+      '<div><button class="btn primary" id="break-go" disabled>Ещё идёт</button></div>'+
+      '<div style="margin-top:14px"><button class="small" id="skip">Пропустить перерыв</button></div>'+
+      '</div>';
+    document.getElementById("break-go").onclick = ()=>{ i++; render(); };
+    document.getElementById("skip").onclick = ()=>{ i++; render(); };
+    startTimer();
+    renderTally();
+    return;
+  }
+
+  left = s.mins*60;
+  clockLabel.textContent = "на блок " + s.mins + " мин";
+
+  let html =
+    '<div class="card">'+
+    '<p class="kicker">Блок '+ (blockIdx.indexOf(i)+1) +'</p>'+
+    '<h1>'+s.title+'</h1>'+
+    '<p class="goal">'+s.goal+'</p>'+
+    '<div class="clock"><span class="clockface" id="face">'+fmt(left)+'</span>'+
+    '<button class="small" id="tstart">Запустить таймер</button></div>'+
+    '<ol class="steps">';
+
+  s.steps.forEach((st,n)=>{
+    html += '<li'+(checks[i][n]?' class="struck"':'')+' data-n="'+n+'">'+
+            '<button class="tick" aria-pressed="'+(checks[i][n]?'true':'false')+'" aria-label="Отметить шаг"></button>'+
+            '<div class="txt">'+st.t+'</div>';
+    if(st.cmd){
+      html += '<div class="cmd"><code id="c'+i+'_'+n+'">'+esc(st.cmd)+'</code>'+
+              '<button class="copy" data-copy="c'+i+'_'+n+'">Копировать</button></div>';
+    }
+    if(st.expect) html += '<div class="expect">'+st.expect+'</div>';
+    html += '</li>';
+  });
+
+  html += '</ol>';
+  if(s.trap) html += '<div class="trap" style="margin-top:18px"><b>Кроличья нора.</b> '+s.trap+'</div>';
+  html += '<div class="finishline"><strong>Блок закрыт, когда:</strong> '+s.done+'</div>';
+  html += '<div class="nav">'+
+          (i>0?'<button class="btn ghost" id="prev">Назад</button>':'<span></span>')+
+          '<button class="btn primary" id="next">Блок пройден</button></div>'+
+          '</div>';
+
+  stage.innerHTML = html;
+
+  stage.querySelectorAll(".tick").forEach(b=>{
+    b.onclick = ()=>{
+      const li = b.closest("li");
+      const n = +li.dataset.n;
+      checks[i][n] = !checks[i][n];
+      b.setAttribute("aria-pressed", checks[i][n]?"true":"false");
+      li.classList.toggle("struck", checks[i][n]);
+      renderTally();
+    };
+  });
+
+  document.getElementById("tstart").onclick = (e)=>{
+    if(running){ stopTimer(); e.target.textContent="Продолжить"; }
+    else { startTimer(); e.target.textContent="Пауза"; }
+  };
+  document.getElementById("next").onclick = ()=>{ i++; render(); };
+  const p = document.getElementById("prev");
+  if(p) p.onclick = ()=>{ i--; render(); };
+
+  renderTally();
+}
+
+document.addEventListener("click", e=>{
+  const b = e.target.closest(".copy");
+  if(!b) return;
+  const txt = document.getElementById(b.dataset.copy).textContent;
+  const done = ()=>{ b.textContent="Скопировано"; b.classList.add("ok");
+    setTimeout(()=>{ b.textContent="Копировать"; b.classList.remove("ok"); },1400); };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done).catch(()=>{});
+  } else {
+    const ta=document.createElement("textarea"); ta.value=txt; document.body.appendChild(ta);
+    ta.select(); try{document.execCommand("copy");done();}catch(err){} ta.remove();
+  }
+});
+
+const parkPanel = document.getElementById("park-panel");
+const stuckPanel = document.getElementById("stuck-panel");
+const parkArea = document.getElementById("park");
+parkArea.addEventListener("input", ()=>{ parkText = parkArea.value; });
+
+document.getElementById("park-btn").onclick = ()=>{
+  stuckPanel.classList.add("hide");
+  parkPanel.classList.toggle("hide");
+  if(!parkPanel.classList.contains("hide")){ parkArea.value = parkText; parkArea.focus(); }
+};
+document.getElementById("stuck-btn").onclick = ()=>{
+  parkPanel.classList.add("hide");
+  stuckPanel.classList.toggle("hide");
+};
+
+render();
+</script>

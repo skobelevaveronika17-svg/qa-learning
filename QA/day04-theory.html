@@ -1,0 +1,826 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Виды и уровни тестирования — день 4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --paper:#E7ECEE;
+  --card:#FCFCFB;
+  --ink:#16232B;
+  --soft:#5A6B72;
+  --line:#CBD4D7;
+
+  --level:#256B7C;      /* уровни, определения */
+  --level-bg:#DDEAEE;
+  --pyramid:#6B4A86;    /* пирамида */
+  --pyramid-bg:#E6DFEC;
+  --alert:#9C3B33;      /* ловушки, антипаттерны */
+  --alert-bg:#F2E0DD;
+  --note:#4A6B2A;       /* в тетрадь */
+  --note-bg:#E3EBD9;
+  --flash:#96700F;      /* на карточки */
+  --flash-bg:#F2E9CE;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,sans-serif;
+  font-size:16.5px;
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+
+.wrap{max-width:840px;margin:0 auto;padding:26px 20px 70px}
+
+/* ---------- шапка ---------- */
+.masthead{
+  border-bottom:2px solid var(--ink);
+  padding-bottom:12px;
+  margin-bottom:14px;
+}
+.masthead h1{
+  font-family:"Newsreader",Georgia,serif;
+  font-weight:500;
+  font-size:31px;
+  line-height:1.1;
+  margin:0 0 4px;
+  letter-spacing:-0.01em;
+}
+.masthead p{margin:0;color:var(--soft);font-size:14.5px}
+
+/* ---------- индекс блоков ---------- */
+.index{
+  display:flex;flex-wrap:wrap;gap:6px;
+  margin-bottom:26px;
+}
+.chip{
+  font-family:inherit;
+  font-size:13.5px;
+  padding:6px 12px;
+  border:1px solid var(--line);
+  background:transparent;
+  color:var(--soft);
+  border-radius:100px;
+  cursor:pointer;
+}
+.chip:hover{border-color:var(--ink);color:var(--ink)}
+.chip.on{background:var(--ink);border-color:var(--ink);color:var(--card)}
+.chip.done{border-color:var(--note);color:var(--note)}
+.chip.done.on{background:var(--note);border-color:var(--note);color:#fff}
+
+/* ---------- блок ---------- */
+.block{display:none}
+.block.show{display:block}
+
+.sheet{
+  background:var(--card);
+  border:1px solid var(--line);
+  padding:32px 34px 28px;
+}
+
+.head{
+  display:flex;justify-content:space-between;align-items:baseline;
+  gap:16px;border-bottom:1px solid var(--line);
+  padding-bottom:14px;margin-bottom:22px;
+}
+.head h2{
+  font-family:"Newsreader",Georgia,serif;
+  font-weight:500;font-size:29px;line-height:1.12;margin:0;
+}
+.mins{color:var(--soft);font-size:14px;white-space:nowrap}
+
+.sheet p{max-width:70ch;margin:0 0 15px}
+.sheet h3{
+  font-family:"Newsreader",Georgia,serif;
+  font-weight:600;font-size:20px;margin:28px 0 10px;
+}
+.lead{font-size:18px;color:var(--soft);max-width:66ch}
+
+b,strong{font-weight:600}
+code{
+  font-family:"IBM Plex Mono",monospace;font-size:0.9em;
+  background:#EEF1F1;padding:1px 5px;border-radius:2px;
+}
+
+/* ---------- термин ---------- */
+.term{
+  border-left:3px solid var(--level);
+  background:var(--level-bg);
+  padding:13px 16px;margin:0 0 12px;max-width:70ch;
+}
+.term .name{
+  font-family:"Newsreader",Georgia,serif;
+  font-weight:600;font-size:18px;color:var(--level);
+  display:block;margin-bottom:2px;
+}
+.term p{margin:0}
+.term p + p{margin-top:8px}
+
+/* ---------- ловушка ---------- */
+.alert{
+  border-left:3px solid var(--alert);
+  background:var(--alert-bg);
+  padding:13px 16px;margin:16px 0;max-width:70ch;
+}
+.alert .name{
+  font-weight:600;color:var(--alert);display:block;margin-bottom:3px;
+}
+.alert p{margin:0}
+
+/* ---------- пример ---------- */
+.example{
+  border:1px dashed var(--line);
+  padding:13px 16px;margin:16px 0;max-width:70ch;
+  background:#F7F8F8;
+}
+.example .name{font-weight:600;display:block;margin-bottom:3px;font-size:14.5px;color:var(--soft)}
+.example p{margin:0}
+
+/* ---------- таблица ---------- */
+table{border-collapse:collapse;width:100%;max-width:70ch;margin:16px 0;font-size:15.5px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;background:#F1F4F4}
+
+/* ---------- итоги блока ---------- */
+.recap{
+  display:grid;grid-template-columns:1fr 1fr;gap:14px;
+  margin-top:30px;padding-top:22px;border-top:2px solid var(--ink);
+}
+.box{padding:15px 17px}
+.box.paper{background:var(--note-bg);border-left:3px solid var(--note)}
+.box.cards{background:var(--flash-bg);border-left:3px solid var(--flash)}
+.box h4{
+  font-family:"Newsreader",Georgia,serif;
+  font-size:17px;font-weight:600;margin:0 0 8px;
+}
+.box.paper h4{color:var(--note)}
+.box.cards h4{color:var(--flash)}
+.box ul{margin:0;padding-left:17px;font-size:15px}
+.box li{margin-bottom:5px}
+.box .qa{font-size:15px;margin-bottom:9px}
+.box .qa span{display:block;color:var(--soft)}
+
+/* ---------- навигация ---------- */
+.nav{display:flex;justify-content:space-between;gap:14px;margin-top:22px}
+button.btn{
+  font-family:inherit;font-size:15.5px;padding:11px 24px;
+  border:1px solid var(--ink);border-radius:2px;cursor:pointer;
+}
+.primary{background:var(--ink);color:var(--card)}
+.primary:hover{background:#0B171E}
+.ghost{background:transparent;color:var(--ink)}
+.ghost:hover{background:#EEF1F1}
+button:focus-visible,.chip:focus-visible{outline:2px solid var(--pyramid);outline-offset:2px}
+
+/* ---------- тест ---------- */
+.q{border-top:1px solid var(--line);padding:22px 0}
+.q:first-of-type{border-top:none}
+.q .ask{font-weight:500;margin-bottom:12px;max-width:70ch}
+.q .num{color:var(--soft);font-size:14px;margin-right:6px}
+.opt{display:block;margin-bottom:7px;max-width:70ch;cursor:pointer;
+  padding:9px 13px;border:1px solid var(--line);background:#F9FAFA;font-size:15.5px}
+.opt:hover{border-color:var(--soft)}
+.opt input{margin-right:9px}
+.opt.right{background:var(--note-bg);border-color:var(--note)}
+.opt.wrong{background:var(--alert-bg);border-color:var(--alert)}
+.why{margin-top:10px;padding:11px 14px;background:#F1F4F4;
+  border-left:3px solid var(--soft);font-size:15px;max-width:70ch;display:none}
+.why.show{display:block}
+.score{
+  margin-top:24px;padding:20px;background:var(--level-bg);
+  border-left:3px solid var(--level);display:none;max-width:70ch;
+}
+.score.show{display:block}
+.score strong{font-family:"Newsreader",serif;font-size:22px;display:block;margin-bottom:6px}
+
+@media (max-width:640px){
+  .sheet{padding:22px 18px}
+  .masthead h1{font-size:25px}
+  .head{flex-direction:column;gap:4px}
+  .head h2{font-size:23px}
+  .recap{grid-template-columns:1fr}
+  .nav{flex-direction:column-reverse}
+  .nav button{width:100%}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+
+<div class="masthead">
+  <h1>Виды и уровни тестирования</h1>
+  <p>День 4. Шесть блоков и тест. Примерно 2,5 часа.</p>
+</div>
+
+<div class="index" id="index"></div>
+
+<!-- ============ 1 ============ -->
+<section class="block show" data-name="Уровни">
+<div class="sheet">
+  <div class="head"><h2>Уровни тестирования</h2><span class="mins">около 20 минут</span></div>
+
+  <p class="lead">Уровень отвечает на вопрос «на какой глубине мы проверяем». Их четыре, и движение идёт снизу вверх: от отдельной детали к готовому продукту.</p>
+
+  <div class="term">
+    <span class="name">Unit — модульное</span>
+    <p>Проверка одной маленькой части кода в отрыве от всего остального, обычно одной функции. Пишут сами разработчики.</p>
+    <p>Функция считает скидку. Тест проверяет: цена 100, скидка 20% — должно вернуться 80. База не нужна, браузер не нужен, ничего вокруг не запускается.</p>
+  </div>
+
+  <div class="term">
+    <span class="name">Integration — интеграционное</span>
+    <p>Проверка, что две или больше частей работают вместе.</p>
+    <p>Функция скидки правильно получает данные из базы и отдаёт их в оформление заказа. Здесь ловятся баги на стыках — самое частое место поломок, потому что свою часть каждый разработчик проверил, а вместе никто не собирал.</p>
+  </div>
+
+  <div class="term">
+    <span class="name">System — системное</span>
+    <p>Проверка всей собранной системы целиком, как готового продукта, против требований. Уровень, на котором обычно работает тестировщик.</p>
+  </div>
+
+  <div class="term">
+    <span class="name">Acceptance — приёмочное</span>
+    <p>Проверка, что продукт решает задачу заказчика и его можно принимать. Часто выполняет сам заказчик или бизнес. Второе название — UAT, user acceptance testing.</p>
+  </div>
+
+  <div class="example">
+    <span class="name">Как запомнить порядок</span>
+    <p>Сначала проверяем детали, потом их соединения, потом всю машину, потом — годится ли машина заказчику.</p>
+  </div>
+
+  <div class="recap">
+    <div class="box paper">
+      <h4>В тетрадь</h4>
+      <ul>
+        <li>Четыре уровня столбиком снизу вверх, у каждого свой пример</li>
+        <li>Кто пишет unit-тесты, кто работает на системном уровне</li>
+        <li>Отдельно: интеграционный уровень ловит баги на стыках</li>
+      </ul>
+    </div>
+    <div class="box cards">
+      <h4>На карточки</h4>
+      <div class="qa">Назови четыре уровня снизу вверх<span>unit → integration → system → acceptance</span></div>
+      <div class="qa">На каком уровне ловятся баги на стыках частей?<span>интеграционный</span></div>
+      <div class="qa">Кто обычно пишет unit-тесты?<span>разработчики</span></div>
+    </div>
+  </div>
+
+  <div class="nav"><span></span><button class="btn primary" data-go="1">Дальше</button></div>
+</div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="block" data-name="Пирамида">
+<div class="sheet">
+  <div class="head"><h2>Пирамида тестирования</h2><span class="mins">около 25 минут</span></div>
+
+  <p class="lead">Самая важная схема в профессии автоматизатора. Её просят нарисовать на собеседованиях, и она объясняет, почему в твоём плане API-тесты идут раньше UI-тестов.</p>
+
+  <svg viewBox="0 0 640 420" style="width:100%;max-width:560px;height:auto;margin:22px 0;display:block" role="img" aria-label="Пирамида тестирования: снизу вверх — unit-тесты, интеграционные, end-to-end">
+    <defs>
+      <style>
+        .p-dark{font-family:"IBM Plex Sans",sans-serif;font-size:19px;font-weight:600;fill:#16232B}
+        .p-light{font-family:"IBM Plex Sans",sans-serif;font-size:19px;font-weight:600;fill:#FFFFFF}
+        .p-side{font-family:"IBM Plex Sans",sans-serif;font-size:14px;fill:#5A6B72}
+        .p-num{font-family:"IBM Plex Sans",sans-serif;font-size:15px;font-weight:600;fill:#16232B}
+      </style>
+    </defs>
+
+    <polygon points="215,35 425,35 445,130 195,130" fill="#F2B705"/>
+    <polygon points="180,145 460,145 480,250 160,250" fill="#10A392"/>
+    <polygon points="145,265 495,265 515,370 125,370" fill="#1E88DB"/>
+
+    <text class="p-dark"  x="320" y="90"  text-anchor="middle">End to end</text>
+    <text class="p-light" x="320" y="205" text-anchor="middle">Integration</text>
+    <text class="p-light" x="320" y="325" text-anchor="middle">Unit</text>
+
+    <text class="p-num"  x="530" y="80"  >10%</text>
+    <text class="p-side" x="530" y="99"  >мало, медленные</text>
+    <text class="p-num"  x="530" y="198" >20%</text>
+    <text class="p-side" x="530" y="217" >средне</text>
+    <text class="p-num"  x="530" y="318" >70%</text>
+    <text class="p-side" x="530" y="337" >много, быстрые</text>
+  </svg>
+
+  <p>Пирамида говорит о <b>пропорции</b>: сколько тестов какого типа должно быть в проекте. Ориентир — примерно 70% unit, 20% интеграционных, 10% end-to-end. Цифры условные и меняются от проекта к проекту, важна форма: широкое основание, узкая верхушка.</p>
+
+  <div class="alert">
+    <span class="name">Два варианта названий — это одно и то же</span>
+    <p>Ты встретишь пирамиду с ярусами <b>Unit — Integration — End to end</b> и с ярусами <b>Unit — API — UI</b>. Разница только в словах: верхний ярус называют по способу проверки (через интерфейс) или по охвату (весь сценарий целиком). На собеседовании подойдёт любой вариант, главное объяснить логику.</p>
+  </div>
+
+  <h3>Нижний ярус: unit-тесты</h3>
+  <p><b>Что проверяют:</b> одну функцию в отрыве от всего. Дали на вход значения — проверили, что вернулось ожидаемое.</p>
+  <p><b>Кто пишет:</b> разработчики.</p>
+  <p><b>Сколько идёт:</b> миллисекунды. Тысяча таких тестов пройдёт меньше чем за минуту.</p>
+  <p><b>Что не поймают:</b> проблемы на стыках. Каждая функция работает правильно, а вместе система разваливается.</p>
+
+  <h3>Средний ярус: интеграционные</h3>
+  <p><b>Что проверяют:</b> что несколько частей корректно работают вместе — код с базой, сервис с другим сервисом, приложение с внешним API.</p>
+  <p><b>Кто пишет:</b> разработчики и автоматизаторы.</p>
+  <p><b>Сколько идёт:</b> доли секунды или секунды — обычно нужна база или запущенный сервис, но браузер не нужен.</p>
+  <p><b>Зачем их столько:</b> это золотая середина. Уже проверяется реальное взаимодействие, но ещё быстро и стабильно.</p>
+
+  <h3>Верхний ярус: end-to-end</h3>
+  <p><b>Что проверяют:</b> полный путь пользователя через интерфейс. Открыл сайт, нашёл товар, положил в корзину, оплатил, получил письмо.</p>
+  <p><b>Кто пишет:</b> автоматизаторы. Это твоя будущая работа.</p>
+  <p><b>Сколько идёт:</b> десятки секунд каждый. Поднять браузер, дождаться загрузки страниц, прокликать всю цепочку.</p>
+  <p><b>Зачем они нужны:</b> только они проверяют продукт так, как его видит пользователь. Ни один unit-тест не заметит, что кнопка оплаты уехала за край экрана.</p>
+
+  <h3>Почему форма именно такая</h3>
+  <p>Четыре свойства ухудшаются по мере подъёма.</p>
+
+  <table>
+    <tr><th></th><th>Unit</th><th>End to end</th></tr>
+    <tr><td>Скорость</td><td>миллисекунды</td><td>десятки секунд</td></tr>
+    <tr><td>Стабильность</td><td>зависит только от своей функции</td><td>зависит от браузера, сети, вёрстки, анимаций</td></tr>
+    <tr><td>Точность падения</td><td>видно сломанную функцию</td><td>видно только «кнопка не нажалась»</td></tr>
+    <tr><td>Поддержка</td><td>почти не требует</td><td>ломается при любой правке вёрстки</td></tr>
+  </table>
+
+  <p>Тест, который падает не из-за бага, а из-за среды — сеть моргнула, страница не успела прогрузиться, анимация не доиграла — называется <b>флакающим</b>. Чем выше ярус, тем их больше, и это главная головная боль автоматизаторов.</p>
+
+  <div class="alert">
+    <span class="name">Антипаттерн: перевёрнутая пирамида, она же «мороженое»</span>
+    <p>Команда автоматизировала много end-to-end тестов и почти не пишет unit и интеграционные. Что происходит дальше: прогон занимает четыре часа вместо десяти минут, треть тестов падает случайно, разбор падений съедает рабочий день, команда начинает игнорировать красные сборки и в итоге тесты отключают.</p>
+    <p>Так умирает большинство неудачных проектов автоматизации. Причём выглядит это сначала хорошо: тестов много, покрытие «полное», все довольны.</p>
+  </div>
+
+  <div class="example">
+    <span class="name">Практический вывод</span>
+    <p>Работа автоматизатора — не «автоматизировать всё через браузер», а выбрать правильный ярус для каждой проверки.</p>
+    <p>Расчёт скидки при пятнадцати наборах данных можно проверить через API за секунду, а можно через браузер за десять минут. Результат одинаковый, но второй вариант — плохая работа, даже если все тесты зелёные.</p>
+    <p>Именно поэтому в твоём плане обучения API-тесты стоят раньше UI-тестов. Это не случайный порядок.</p>
+  </div>
+
+  <div class="recap">
+    <div class="box paper">
+      <h4>В тетрадь</h4>
+      <ul>
+        <li>Нарисовать пирамиду: три яруса с подписями и процентами 70 / 20 / 10</li>
+        <li>Рядом с каждым ярусом: что проверяет, кто пишет, сколько идёт</li>
+        <li>Четыре свойства, которые ухудшаются кверху</li>
+        <li>Отдельно «мороженое» и чем оно заканчивается</li>
+        <li>Пометка: Unit — Integration — E2E и Unit — API — UI это одно и то же</li>
+      </ul>
+    </div>
+    <div class="box cards">
+      <h4>На карточки</h4>
+      <div class="qa">Назови ярусы пирамиды и пропорции<span>unit 70%, интеграционные 20%, end-to-end 10%</span></div>
+      <div class="qa">Почему end-to-end тестов должно быть мало?<span>медленные, хрупкие, дорогие в поддержке, не показывают причину падения</span></div>
+      <div class="qa">Что такое флакающий тест?<span>падает не из-за бага, а из-за среды: сети, загрузки, анимаций</span></div>
+      <div class="qa">Что такое «мороженое» и чем кончается?<span>перевёрнутая пирамида: долгий прогон, случайные падения, недоверие, тесты отключают</span></div>
+      <div class="qa">Что проверяет интеграционный ярус?<span>что несколько частей работают вместе: код с базой, сервис с сервисом</span></div>
+    </div>
+  </div>
+
+  <div class="nav"><button class="btn ghost" data-go="0">Назад</button><button class="btn primary" data-go="2">Дальше</button></div>
+</div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="block" data-name="Функциональное">
+<div class="sheet">
+  <div class="head"><h2>Функциональное и нефункциональное</h2><span class="mins">около 20 минут</span></div>
+
+  <p class="lead">Всё тестирование делится надвое по одному признаку: проверяем ли мы, <b>что</b> система делает, или <b>насколько хорошо</b> она это делает.</p>
+
+  <h3>Функциональное</h3>
+  <p>Проверяем, что система выполняет то, что должна. Есть требование — проверяем, работает ли оно.</p>
+  <p>Кнопка «Войти» пускает в аккаунт. Товар добавляется в корзину. Письмо приходит на почту. Скидка считается верно. Фильтр отбирает нужные товары.</p>
+  <p>Ответ здесь всегда бинарный: работает или не работает.</p>
+
+  <h3>Нефункциональное</h3>
+  <p>Функция уже работает. Теперь проверяем качество этой работы: быстро ли, удобно ли, безопасно ли, везде ли.</p>
+  <p>Ответ здесь не бинарный, а измеримый: «страница грузится 4 секунды» — это не «сломано», но может быть неприемлемо.</p>
+
+  <div class="example">
+    <span class="name">Одна функция, две группы проверок</span>
+    <p><b>Форма оплаты, функциональные проверки:</b> платёж проходит, деньги списываются, приходит подтверждение на почту, заказ появляется в личном кабинете.</p>
+    <p><b>Нефункциональные проверки той же формы:</b> страница открывается быстрее двух секунд, выдерживает 500 одновременных платежей, данные карты передаются по защищённому соединению, форма работает на телефоне, суммы показаны в валюте страны пользователя.</p>
+    <p>Заметь: во второй группе оплата везде работает. Вопрос только в том, насколько хорошо.</p>
+  </div>
+
+  <div class="alert">
+    <span class="name">Да, виды нефункционального надо знать</span>
+    <p>«Назови виды нефункционального тестирования» — стандартный вопрос на собеседовании. Достаточно перечислить шесть-семь и уметь объяснить каждый одним предложением с примером. Делать их руками ты, скорее всего, не будешь — для нагрузки и безопасности есть отдельные специалисты и инструменты.</p>
+  </div>
+
+  <h3>Виды нефункционального тестирования</h3>
+
+  <div class="term">
+    <span class="name">Производительность</span>
+    <p>Насколько быстро система работает и сколько пользователей выдерживает. Внутри делится на четыре подвида:</p>
+    <p><b>Нагрузочное</b> — выдержит ли система ожидаемую нагрузку. Тысяча человек одновременно оформляет заказ — всё работает?</p>
+    <p><b>Стрессовое</b> — при какой нагрузке система сломается и как именно. Не «выдержит ли тысячу», а «на какой цифре упадёт». Важно знать заранее, чтобы падение не застало врасплох в чёрную пятницу.</p>
+    <p><b>Тестирование стабильности</b> — не деградирует ли система при долгой непрерывной работе. Запускают на сутки или неделю: бывает, что приложение отлично работает час, а через двое суток забивает память и падает.</p>
+    <p><b>Объёмное</b> — как система ведёт себя при больших объёмах данных. Каталог из ста товаров открывается мгновенно, а из миллиона?</p>
+  </div>
+
+  <div class="term">
+    <span class="name">Юзабилити — удобство использования</span>
+    <p>Может ли пользователь без подсказок понять, что делать, и достичь цели за разумное время.</p>
+    <p>Сколько кликов до оформления заказа. Понятно ли, что означает сообщение об ошибке. Заметна ли кнопка. Не приходится ли искать цену по всему сайту.</p>
+  </div>
+
+  <div class="term">
+    <span class="name">Безопасность</span>
+    <p>Можно ли получить доступ к чужим данным или к тому, к чему доступа быть не должно.</p>
+    <p>Открывается ли чужой заказ подменой номера в адресе страницы. Можно ли зайти в админку без авторизации. Передаётся ли пароль в открытом виде. Не показывает ли сообщение об ошибке лишнего о внутреннем устройстве.</p>
+  </div>
+
+  <div class="term">
+    <span class="name">Совместимость</span>
+    <p>Работает ли одинаково в разных условиях.</p>
+    <p>Браузеры: Chrome, Safari, Firefox. Устройства: телефон, планшет, десктоп. Разрешения экрана. Версии операционных систем. Отдельно — кросс-браузерное и адаптивное тестирование, это подвиды совместимости.</p>
+  </div>
+
+  <div class="term">
+    <span class="name">Локализация и интернационализация</span>
+    <p><b>Локализация</b> — корректна ли адаптация под конкретную страну: перевод без обрезанного текста, формат даты, разделитель в числах, валюта, часовой пояс.</p>
+    <p><b>Интернационализация</b> — заложена ли в продукт сама возможность такой адаптации. Например, влезет ли немецкий перевод в кнопку, рассчитанную под английское слово.</p>
+  </div>
+
+  <div class="term">
+    <span class="name">Отказоустойчивость и восстанавливаемость</span>
+    <p>Что происходит, когда что-то ломается, и может ли система прийти в себя.</p>
+    <p>Оборвалась сеть посреди оплаты — деньги списались дважды или ни разу? Упал внешний сервис доставки — сайт покажет понятное сообщение или белый экран? После перезапуска сервера данные на месте?</p>
+  </div>
+
+  <div class="term">
+    <span class="name">Масштабируемость</span>
+    <p>Можно ли увеличить мощность системы, добавив ресурсов, и вырастет ли производительность пропорционально. Часто рассматривают вместе с производительностью.</p>
+  </div>
+
+  <div class="example">
+    <span class="name">Как это запомнить</span>
+    <p>Не списком, а через один продукт. Возьми любой интернет-магазин и мысленно задай семь вопросов: быстро ли, удобно ли, безопасно ли, везде ли работает, правильно ли переведено, что при сбое, потянет ли рост.</p>
+    <p>Семь вопросов запоминаются легче, чем семь терминов. Названия подтянутся за вопросами.</p>
+  </div>
+
+  <div class="recap">
+    <div class="box paper">
+      <h4>В тетрадь</h4>
+      <ul>
+        <li>Два вопроса крупно: «что делает» и «насколько хорошо делает»</li>
+        <li>Семь видов нефункционального, у каждого одно предложение и пример</li>
+        <li>Отдельно четыре подвида производительности: нагрузочное, стрессовое, стабильности, объёмное</li>
+        <li>Свой пример на одной функции в двух группах проверок</li>
+      </ul>
+    </div>
+    <div class="box cards">
+      <h4>На карточки</h4>
+      <div class="qa">Чем функциональное отличается от нефункционального?<span>что делает против насколько хорошо делает</span></div>
+      <div class="qa">Назови семь видов нефункционального<span>производительность, юзабилити, безопасность, совместимость, локализация, отказоустойчивость, масштабируемость</span></div>
+      <div class="qa">Четыре подвида тестирования производительности<span>нагрузочное, стрессовое, стабильности, объёмное</span></div>
+      <div class="qa">Чем нагрузочное отличается от стрессового?<span>нагрузочное — выдержит ли ожидаемую нагрузку; стрессовое — на какой цифре сломается</span></div>
+      <div class="qa">Чем локализация отличается от интернационализации?<span>локализация — адаптация под страну; интернационализация — заложена ли возможность такой адаптации</span></div>
+      <div class="qa">Пример проверки отказоустойчивости<span>оборвалась сеть при оплате — что с деньгами и что увидит пользователь</span></div>
+    </div>
+  </div>
+
+  <div class="nav"><button class="btn ghost" data-go="1">Назад</button><button class="btn primary" data-go="3">Дальше</button></div>
+</div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="block" data-name="Виды по целям">
+<div class="sheet">
+  <div class="head"><h2>Виды по целям</h2><span class="mins">около 30 минут</span></div>
+
+  <p class="lead">Самый спрашиваемый блок на собеседованиях. Здесь важны не определения, а различия между похожими парами.</p>
+
+  <div class="term">
+    <span class="name">Smoke</span>
+    <p>Быстрая проверка, что основное вообще работает: сайт открывается, вход проходит, заказ создаётся. 15–30 минут, на каждую новую сборку. Смок красный — дальше тестировать бессмысленно, сборку возвращают.</p>
+    <p>Название из электроники: включили прибор, дыма нет — можно проверять дальше.</p>
+  </div>
+
+  <div class="term">
+    <span class="name">Sanity</span>
+    <p>Узкая углублённая проверка одной области после точечных изменений. Починили расчёт доставки — проверяем расчёт доставки во всех вариантах, остальное не трогаем.</p>
+  </div>
+
+  <div class="alert">
+    <span class="name">Различие, которое спрашивают</span>
+    <p>Смок широкий и поверхностный. Sanity узкий и глубокий.</p>
+  </div>
+
+  <div class="term">
+    <span class="name">Regression — регрессия</span>
+    <p>Проверка, что ранее работавшее не сломалось после изменений. Часы или дни, перед релизом. Именно её автоматизируют в первую очередь — однообразная работа, которую человеку делать мучительно, а машине всё равно.</p>
+  </div>
+
+  <div class="term">
+    <span class="name">Re-test</span>
+    <p>Проверка конкретного починенного бага.</p>
+  </div>
+
+  <div class="alert">
+    <span class="name">Вторая пара, которую путают</span>
+    <p>Re-test про один баг. Регрессия про всё остальное, что могло сломаться заодно.</p>
+  </div>
+
+  <div class="term">
+    <span class="name">End-to-end</span>
+    <p>Полный пользовательский сценарий от начала до конца: зашёл, нашёл товар, положил в корзину, оплатил, получил письмо. Проверяется вся цепочка систем.</p>
+  </div>
+
+  <div class="term">
+    <span class="name">Exploratory — исследовательское</span>
+    <p>Тестирование без заранее написанных кейсов: изучаешь продукт и одновременно придумываешь проверки. Не хаос, а осознанный метод, требующий опыта. Хорошо находит то, что не покрыто документацией.</p>
+  </div>
+
+  <div class="term">
+    <span class="name">Ad-hoc и monkey</span>
+    <p>Ad-hoc — без подготовки и структуры, «потыкать наугад». Monkey — случайные бессмысленные действия, обычно автоматически: проверяет, что приложение не падает от неожиданного.</p>
+  </div>
+
+  <h3>Позитивное и негативное</h3>
+  <p>Позитивное: при правильных данных всё работает. Негативное: при неправильных данных система ведёт себя корректно — показывает понятную ошибку, а не падает.</p>
+  <p>Негативных проверок обычно <b>больше</b>. Правильный путь один, неправильных — множество.</p>
+
+  <div class="recap">
+    <div class="box paper">
+      <h4>В тетрадь</h4>
+      <ul>
+        <li>Две пары различий крупно: смок против sanity, re-test против регрессии</li>
+        <li>Остальные виды коротко, по строчке</li>
+        <li>Почему негативных проверок больше позитивных</li>
+      </ul>
+    </div>
+    <div class="box cards">
+      <h4>На карточки</h4>
+      <div class="qa">Чем smoke отличается от sanity?<span>смок широкий и поверхностный, sanity узкий и глубокий</span></div>
+      <div class="qa">Чем re-test отличается от регрессии?<span>re-test про один починенный баг, регрессия про всё остальное</span></div>
+      <div class="qa">Какой вид автоматизируют первым и почему?<span>регрессию: однообразно, часто, много повторов</span></div>
+      <div class="qa">Каких проверок больше и почему?<span>негативных: правильный путь один, неправильных множество</span></div>
+    </div>
+  </div>
+
+  <div class="nav"><button class="btn ghost" data-go="2">Назад</button><button class="btn primary" data-go="4">Дальше</button></div>
+</div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="block" data-name="Ящики">
+<div class="sheet">
+  <div class="head"><h2>Чёрный, белый и серый ящик</h2><span class="mins">около 10 минут</span></div>
+
+  <p class="lead">Классификация по одному признаку: видишь ли ты код во время тестирования.</p>
+
+  <div class="term">
+    <span class="name">Чёрный ящик</span>
+    <p>Кода не видишь, работаешь через интерфейс, как пользователь. Знаешь только вход и ожидаемый выход. Так работает большинство ручных тестировщиков.</p>
+  </div>
+
+  <div class="term">
+    <span class="name">Белый ящик</span>
+    <p>Код видишь и тестируешь исходя из его структуры: все ли ветвления покрыты, все ли условия проверены. Так пишут unit-тесты разработчики.</p>
+  </div>
+
+  <div class="term">
+    <span class="name">Серый ящик</span>
+    <p>Кода целиком не видишь, но знаешь внутреннее устройство: какие есть API, как устроена база, куда пишутся логи. Используешь это для более точных проверок.</p>
+  </div>
+
+  <div class="example">
+    <span class="name">Где здесь ты</span>
+    <p>Автоматизатор работает в сером ящике. Ты не просто кликаешь как пользователь, но и лезешь в базу проверить, что запись создалась, читаешь логи, дёргаешь API напрямую. Знание внутренностей делает проверки точнее и быстрее.</p>
+  </div>
+
+  <div class="recap">
+    <div class="box paper">
+      <h4>В тетрадь</h4>
+      <ul>
+        <li>Три ящика в строку с признаком «виден ли код»</li>
+        <li>Кто в каком работает: ручной тестировщик, разработчик, автоматизатор</li>
+      </ul>
+    </div>
+    <div class="box cards">
+      <h4>На карточки</h4>
+      <div class="qa">По какому признаку делят на ящики?<span>виден ли код во время тестирования</span></div>
+      <div class="qa">В каком ящике работает автоматизатор и почему?<span>серый: знает API, базу, логи и использует это для точности</span></div>
+    </div>
+  </div>
+
+  <div class="nav"><button class="btn ghost" data-go="3">Назад</button><button class="btn primary" data-go="5">Дальше</button></div>
+</div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section class="block" data-name="Статика">
+<div class="sheet">
+  <div class="head"><h2>Статическое и динамическое</h2><span class="mins">около 10 минут</span></div>
+
+  <div class="term">
+    <span class="name">Динамическое</span>
+    <p>Продукт запущен, мы с ним взаимодействуем. Всё, о чём говорилось в предыдущих блоках.</p>
+  </div>
+
+  <div class="term">
+    <span class="name">Статическое</span>
+    <p>Продукт не запускается. Проверяются документы и код глазами: ревью требований, код-ревью, анализ статическими анализаторами.</p>
+  </div>
+
+  <div class="example">
+    <span class="name">Почему это выгоднее всего</span>
+    <p>Статическое тестирование — самое дешёвое. Баг, найденный при вычитке требований, стоит правку одного предложения. Он же, дошедший до продакшена, стоит переписывания кода, релиза и починки испорченных данных.</p>
+    <p>Это прямое продолжение третьего принципа и шкалы цены бага из второго дня.</p>
+  </div>
+
+  <div class="recap">
+    <div class="box paper">
+      <h4>В тетрадь</h4>
+      <ul>
+        <li>Два вида одной строкой: запущен продукт или нет</li>
+        <li>Связь со шкалой цены бага: статическое дешевле всего</li>
+      </ul>
+    </div>
+    <div class="box cards">
+      <h4>На карточки</h4>
+      <div class="qa">Чем статическое отличается от динамического?<span>продукт не запускается, проверяются документы и код глазами</span></div>
+      <div class="qa">Приведи три примера статического тестирования<span>ревью требований, код-ревью, статические анализаторы</span></div>
+    </div>
+  </div>
+
+  <div class="nav"><button class="btn ghost" data-go="4">Назад</button><button class="btn primary" data-go="6">К тесту</button></div>
+</div>
+</section>
+
+<!-- ============ ТЕСТ ============ -->
+<section class="block" data-name="Тест">
+<div class="sheet">
+  <div class="head"><h2>Проверка</h2><span class="mins">около 20 минут</span></div>
+  <p class="lead">Десять вопросов, сложнее обычного. Почти все — на применение, а не на определение. Отвечай на все, потом проверяй.</p>
+
+  <div id="quiz">
+
+    <div class="q" data-right="b">
+      <p class="ask"><span class="num">1</span>Тест проверяет, что после оплаты запись появилась в базе и ушло письмо на почту. Какой это уровень?</p>
+      <label class="opt"><input type="radio" name="q1" value="a">Unit</label>
+      <label class="opt"><input type="radio" name="q1" value="b">Integration</label>
+      <label class="opt"><input type="radio" name="q1" value="c">System</label>
+      <label class="opt"><input type="radio" name="q1" value="d">Acceptance</label>
+      <div class="why">Проверяется взаимодействие нескольких частей: оплата, база, почтовый сервис. Это стык, а значит интеграционный уровень. Системный охватывал бы весь продукт целиком против требований.</div>
+    </div>
+
+    <div class="q" data-right="c">
+      <p class="ask"><span class="num">2</span>Прогон автотестов идёт четыре часа, треть падает без реальных багов, команда начала игнорировать красные сборки. Что произошло?</p>
+      <label class="opt"><input type="radio" name="q2" value="a">Парадокс пестицида</label>
+      <label class="opt"><input type="radio" name="q2" value="b">Кластеризация багов</label>
+      <label class="opt"><input type="radio" name="q2" value="c">Перевёрнутая пирамида</label>
+      <label class="opt"><input type="radio" name="q2" value="d">Провал валидации</label>
+      <div class="why">Долгий прогон плюс массовые случайные падения — признаки того, что автоматизировали в основном через UI. Это «мороженое», и заканчивается оно ровно так: тестам перестают доверять.</div>
+    </div>
+
+    <div class="q" data-right="a">
+      <p class="ask"><span class="num">3</span>Разработчик починил один баг в расчёте доставки. Тестировщик проверяет только доставку, глубоко, во всех вариантах. Как это называется?</p>
+      <label class="opt"><input type="radio" name="q3" value="a">Sanity</label>
+      <label class="opt"><input type="radio" name="q3" value="b">Smoke</label>
+      <label class="opt"><input type="radio" name="q3" value="c">Регрессия</label>
+      <label class="opt"><input type="radio" name="q3" value="d">Re-test</label>
+      <div class="why">Sanity: узко и глубоко по одной области. Re-test был бы проверкой строго того самого бага, а тут проверяются все варианты расчёта. Смок был бы широким и поверхностным, регрессия — по всему продукту.</div>
+    </div>
+
+    <div class="q" data-right="d">
+      <p class="ask"><span class="num">4</span>Проверку «сумма скидки считается верно при 15 разных наборах данных» дешевле всего автоматизировать на уровне:</p>
+      <label class="opt"><input type="radio" name="q4" value="a">UI — так ближе к реальному пользователю</label>
+      <label class="opt"><input type="radio" name="q4" value="b">Acceptance — это бизнес-логика</label>
+      <label class="opt"><input type="radio" name="q4" value="c">End-to-end — проверится вся цепочка</label>
+      <label class="opt"><input type="radio" name="q4" value="d">Unit или API — быстро и стабильно</label>
+      <div class="why">Пятнадцать вариантов данных через браузер — это минуты прогона и куча источников хрупкости. Через unit или API те же пятнадцать проверок выполнятся за секунду. Выбор правильного уровня и есть работа автоматизатора.</div>
+    </div>
+
+    <div class="q" data-right="b">
+      <p class="ask"><span class="num">5</span>Тестировщик смотрит на форму глазами пользователя, кода не видит, но перед проверкой открывает Swagger и заглядывает в базу. В каком ящике он работает?</p>
+      <label class="opt"><input type="radio" name="q5" value="a">Чёрный</label>
+      <label class="opt"><input type="radio" name="q5" value="b">Серый</label>
+      <label class="opt"><input type="radio" name="q5" value="c">Белый</label>
+      <label class="opt"><input type="radio" name="q5" value="d">Зависит от уровня тестирования</label>
+      <div class="why">Кода не видит, но знает внутреннее устройство и пользуется этим — определение серого ящика. Именно так работает автоматизатор.</div>
+    </div>
+
+    <div class="q" data-right="c">
+      <p class="ask"><span class="num">6</span>Что из перечисленного относится к статическому тестированию?</p>
+      <label class="opt"><input type="radio" name="q6" value="a">Smoke-прогон на новой сборке</label>
+      <label class="opt"><input type="radio" name="q6" value="b">Проверка формы на негативные сценарии</label>
+      <label class="opt"><input type="radio" name="q6" value="c">Вычитка требований до начала разработки</label>
+      <label class="opt"><input type="radio" name="q6" value="d">Нагрузочное тестирование</label>
+      <div class="why">Статическое — это когда продукт не запускается. Вычитка требований, код-ревью, статические анализаторы. Всё остальное в списке требует работающего приложения.</div>
+    </div>
+
+    <div class="q" data-right="a">
+      <p class="ask"><span class="num">7</span>«Форма оплаты выдерживает 500 одновременных платежей» — это проверка:</p>
+      <label class="opt"><input type="radio" name="q7" value="a">Нефункциональная, производительность</label>
+      <label class="opt"><input type="radio" name="q7" value="b">Функциональная, потому что проверяется оплата</label>
+      <label class="opt"><input type="radio" name="q7" value="c">Нефункциональная, отказоустойчивость</label>
+      <label class="opt"><input type="radio" name="q7" value="d">Приёмочная</label>
+      <div class="why">Функция оплаты работает — вопрос в том, насколько хорошо она работает под нагрузкой. Это производительность. Отказоустойчивость была бы про поведение при обрыве сети или падении сервиса.</div>
+    </div>
+
+    <div class="q" data-right="d">
+      <p class="ask"><span class="num">8</span>Почему негативных проверок обычно больше позитивных?</p>
+      <label class="opt"><input type="radio" name="q8" value="a">Потому что пользователи чаще ошибаются, чем делают правильно</label>
+      <label class="opt"><input type="radio" name="q8" value="b">Потому что негативные проще писать</label>
+      <label class="opt"><input type="radio" name="q8" value="c">Потому что баги живут только в негативных сценариях</label>
+      <label class="opt"><input type="radio" name="q8" value="d">Потому что правильный путь один, а неправильных множество</label>
+      <div class="why">Причина комбинаторная, а не психологическая: корректный ввод один, а некорректных вариантов бесконечно много — пустое поле, пробелы, спецсимволы, слишком длинный текст, неверный формат.</div>
+    </div>
+
+    <div class="q" data-right="b">
+      <p class="ask"><span class="num">9</span>Тест падает раз в десять прогонов, всегда в разных местах, при этом руками сценарий воспроизводится стабильно. Как это называется и в чём вероятная причина?</p>
+      <label class="opt"><input type="radio" name="q9" value="a">Регрессия, изменения сломали старую функциональность</label>
+      <label class="opt"><input type="radio" name="q9" value="b">Флакающий тест, вероятно проблема с ожиданиями или средой</label>
+      <label class="opt"><input type="radio" name="q9" value="c">Парадокс пестицида, тест устарел</label>
+      <label class="opt"><input type="radio" name="q9" value="d">Баг в продукте, который проявляется случайно</label>
+      <div class="why">Случайные падения без воспроизведения руками — классический флакающий тест. Чаще всего причина в том, что тест не дожидается загрузки элемента, либо в нестабильности окружения. Верхний ярус пирамиды страдает этим сильнее всего.</div>
+    </div>
+
+    <div class="q" data-right="c">
+      <p class="ask"><span class="num">10</span>Заказчик проверяет готовый продукт и решает, принимать ли работу. Тестировщик команды при этом уже прогнал полный набор проверок против требований. Назови уровни в правильном порядке.</p>
+      <label class="opt"><input type="radio" name="q10" value="a">Сначала acceptance, потом system</label>
+      <label class="opt"><input type="radio" name="q10" value="b">Оба относятся к system</label>
+      <label class="opt"><input type="radio" name="q10" value="c">Сначала system, потом acceptance</label>
+      <label class="opt"><input type="radio" name="q10" value="d">Оба относятся к acceptance</label>
+      <div class="why">Тестировщик работает на системном уровне: проверяет собранный продукт против требований. Приёмка заказчиком идёт после и отвечает на другой вопрос — решает ли продукт задачу бизнеса.</div>
+    </div>
+
+  </div>
+
+  <div class="nav">
+    <button class="btn ghost" data-go="5">Назад</button>
+    <button class="btn primary" id="check">Проверить ответы</button>
+  </div>
+
+  <div class="score" id="score"></div>
+</div>
+</section>
+
+</div>
+
+<script>
+const blocks = [...document.querySelectorAll(".block")];
+const index  = document.getElementById("index");
+const seen   = new Set([0]);
+let cur = 0;
+
+blocks.forEach((b,i)=>{
+  const c = document.createElement("button");
+  c.className = "chip";
+  c.textContent = b.dataset.name;
+  c.onclick = ()=>show(i);
+  index.appendChild(c);
+});
+
+function show(i){
+  blocks[cur].classList.remove("show");
+  cur = i;
+  seen.add(i);
+  blocks[cur].classList.add("show");
+  [...index.children].forEach((c,n)=>{
+    c.className = "chip" + (seen.has(n) && n!==cur ? " done" : "") + (n===cur ? " on" : "");
+  });
+  window.scrollTo({top:0,behavior:"instant"});
+}
+
+document.addEventListener("click", e=>{
+  const b = e.target.closest("[data-go]");
+  if(b) show(+b.dataset.go);
+});
+
+document.getElementById("check").onclick = ()=>{
+  const qs = [...document.querySelectorAll(".q")];
+  let right = 0;
+  qs.forEach(q=>{
+    const picked = q.querySelector("input:checked");
+    q.querySelectorAll(".opt").forEach(o=>o.classList.remove("right","wrong"));
+    q.querySelectorAll(".opt").forEach(o=>{
+      const val = o.querySelector("input").value;
+      if(val === q.dataset.right) o.classList.add("right");
+      else if(picked && picked.value === val) o.classList.add("wrong");
+    });
+    q.querySelector(".why").classList.add("show");
+    if(picked && picked.value === q.dataset.right) right++;
+  });
+
+  let verdict;
+  if(right >= 9) verdict = "Материал усвоен уверенно. Можно идти дальше и вернуться к этим темам только на плановом повторении.";
+  else if(right >= 7) verdict = "Хороший результат. Перечитай блоки, где ошиблась, и добавь эти вопросы в стопку «запнулась».";
+  else if(right >= 5) verdict = "Основа есть, но детали плывут. Перечитай блоки с ошибками и перепиши по ним конспект заново — не перечитывай, а именно перепиши своими словами.";
+  else verdict = "Нормальный результат для первого прохода такого теста. Вернись к блокам с ошибками, разбери примеры и попробуй снова завтра.";
+
+  const s = document.getElementById("score");
+  s.innerHTML = "<strong>" + right + " из 10</strong>" + verdict;
+  s.classList.add("show");
+  s.scrollIntoView({behavior:"smooth",block:"center"});
+};
+
+show(0);
+</script>

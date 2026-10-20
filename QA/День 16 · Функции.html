@@ -1,0 +1,789 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>День 16 · Функции</title>
+<style>
+/* Оформление дня 13: светлая бумага, вкладки сверху, тёмные блоки кода, цветные плашки по роли */
+:root{
+  --bg:#eef1f2; --paper:#fff; --ink:#1b2430; --soft:#4e5a67; --line:#d7dde0;
+  --blue:#1f5fa9; --blue-bg:#e9f1fa;
+  --red:#b0352b; --red-bg:#fbecea;
+  --green:#276f52; --green-bg:#e8f4ee;
+  --amber:#9a6a00; --amber-bg:#fbf2df;
+  --violet:#5e4b8b; --violet-bg:#efebf8;
+  --code-bg:#0f1720; --code-fg:#dce7f0; --code-cm:#8ea2b4;
+  --chip:#eef1f3; --th:#f2f5f6; --soft-bg:#f6f8f9; --hover:#eaf0f3;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.62;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding-inline:18px;padding-block:0 60px}
+header{padding:34px 0 14px}
+.day{font-size:14px;color:var(--soft)}
+h1{font-size:33px;line-height:1.15;margin:.2em 0 .3em;text-wrap:balance}
+.lead{color:var(--soft);margin:0;max-width:62ch}
+
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);padding:10px 0 8px;
+  display:flex;gap:6px;overflow-x:auto;border-bottom:1px solid var(--line)}
+.tabs button{flex:0 0 auto;background:var(--paper);border:1px solid var(--line);border-radius:8px;
+  padding:8px 13px;font:inherit;font-size:14.5px;color:var(--soft);cursor:pointer;white-space:nowrap}
+.tabs button.on{background:var(--ink);color:var(--paper);border-color:var(--ink);font-weight:600}
+.tabs button .n{opacity:.55;margin-right:6px}
+button:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+.pane{display:none;background:var(--paper);border:1px solid var(--line);border-top:0;
+  border-radius:0 0 12px 12px;padding:28px 30px 34px}
+.pane.on{display:block}
+.pane h2{margin:0 0 6px;font-size:26px;line-height:1.2;text-wrap:balance}
+.pane .sub{color:var(--soft);margin:0 0 20px;font-size:15.5px}
+h3{font-size:19.5px;margin:28px 0 8px}
+h4{font-size:17px;margin:20px 0 6px}
+p{margin:12px 0}
+ul,ol{padding-left:24px}li{margin:6px 0}
+code.i{background:var(--chip);border:1px solid var(--line);border-radius:4px;padding:1px 5px;
+ font-family:Consolas,monospace;font-size:.92em}
+pre{background:var(--code-bg);color:var(--code-fg);border-radius:9px;padding:15px 17px;overflow-x:auto;
+ font-family:Consolas,monospace;font-size:14.5px;line-height:1.55;margin:14px 0}
+pre .cm{color:var(--code-cm)}
+pre.light{background:var(--soft-bg);color:var(--ink);border:1px solid var(--line)}
+
+.box{border-left:4px solid;border-radius:0 8px 8px 0;padding:14px 18px;margin:18px 0}
+.box .title{font-weight:700;margin-bottom:4px}
+.def{border-color:var(--blue);background:var(--blue-bg)} .def .title{color:var(--blue)}
+.trap{border-color:var(--red);background:var(--red-bg)} .trap .title{color:var(--red)}
+.note{border-color:var(--green);background:var(--green-bg)} .note .title{color:var(--green)}
+.card{border-color:var(--amber);background:var(--amber-bg)} .card .title{color:var(--amber)}
+.task{border-color:var(--violet);background:var(--violet-bg)} .task .title{color:var(--violet)}
+.box p:first-of-type{margin-top:2px}.box p:last-child{margin-bottom:2px}
+
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15.5px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--th);font-weight:600}
+td{font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto}
+.mono{font-family:Consolas,monospace;white-space:nowrap}
+
+details{border:1px solid var(--line);background:var(--soft-bg);border-radius:8px;padding:10px 14px;margin:10px 0}
+summary{cursor:pointer;font-weight:600;color:var(--violet)}
+details[open] summary{margin-bottom:8px}
+.mark{display:inline-block;font-size:12.5px;font-weight:700;border-radius:99px;padding:1px 9px;margin-left:6px;vertical-align:1px}
+.m-ok{background:var(--green-bg);color:var(--green)}
+.m-half{background:var(--amber-bg);color:var(--amber)}
+.yours{border-left:3px solid var(--line);padding:2px 0 2px 12px;color:var(--soft);font-size:15.5px;margin:8px 0}
+
+.q{border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:16px 0}
+.qn{font-weight:700;margin-bottom:6px}
+.opts{display:grid;gap:8px;margin-top:12px}
+.opt{text-align:left;background:var(--soft-bg);border:1px solid var(--line);border-radius:8px;
+ padding:10px 14px;cursor:pointer;font:inherit;font-size:16px;color:var(--ink)}
+.opt:hover{background:var(--hover)}
+.opt.right{background:var(--green-bg);border-color:var(--green);font-weight:600}
+.opt.wrong{background:var(--red-bg);border-color:var(--red)}
+.expl{margin-top:12px;padding:12px 14px;background:var(--soft-bg);border-radius:8px}
+.score{position:sticky;bottom:env(safe-area-inset-bottom,0px);background:var(--paper);border:1px solid var(--line);
+ border-radius:10px;padding:12px 18px;margin-top:18px;font-weight:600;font-variant-numeric:tabular-nums}
+
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:34px;padding-top:18px;border-top:1px solid var(--line)}
+.nav button{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 16px;
+ font:inherit;cursor:pointer;color:var(--ink)}
+.nav .next{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.nav button[disabled]{opacity:.35;cursor:default}
+@media(max-width:640px){.wrap{padding-inline:16px}.pane{padding:20px 17px 26px}h1{font-size:27px}pre{font-size:13.5px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+<style>
+.simple{border:1px solid var(--line);background:var(--soft-bg);border-radius:10px;padding:14px 18px;margin:16px 0}
+.simple .title{font-weight:700;margin-bottom:4px;color:var(--ink)}
+.steps{counter-reset:st;list-style:none;padding-left:0}
+.steps>li{counter-increment:st;position:relative;padding-left:38px;margin:12px 0}
+.steps>li::before{content:counter(st);position:absolute;left:0;top:1px;width:26px;height:26px;border-radius:50%;
+  background:var(--ink);color:var(--paper);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.done{border:1px dashed var(--green);border-radius:8px;padding:10px 14px;margin:14px 0;font-size:15.5px}
+.done b{color:var(--green)}
+.req{border:1px solid var(--line);border-radius:10px;background:var(--soft-bg);padding:16px 20px;margin:16px 0}
+.req p{margin:9px 0}
+.req .rn{font-weight:700;font-family:Consolas,monospace;margin-right:6px}
+.ask{display:grid;gap:8px;margin:10px 0}
+.ask label{display:flex;gap:8px;align-items:flex-start;font-size:16px;cursor:pointer}
+.ask input{margin-top:5px}
+</style>
+<style>
+.split{display:flex;align-items:center;gap:12px;margin:28px 0 8px;color:var(--soft);font-size:14.5px;font-weight:600}
+.split::before,.split::after{content:"";flex:1;border-top:1px dashed var(--line)}
+</style>
+
+<div class="wrap">
+
+<header>
+  <div class="day">День 16 · вторник, 6 октября · Python, тема 2.4</div>
+  <h1>Функции</h1>
+  <p class="lead">Функция — это кусок кода с именем, который можно вызывать сколько угодно раз. Через три месяца каждый твой автотест будет функцией. Сегодня учимся их писать и, главное, находить в них баги.</p>
+</header>
+
+<div class="box def">
+  <div class="title">Первый день в новом темпе — два захода</div>
+  <p><b>Заход 1 · 2:10</b> — вкладки 0–5: карточки, код, охота, разбор, теория, задание, тест.</p>
+  <p><b>Перерыв — не меньше часа без экрана.</b></p>
+  <p><b>Заход 2 · 2:00</b> — вкладки 6–9: английский, Python, тест-кейсы, итоги.</p>
+</div>
+
+<div class="tabs" id="tabs"></div>
+
+<!-- 0 -->
+<div class="pane" data-title="Карточки и код">
+  <h2>Разминка</h2>
+  <p class="sub">25 минут: карточки 15, чтение кода 10</p>
+
+  <h3>Карточки</h3>
+  <ol class="steps">
+    <li>В <code class="i">flashcards-interview.html</code> отметь <b>E · Циклы</b> и <b>M · Словари</b>. Это 12 карточек.</li>
+    <li>Вслух, потом открываешь. Второй заход — по «Запнулась».</li>
+  </ol>
+  <div class="done"><b>Готово, когда</b> записала счёт из 12. И за день 15 тоже пришли счёт D и L — его пока нет.</div>
+
+  <h3>Чтение кода</h3>
+  <p>Первый вопрос — на правило, где ты ошиблась два раза подряд: запись по новому ключу. Остальные — на циклы и словари. Пиши таблицу на бумаге, по строкам.</p>
+  <div id="quizA"></div>
+</div>
+
+<!-- 1 -->
+<div class="pane" data-title="Охота">
+  <h2>Функции джуна</h2>
+  <p class="sub">25 минут</p>
+
+  <p>Джун разбил валидатор формы входа на функции. Справа от каждого вызова — что он ожидал увидеть. Теорию по функциям мы ещё не проходили, но ищи так же, как в дне 14: запускай и сравнивай.</p>
+
+  <div class="simple">
+    <div class="title">Что нужно знать, чтобы начать</div>
+    <p><code class="i">def имя(что_на_входе):</code> — так функция объявляется. Код под ней с отступом не выполняется сам — только когда функцию <b>вызывают</b>: <code class="i">имя(данные)</code>.</p>
+    <p><code class="i">return</code> — что функция отдаёт обратно туда, откуда её вызвали. Остальное разберём на вкладке «Функции».</p>
+  </div>
+
+  <div class="box task">
+    <div class="title">Как работать</div>
+    <ol class="steps">
+      <li>Сохрани как <code class="i">python/day16_hunt.py</code> и запусти.</li>
+      <li>Сравни каждую напечатанную строку с комментарием справа. Обрати внимание: строк в выводе больше, чем вызовов <code class="i">print</code> внизу. Откуда лишние?</li>
+      <li>Упало — запиши ошибку, закомментируй строку, запусти снова.</li>
+      <li>Каждую находку записывай тремя частями: <b>какая функция или строка → что вышло → почему</b>.</li>
+    </ol>
+  </div>
+
+<pre><span class="cm"># Функции для формы входа — написал джун</span>
+def check_length(password):
+    if 8 &lt;= len(password) &lt;= 20:
+        print(True)
+    else:
+        print(False)
+
+
+def has_digit(password):
+    for ch in password:
+        if ch.isdigit():
+            return True
+        else:
+            return False
+
+
+def has_upper(password):
+    found = False
+    for ch in password:
+        if ch.isupper():
+            found = True
+    return found
+
+
+def check_password(password, email):
+    if password == "":
+        return "Заполните поле"
+    if not check_length(password):
+        return "Пароль должен содержать от 8 до 20 символов"
+    if not has_digit(password):
+        return "Пароль должен содержать хотя бы одну цифру"
+    if not has_upper(password):
+        return "Пароль должен содержать хотя бы одну заглавную букву"
+    return "OK"
+
+
+def is_blocked(attempts, limit=4):
+    return attempts &gt;= limit
+
+
+attempts = 0
+
+def add_attempt():
+    attempts = attempts + 1
+    return attempts
+
+
+print(has_upper("Anna1234"))                         <span class="cm"># ожидаем True</span>
+print(check_length("Anna1234"))                      <span class="cm"># ожидаем True</span>
+print(has_digit("Anna1234"))                         <span class="cm"># ожидаем True</span>
+print(check_password("anna@test.ru", "Anna1234"))    <span class="cm"># ожидаем OK</span>
+print(is_blocked(4))                                 <span class="cm"># ожидаем False: блокирует пятая попытка (3.8)</span>
+check_password("Anna1234", "anna@test.ru")           <span class="cm"># ожидаем увидеть OK</span>
+print(add_attempt())                                 <span class="cm"># ожидаем 1</span></pre>
+
+  <div class="box card">
+    <div class="title">Сколько искать</div>
+    <p>Семь проблем. Одна функция из пяти написана правильно — это контрольная. Одна проблема не ломает вывод, но в коде её видно глазами: что-то объявлено и ни разу не использовано.</p>
+  </div>
+  <div class="done"><b>Готово, когда</b> у каждой находки три части. «Функция не работает» — не находка. «has_digit("Anna1234") печатает False вместо True, потому что…» — находка.</div>
+</div>
+
+<!-- 2 -->
+<div class="pane" data-title="Разбор">
+  <h2>Что было в функциях джуна</h2>
+  <p class="sub">15 минут. После охоты</p>
+
+  <p>Вот что печатает программа целиком:</p>
+<pre class="light">True                                          ← has_upper — верно
+True                                          ← print внутри check_length
+None                                          ← а это то, что check_length вернула
+False                                         ← has_digit
+True                                          ← опять print внутри check_length
+Пароль должен содержать от 8 до 20 символов   ← check_password
+True                                          ← is_blocked(4)
+True                                          ← print внутри check_length, и больше ничего
+UnboundLocalError: cannot access local variable 'attempts' ...</pre>
+
+  <details><summary>1 · check_length печатает, а не возвращает</summary>
+    <p><b>Что вышло:</b> две строки — <code class="i">True</code> и <code class="i">None</code> — вместо одной.</p>
+    <p><b>Почему:</b> внутри функции стоит <code class="i">print(True)</code>, а не <code class="i">return True</code>. <code class="i">print</code> показывает на экране, но наружу ничего не отдаёт. Функция без <code class="i">return</code> возвращает <code class="i">None</code> — «ничего».</p>
+    <p><b>Последствие:</b> <code class="i">not check_length(...)</code> — это <code class="i">not None</code>, то есть всегда <code class="i">True</code>. Значит, check_password отклонит <b>любой</b> пароль по длине. Отсюда и лишние строки <code class="i">True</code> в выводе: каждый вызов check_length печатает.</p>
+  </details>
+
+  <details><summary>2 · has_digit решает по первому символу</summary>
+    <p><b>Что вышло:</b> <code class="i">False</code> для <code class="i">Anna1234</code>, хотя цифры там есть.</p>
+    <p><b>Почему:</b> <code class="i">return</code> сразу выходит из функции — как <code class="i">break</code>, только сильнее. Первый символ «A» не цифра, срабатывает <code class="i">else: return False</code>, и до «1» цикл не доходит.</p>
+    <p><b>Правильно — как в has_upper:</b> флаг до цикла, <code class="i">return</code> после цикла. Или <code class="i">return True</code> внутри и <code class="i">return False</code> <b>после</b> цикла, без else.</p>
+    <p>Это та же ошибка, что «решение внутри цикла» в твоей вчерашней задаче про релиз. Правило то же: цикл просматривает всё, вывод — после.</p>
+  </details>
+
+  <details><summary>3 · has_upper — контрольная, написана верно</summary>
+    <p>Флаг до цикла, меняется внутри, <code class="i">return</code> после цикла. Так и надо. Если ты нашла здесь баг — проверь, не придумала ли его.</p>
+  </details>
+
+  <details><summary>4 · Аргументы перепутаны местами</summary>
+    <p><b>Что вышло:</b> «Пароль должен содержать от 8 до 20 символов» вместо OK.</p>
+    <p><b>Почему:</b> функция объявлена как <code class="i">check_password(password, email)</code>, а вызвана как <code class="i">check_password("anna@test.ru", "Anna1234")</code>. Аргументы раскладываются <b>по порядку</b>: первый — в password, второй — в email. Проверялся адрес почты как пароль.</p>
+    <p><b>Как защищаться:</b> именованные аргументы — <code class="i">check_password(password="Anna1234", email="anna@test.ru")</code>. Тогда порядок неважен.</p>
+    <p>Заметь: даже с правильным порядком вышло бы не OK, а то же сообщение о длине — из-за бага 1. Два бага на одном вызове — частая история.</p>
+  </details>
+
+  <details><summary>5 · Параметр email нигде не используется</summary>
+    <p>В выводе этого не видно. Видно только глазами: email принимается и ни разу не участвует в проверках. Либо параметр лишний, либо проверка email забыта. Это вопрос разработчику — как вопрос аналитику в дне 15.</p>
+  </details>
+
+  <details><summary>6 · is_blocked блокирует на четвёртой попытке</summary>
+    <p><b>Что вышло:</b> <code class="i">True</code> при 4 попытках.</p>
+    <p><b>Почему:</b> значение по умолчанию <code class="i">limit=4</code>, а по требованию 3.8 блокирует <b>пятая</b>. Это граница — твоя постоянная линия. Три проверки: 4 → False, 5 → True, 6 → True.</p>
+  </details>
+
+  <details><summary>7 · Результат check_password выброшен</summary>
+    <p><b>Что вышло:</b> на экране только <code class="i">True</code> — от print внутри check_length. Самого ответа функции нет.</p>
+    <p><b>Почему:</b> функция вызвана, но её результат никуда не положен и не напечатан. <code class="i">return</code> отдаёт значение — а принять его некому. Нужно <code class="i">print(check_password(...))</code> или <code class="i">result = check_password(...)</code>.</p>
+  </details>
+
+  <details><summary>8 · add_attempt падает</summary>
+    <p><b>Что вышло:</b> <code class="i">UnboundLocalError</code>.</p>
+    <p><b>Почему:</b> внутри функции стоит присваивание <code class="i">attempts = ...</code>. Python решает: значит, attempts — <b>своя, внутренняя</b> переменная этой функции, а не та, что снаружи. А внутренняя ещё пустая — прибавлять не к чему.</p>
+    <p><b>Правильно:</b> передать значение внутрь и вернуть новое: <code class="i">def add_attempt(attempts): return attempts + 1</code>, вызов — <code class="i">attempts = add_attempt(attempts)</code>.</p>
+  </details>
+</div>
+
+<!-- 3 -->
+<div class="pane" data-title="Функции">
+  <h2>Как устроена функция</h2>
+  <p class="sub">25 минут</p>
+
+  <div class="simple">
+    <div class="title">Простыми словами</div>
+    <p>Функция — рецепт с названием. Записала один раз — дальше пишешь только название и подставляешь продукты. На входе — данные, на выходе — результат.</p>
+  </div>
+
+  <h3>Зачем — пример</h3>
+  <p>В дне 14 ты проверяла пароль восьми пользователей, и проверка была внутри цикла. А если проверить пароль нужно ещё в регистрации и в смене пароля? Копировать 15 строк трижды — и при изменении правила править в трёх местах. С функцией — пишешь один раз:</p>
+<pre>def check_password(password):
+    if password == "":
+        return "Заполните поле"
+    if len(password) &lt; 8 or len(password) &gt; 20:
+        return "Пароль должен содержать от 8 до 20 символов"
+    return "OK"
+
+print(check_password("Anna1234"))   <span class="cm"># OK</span>
+print(check_password("Ivan123"))    <span class="cm"># Пароль должен содержать от 8 до 20 символов</span>
+print(check_password(""))           <span class="cm"># Заполните поле</span></pre>
+
+  <h3>Из чего состоит</h3>
+  <div class="box def">
+    <div class="title">[Бумага] Анатомия функции</div>
+<pre class="light">def   check_password ( password ) :
+ │          │             │
+ │          │             └─ параметр: имя для данных на входе
+ │          └─ имя функции: глагол, что она делает
+ └─ «объявляю функцию»
+
+    return "OK"     ← что функция отдаёт наружу. После return функция сразу заканчивается
+
+check_password("Anna1234")   ← вызов. "Anna1234" — аргумент, он попадает в password</pre>
+    <p><b>Параметр</b> — имя в объявлении. <b>Аргумент</b> — конкретное значение при вызове. На собеседовании это различие спрашивают.</p>
+  </div>
+
+  <h3>return и print — главное отличие</h3>
+  <div class="scroll"><table>
+    <tr><th></th><th><code class="i">print(x)</code></th><th><code class="i">return x</code></th></tr>
+    <tr><td>Что делает</td><td>показывает на экране</td><td>отдаёт значение тому, кто вызвал</td></tr>
+    <tr><td>Можно ли использовать результат</td><td>нет, он только на экране</td><td>да: положить в переменную, сравнить, передать дальше</td></tr>
+    <tr><td>Заканчивает ли функцию</td><td>нет</td><td>да, сразу</td></tr>
+    <tr><td>Если в функции нет return</td><td colspan="2">функция возвращает <code class="i">None</code></td></tr>
+  </table></div>
+  <div class="box note">
+    <div class="title">Почему это важно тестировщику</div>
+    <p>Автотест проверяет то, что функция <b>вернула</b>. Если функция только печатает, проверить её автоматически нельзя — на экран автотест не смотрит. Баг 1 в охоте — именно такой.</p>
+  </div>
+
+  <h3>Несколько параметров и значения по умолчанию</h3>
+<pre>def greet(name, greeting="Привет"):
+    return f"{greeting}, {name}!"
+
+greet("Анна")                          <span class="cm"># Привет, Анна!          — greeting взят по умолчанию</span>
+greet("Анна", "Здравствуйте")          <span class="cm"># Здравствуйте, Анна!    — по порядку</span>
+greet(greeting="Хай", name="Анна")     <span class="cm"># Хай, Анна!             — по именам, порядок неважен</span></pre>
+  <p>Значение по умолчанию — это то, что будет, если аргумент не передали. В охоте <code class="i">limit=4</code> — неправильное значение по умолчанию: никто не передал limit, и граница съехала незаметно.</p>
+
+  <h3>Своё и чужое: область видимости</h3>
+  <div class="simple">
+    <div class="title">Простыми словами</div>
+    <p>Переменная, которой присвоили значение <b>внутри</b> функции, — своя у этой функции. Снаружи её не видно. А то, что снаружи, функция может прочитать, но не может изменить простым присваиванием.</p>
+  </div>
+<pre>def f(x):
+    x = x + 1        <span class="cm"># это своя x функции — копия значения</span>
+    return x
+
+x = 5
+print(f(x), x)       <span class="cm"># 6 5 — наружная x не изменилась</span></pre>
+  <div class="box card">
+    <div class="title">[Бумага] Правило</div>
+    <p>Данные — <b>внутрь через параметры</b>, результат — <b>наружу через return</b>. Функция не трогает переменные снаружи. Так её можно проверить отдельно от остальной программы — а значит, написать на неё автотест.</p>
+  </div>
+
+  <h3>Мостик к pytest</h3>
+  <p>Через три месяца автотест будет выглядеть так:</p>
+<pre>def test_password_too_short():
+    assert check_password("Ivan123") == "Пароль должен содержать от 8 до 20 символов"</pre>
+  <p>Это тоже функция. Внутри — вызов проверяемой функции с тестовыми данными и сравнение результата с ожидаемым. <code class="i">assert</code> — «утверждаю, что это правда»; если нет, тест падает. То есть автотест — это твой тест-кейс, записанный кодом: данные, действие, ожидаемый результат.</p>
+</div>
+
+<!-- 4 -->
+<div class="pane" data-title="Задание">
+  <h2>Тест-данные для функции</h2>
+  <p class="sub">30 минут</p>
+
+  <p>Перед тем как писать автотест, тестировщик решает, <b>какими данными</b> проверять функцию. Это тот же тест-дизайн, что для формы, только вход — аргумент, а выход — то, что вернул <code class="i">return</code>.</p>
+
+  <p>Функция: <code class="i">check_password(password)</code>. Возвращает одно сообщение — первое нарушенное правило в порядке 3.2 → 3.4 → 3.5 → 3.6, или <code class="i">"OK"</code>.</p>
+
+  <div class="box task">
+    <div class="title">Задание</div>
+    <ol class="steps">
+      <li>Создай <code class="i">manual/test-data-check-password.md</code> с таблицей из трёх столбцов: <b>пароль</b> → <b>ожидаемый результат</b> → <b>что проверяем</b>.</li>
+      <li>Покрой классы эквивалентности: пустой, нормальный, без цифры, без заглавной.</li>
+      <li>Покрой обе границы длины тремя точками каждую.</li>
+      <li>Добавь хотя бы один пароль, который ломает <b>два</b> правила сразу. Какое сообщение вернётся? Это проверка порядка.</li>
+    </ol>
+  </div>
+
+  <p>Образец первой строки:</p>
+<pre class="light">| Пароль | Ожидаемый результат | Что проверяем |
+|---|---|---|
+| Anna1234 | OK | Нормальный пароль, нижняя граница длины (8) |</pre>
+
+  <div class="box trap">
+    <div class="title">Правило из дня 12 работает и здесь</div>
+    <p>Пароль на границе длины должен нарушать <b>только длину</b>. «aaaaaaa» на 7 символов — плохие данные: там нет ни цифры, ни заглавной, и непонятно, какое правило проверено. «Abcdef1» — хорошие.</p>
+  </div>
+
+  <div class="done"><b>Готово, когда</b> в таблице не меньше 10 строк. Есть 7, 8, 9, 19, 20, 21 символ. Есть пустой пароль. Каждый пароль на границе ломает не больше одного правила — кроме строки про порядок.</div>
+
+  <p style="color:var(--soft);font-size:15.5px">Эта таблица пригодится во втором заходе: по ней ты проверишь свою функцию в задаче 1.</p>
+</div>
+
+<!-- 5 -->
+<div class="pane" data-title="Тест">
+  <h2>Тест</h2>
+  <p class="sub">8 вопросов, 10 минут · конец первого захода</p>
+  <div id="quizB"></div>
+  <div class="score" id="scoreB">Отвечено 0 из 8</div>
+  <div class="split">перерыв — не меньше часа без экрана</div>
+</div>
+
+<!-- 6 -->
+<div class="pane" data-title="Английский">
+  <h2>Английский · урок 2</h2>
+  <p class="sub">20 минут · первым делом во втором заходе · без оценки, только «сделано»</p>
+  <p>Тема: шаги баг-репорта. Шаги на английском пишутся командами: «Open…», «Click…», «Enter…». Это самая простая форма глагола — без окончаний.</p>
+
+  <h3>1. Повторение · 3 минуты</h3>
+  <p>Закрой правый столбец и вспомни перевод вслух.</p>
+  <div class="scroll"><table>
+    <tr><th>Слово</th><th>Перевод</th><th>Слово</th><th>Перевод</th></tr>
+    <tr><td>bug</td><td>баг</td><td>form</td><td>форма</td></tr>
+    <tr><td>page</td><td>страница</td><td>link</td><td>ссылка</td></tr>
+    <tr><td>button</td><td>кнопка</td><td>error</td><td>ошибка</td></tr>
+    <tr><td>field</td><td>поле</td><td>message</td><td>сообщение</td></tr>
+  </table></div>
+
+  <h3>2. Новые слова · 5 минут</h3>
+  <p>Каждое — в <a href="https://translate.google.com/?sl=en&tl=ru" target="_blank" rel="noopener">Google Переводчик</a>, послушать, повторить вслух три раза.</p>
+  <div class="scroll"><table>
+    <tr><th>Слово</th><th>Звучит примерно</th><th>Перевод</th></tr>
+    <tr><td><b>open</b></td><td>о́упэн</td><td>открыть</td></tr>
+    <tr><td><b>click</b></td><td>клик</td><td>нажать, кликнуть</td></tr>
+    <tr><td><b>enter</b></td><td>э́нтэ</td><td>ввести</td></tr>
+    <tr><td><b>check</b></td><td>чек</td><td>проверить</td></tr>
+    <tr><td><b>empty</b></td><td>э́мпти</td><td>пустой</td></tr>
+    <tr><td><b>step</b></td><td>стэп</td><td>шаг</td></tr>
+  </table></div>
+
+  <h3>3. Правило · 5 минут</h3>
+  <div class="box def">
+    <div class="title">[Бумага] Команда — просто глагол в начале</div>
+<pre class="light">Open the login page.      Откройте страницу входа.
+Click the button.         Нажмите кнопку.
+Do not click the button.  Не нажимайте кнопку.</pre>
+    <p>Глагол — первым словом, без «вы» и без окончаний. Отрицание — <b>Do not</b> перед глаголом.</p>
+  </div>
+  <div class="box def">
+    <div class="title">[Бумага] the — «та самая»</div>
+    <p>В уроке 1 было <b>a</b> — «какая-то одна»: <i>This is a button</i>. Когда понятно, о какой именно речь — на этой странице одна такая кнопка, — пишут <b>the</b>: <i>Click the button</i>.</p>
+    <p>В шагах баг-репорта почти всегда <b>the</b>: страница, поле, кнопка — конкретные.</p>
+  </div>
+
+  <h3>4. Переведи сама · 4 минуты</h3>
+  <ol>
+    <li>Откройте страницу входа.</li>
+    <li>Введите email.</li>
+    <li>Оставьте поле пароля пустым. <span style="color:var(--soft)">— оставить: leave</span></li>
+    <li>Нажмите кнопку.</li>
+    <li>Проверьте сообщение об ошибке.</li>
+  </ol>
+  <details><summary>Ответы</summary>
+    <ol>
+      <li>Open the login page.</li>
+      <li>Enter the email. <span style="color:var(--soft)">— или Enter your email</span></li>
+      <li>Leave the password field empty.</li>
+      <li>Click the button.</li>
+      <li>Check the error message.</li>
+    </ol>
+  </details>
+
+  <h3>5. Прочитай настоящий баг-репорт · 3 минуты</h3>
+<pre class="light"><b>Steps to reproduce:</b>
+1. Open the login page.
+2. Enter "anna@test.ru" in the email field.
+3. Leave the password field empty.
+4. Click "Log in".
+
+<b>Expected result:</b> The message "Fill in the field" is shown under the password field.
+<b>Actual result:</b> The page reloads. No message.</pre>
+  <p style="font-size:15.5px">Подсказки: <b>steps to reproduce</b> — шаги воспроизведения, <b>in</b> — в, <b>expected</b> — ожидаемый, <b>actual</b> — фактический, <b>result</b> — результат, <b>is shown</b> — показывается, <b>under</b> — под, <b>reloads</b> — перезагружается, <b>no</b> — нет.</p>
+  <details><summary>Перевод</summary>
+    <p><b>Шаги воспроизведения:</b> 1. Откройте страницу входа. 2. Введите «anna@test.ru» в поле email. 3. Оставьте поле пароля пустым. 4. Нажмите «Войти».</p>
+    <p><b>Ожидаемый результат:</b> под полем пароля показывается сообщение «Заполните поле». <b>Фактический:</b> страница перезагружается, сообщения нет.</p>
+    <p>Это твоё правило 3.2 и пункт 3 требования 4. Ты прочитала английский баг-репорт целиком.</p>
+  </details>
+
+  <div id="quizE"></div>
+  <div class="done"><b>Сделано, когда</b> шесть слов произнесены вслух, пять предложений написаны в тетради, баг-репорт прочитан.</div>
+</div>
+
+<!-- 7 -->
+<div class="pane" data-title="Python">
+  <h2>Переписываем на функции</h2>
+  <p class="sub">60 минут</p>
+
+  <h3>0. Разобранный пример</h3>
+  <p>Вчерашний счётчик статусов, завёрнутый в функцию:</p>
+<pre>def count_statuses(results):
+    counts = {}
+    for r in results:
+        s = r["status"]
+        if s in counts:
+            counts[s] = counts[s] + 1
+        else:
+            counts[s] = 1
+    return counts
+
+run = [{"status": "passed"}, {"status": "failed"}, {"status": "passed"}]
+summary = count_statuses(run)
+print(summary)              <span class="cm"># {'passed': 2, 'failed': 1}</span></pre>
+  <div class="scroll"><table>
+    <tr><th>Шаг</th><th>Что происходит</th></tr>
+    <tr><td><code class="i">def count_statuses(results):</code></td><td>Функция объявлена. Пока ничего не выполняется.</td></tr>
+    <tr><td><code class="i">run = [...]</code></td><td>Создали список из трёх словарей.</td></tr>
+    <tr><td><code class="i">count_statuses(run)</code></td><td>Вызов. Список <code class="i">run</code> попадает в параметр <code class="i">results</code>. Выполняется тело функции.</td></tr>
+    <tr><td><code class="i">counts = {}</code> внутри</td><td>Свой словарь функции. Снаружи его не видно.</td></tr>
+    <tr><td>цикл</td><td>Тот же счётчик, что в дне 14.</td></tr>
+    <tr><td><code class="i">return counts</code></td><td>Словарь отдаётся наружу. Функция закончилась.</td></tr>
+    <tr><td><code class="i">summary = ...</code></td><td>То, что вернулось, легло в <code class="i">summary</code>.</td></tr>
+  </table></div>
+  <p>Отличие от вчерашнего кода — три строки: <code class="i">def</code> сверху, отступ у тела и <code class="i">return</code> в конце. Счётчик тот же.</p>
+
+  <h3>Задача 1 — check_password · 20 минут</h3>
+  <p>Файл <code class="i">python/day16_functions.py</code>.</p>
+  <ol class="steps">
+    <li>Возьми свой код задачи 3 дня 14 и заверни проверку в функцию <code class="i">check_password(password)</code>. Она должна <b>возвращать</b> сообщение, а не печатать его.</li>
+    <li>Ниже — цикл по тем же восьми пользователям: на каждом вызывает функцию и печатает email и результат.</li>
+    <li>Проверь функцию по своей таблице из задания: для каждой строки вызови и сравни глазами с ожидаемым.</li>
+  </ol>
+  <p>Вывод цикла должен совпасть с днём 14:</p>
+<pre class="light">anna@test.ru — OK
+ivan@test.ru — Пароль должен содержать от 8 до 20 символов
+olga@test.ru — Пароль должен содержать хотя бы одну заглавную букву
+petr@test.ru — Пароль должен содержать хотя бы одну цифру
+max@test.ru — Пароль должен содержать от 8 до 20 символов
+lena@test.ru — OK
+kate@test.ru — Пароль должен содержать от 8 до 20 символов
+nina@test.ru — Заполните поле</pre>
+  <details><summary>Подсказка — скелет</summary>
+<pre>def check_password(password):
+    if password == "":
+        return "Заполните поле"
+    if ...:
+        return "Пароль должен содержать от 8 до 20 символов"
+
+    has_digit = False
+    has_upper = False
+    for ch in password:
+        ...
+
+    if not has_digit:
+        return ...
+    if not has_upper:
+        return ...
+    return "OK"
+
+
+for u in users:
+    print(f"{u['email']} — {check_password(u['password'])}")</pre>
+    <p>Заметь: <code class="i">elif</code> больше не нужен. Каждый <code class="i">return</code> сразу выходит из функции, поэтому до следующего <code class="i">if</code> дело доходит, только если предыдущий не сработал.</p>
+  </details>
+
+  <h3>Задача 2 — счётчик для любого поля · 20 минут</h3>
+  <p>Пример выше считает только по полю <code class="i">"status"</code>. Сделай функцию <code class="i">count_by(items, key)</code>, которая считает по <b>любому</b> полю — его имя передаётся вторым аргументом.</p>
+  <p>Проверь на списке багов из дня 15:</p>
+<pre class="light">print(count_by(bugs, "severity"))
+print(count_by(bugs, "status"))</pre>
+<pre class="light">{'critical': 2, 'major': 3, 'minor': 1, 'trivial': 1}
+{'open': 5, 'closed': 2}</pre>
+  <details><summary>Подсказка</summary>
+    <p>Единственное отличие от примера: вместо <code class="i">r["status"]</code> — <code class="i">item[key]</code>. Имя поля теперь не написано в коде, а приходит параметром.</p>
+  </details>
+
+  <h3>Задача 3 — можно ли выпускать · 20 минут</h3>
+  <p>Функция <code class="i">is_release_allowed(bugs)</code> возвращает <code class="i">True</code>, если открытых critical нет, и <code class="i">False</code>, если есть. Сама ничего не печатает.</p>
+  <p>Проверь её на трёх наборах данных — это и есть мини-автотест:</p>
+<pre class="light">print(is_release_allowed(bugs) == False)
+print(is_release_allowed([]) == True)
+print(is_release_allowed([{"id": "BUG-05", "severity": "critical", "status": "closed"}]) == True)</pre>
+  <p>Все три строки должны напечатать <code class="i">True</code>. Если где-то <code class="i">False</code> — нашла баг в своей функции.</p>
+  <details><summary>Подсказка — вспомни баг 2 из охоты</summary>
+    <p>Можно выйти сразу, как только нашла открытый critical: <code class="i">return False</code> внутри цикла. Но <code class="i">return True</code> — только <b>после</b> цикла, когда просмотрены все. Иначе получится has_digit джуна.</p>
+    <p>Второй набор — пустой список — граница. Цикл не выполнится ни разу. Что вернёт функция?</p>
+  </details>
+
+  <div class="done"><b>Готово, когда</b> вывод задачи 1 совпадает с образцом, задача 2 печатает два словаря, задача 3 — три <code class="i">True</code>. Отступы — по 4 пробела (<code class="i">Ctrl+Alt+L</code> в PyCharm).</div>
+</div>
+
+<!-- 8 -->
+<div class="pane" data-title="Тест-кейсы">
+  <h2>TC-004 и TC-005</h2>
+  <p class="sub">30 минут · к CP1: было 3 из 20, станет 5</p>
+
+  <p>Оба — на форму входа. Тексты сообщений — дословно из справочника дня 13.</p>
+
+  <h3>TC-004 · Пароль без цифры</h3>
+  <p>Негативный кейс на правило 3.5. Пароль ломает <b>только</b> отсутствие цифры: длина в норме, заглавная есть. Сегодняшнее задание — та же мысль.</p>
+
+  <h3>TC-005 · Блокировка после пятой неверной попытки</h3>
+  <p>Перед тем как писать, ответь на бумаге:</p>
+  <ol class="steps">
+    <li>Какие номера попыток проверить вокруг числа 5? Правило трёх проверок. Сегодня ты уже видела этот баг в is_blocked.</li>
+    <li>Что показывается после 4-й попытки и после 5-й — дословно и где (над формой или под полем)?</li>
+    <li>Постусловие: что будет со следующими кейсами на этого пользователя, если блокировку не снять? Как снять?</li>
+  </ol>
+
+<pre class="light">ID:
+Название:
+Приоритет:
+Предусловие:
+Тестовые данные:
+Шаги:
+  1.
+Ожидаемый результат:
+Постусловие:</pre>
+
+  <div class="done"><b>Готово, когда</b> данные ломают ровно одно правило. Тексты — дословно, с местом показа. В TC-005 проверены 4-я и 5-я попытки, а не только 5-я. Есть постусловие. Предусловие не ссылается на другой кейс.</div>
+  <div class="box task">
+    <div class="title">[Репо]</div>
+    <p><code class="i">manual/test-cases.md</code> — дописать к трём существующим.</p>
+  </div>
+</div>
+
+<!-- 9 -->
+<div class="pane" data-title="Итоги">
+  <h2>Закрываем день</h2>
+  <p class="sub">5 минут</p>
+
+  <div class="box note">
+    <div class="title">[Бумага]</div>
+    <ul>
+      <li>Анатомия функции: def, имя, параметр, тело, return. Параметр против аргумента.</li>
+      <li>return против print — таблица из четырёх строк.</li>
+      <li>Нет return — функция вернула None.</li>
+      <li>return сразу выходит из функции — поэтому «return False» в else внутри цикла ломает проверку.</li>
+      <li>Аргументы по порядку и по именам. Значение по умолчанию.</li>
+      <li>Данные внутрь через параметры, результат наружу через return.</li>
+      <li>Автотест = функция: вызов с данными + сравнение с ожидаемым.</li>
+    </ul>
+  </div>
+
+  <div class="box task">
+    <div class="title">[Репо]</div>
+<pre>git add python/day16_hunt.py python/day16_functions.py manual/test-data-check-password.md manual/test-cases.md
+git commit -m "День 16: функции, тест-данные для check_password, TC-004 и TC-005"
+git push</pre>
+  </div>
+
+  <div class="box def">
+    <div class="title">Что мне прислать</div>
+    <ol>
+      <li>Счёт карточек E и M. И D с L за вчера.</li>
+      <li>Охоту — находки в три части.</li>
+      <li>Таблицу тест-данных.</li>
+      <li>Код трёх задач и вывод.</li>
+      <li>TC-004 и TC-005.</li>
+      <li>Номера вопросов теста, где ошиблась.</li>
+      <li>Английский — «сделано» или «не сделано». Если было тяжело — что именно.</li>
+    </ol>
+  </div>
+
+  <h3>Дальше</h3>
+  <p>День 17 — HTML и CSS: как устроена страница и как найти на ней элемент. Твой дизайнерский опыт здесь работает напрямую. Во втором заходе — валидатор паролей, разбитый на маленькие функции, и TC-006.</p>
+</div>
+
+</div>
+
+<script>
+var QA=[
+{q:'d = {"a": 1}\nd["c"] = d.get("b", 10)\nprint(len(d), d["c"])',
+ o:['1 10','2 10','2 1','KeyError'],a:1,
+ e:'Ключа "b" нет, поэтому get возвращает значение по умолчанию — 10. Ключа "c" тоже не было: запись по новому ключу СОЗДАЁТ пару. В словаре теперь две пары: "a" и "c".'},
+{q:'total = 0\nfor n in [3, 7, 2, 9]:\n    if n > 5:\n        break\n    total += n\nprint(total)',
+ o:['3','10','12','21'],a:0,
+ e:'Первый проход: 3 не больше 5, total = 3. Второй: 7 больше 5 — break, и строка total += n уже не выполняется. До 2 и 9 цикл не доходит.'},
+{q:'c = {}\nfor w in ["a", "b", "a"]:\n    c[w] = c.get(w, 0) + 1\nprint(c)',
+ o:["{'a': 1, 'b': 1}","{'a': 2, 'b': 1}","{'a': 3}","KeyError"],a:1,
+ e:'Это словарь-счётчик в одну строку. На первом "a" get вернул 0 по умолчанию, стало 1. На "b" — так же. На втором "a" get нашёл 1, стало 2.'},
+{q:'users = [{"n": "A", "ok": True}, {"n": "B", "ok": False}, {"n": "C", "ok": True}]\nnames = []\nfor u in users:\n    if u["ok"]:\n        names.append(u["n"])\nprint(len(names), names[-1])',
+ o:['3 C','2 C','2 A','2 B'],a:1,
+ e:'В список попадают только те, у кого ok — True: A и C. Длина 2, последний элемент — C.'}
+];
+
+var QB=[
+{q:'def f():\n    x = 5\n\nresult = f()\nprint(result)',
+ o:['5','None','x','Ошибка'],a:1,
+ e:'В функции нет return. Значит, она возвращает None, хотя внутри что-то посчитала. x — своя переменная функции, наружу она не попадает.'},
+{q:'def show():\n    print(1)\n\nr = show()\nprint(r)',
+ o:['1, затем 1','1, затем None','None, затем 1','Только None'],a:1,
+ e:'Вызов show() печатает 1 — это print внутри. Но вернуть функция ничего не вернула, поэтому в r лежит None, и второй print печатает None. Это баг check_length из охоты.'},
+{q:'def f(x):\n    x = x + 1\n    return x\n\nx = 5\nprint(f(x), x)',
+ o:['6 6','6 5','5 5','Ошибка'],a:1,
+ e:'Внутри функции x — своя переменная, копия значения 5. Она стала 6 и вернулась. Наружная x не изменилась и осталась 5.'},
+{q:'def has_failed(statuses):\n    for s in statuses:\n        if s == "failed":\n            return True\n        else:\n            return False\n\nprint(has_failed(["passed", "failed"]))',
+ o:['True','False','None','Ошибка'],a:1,
+ e:'Первый элемент "passed" — срабатывает else: return False, и функция заканчивается. До "failed" цикл не доходит. Это баг has_digit из охоты: return False должен стоять после цикла.'},
+{q:'def greet(name, greeting="Привет"):\n    return greeting + ", " + name\n\nprint(greet("Анна"))',
+ o:['Анна, Привет','Привет, Анна','Ошибка: не хватает аргумента','None'],a:1,
+ e:'greeting не передан — берётся значение по умолчанию "Привет". Аргумент "Анна" попадает в первый параметр, name.'},
+{q:'Чем параметр отличается от аргумента?',
+ o:['Это одно и то же','Параметр — имя в объявлении функции, аргумент — значение при вызове','Аргумент — в объявлении, параметр — при вызове','Параметр бывает только числом'],a:1,
+ e:'def check_password(password) — password это параметр. check_password("Anna1234") — "Anna1234" это аргумент, он попадает в параметр.'},
+{q:'По требованию блокирует пятая неверная попытка. Какая функция написана верно?',
+ o:['return attempts >= 4','return attempts > 5','return attempts >= 5','return attempts == 4'],a:2,
+ e:'Проверь тремя точками: 4 → False, 5 → True, 6 → True. Это даёт только >= 5. Вариант > 5 пропустит пятую — та же ошибка на единицу в другую сторону.'},
+{q:'Что такое автотест на pytest?',
+ o:['Программа, которая сама придумывает проверки','Функция, которая вызывает проверяемый код с данными и сравнивает результат с ожидаемым','Скриншот страницы','Запись действий пользователя'],a:1,
+ e:'Тест — это функция с именем на test_. Внутри — вызов с тестовыми данными и assert: результат равен ожидаемому. По сути тест-кейс, записанный кодом.'}
+];
+
+var QE=[
+{q:'Как написать шаг «Нажмите кнопку»?',o:['Click button.','Clicks the button.','Click the button.','You click a button.'],a:2,
+ e:'Глагол первым словом, без окончаний. the — потому что кнопка конкретная, та самая на странице.'},
+{q:'Как сказать «Не вводите пароль»?',o:['Not enter the password.','Do not enter the password.','Enter not the password.','No enter password.'],a:1,
+ e:'Отрицание в команде — Do not перед глаголом.'},
+{q:'Что значит «Expected result»?',o:['Фактический результат','Ожидаемый результат','Шаги воспроизведения','Результат теста'],a:1,
+ e:'expected — ожидаемый. Фактический — actual result.'},
+{q:'Что значит «Leave the field empty»?',o:['Удалите поле','Оставьте поле пустым','Покиньте страницу','Заполните поле'],a:1,
+ e:'leave — оставить, empty — пустой.'}
+];
+
+function buildQuiz(host,data,scoreEl,code){
+  var answered=0,right=0;
+  data.forEach(function(item,i){
+    var box=document.createElement('div');box.className='q';
+    var t=document.createElement('div');t.className='qn';t.textContent='Вопрос '+(i+1);box.appendChild(t);
+    if(code||item.q.indexOf('\n')>-1){var pre=document.createElement('pre');pre.textContent=item.q;box.appendChild(pre);
+      if(code){var hint=document.createElement('div');hint.textContent='Что напечатается?';box.appendChild(hint);}}
+    else{var qt=document.createElement('div');qt.textContent=item.q;box.appendChild(qt);}
+    var opts=document.createElement('div');opts.className='opts';
+    var expl=document.createElement('div');expl.className='expl';expl.hidden=true;expl.textContent=item.e;
+    var locked=false;
+    item.o.forEach(function(text,j){
+      var b=document.createElement('button');b.className='opt';b.type='button';b.textContent=text;
+      if(code)b.style.fontFamily='Consolas,monospace';
+      b.onclick=function(){
+        if(locked)return;locked=true;answered++;if(j===item.a)right++;
+        [].forEach.call(opts.children,function(el,k){
+          if(k===item.a)el.classList.add('right');else if(k===j)el.classList.add('wrong');
+        });
+        expl.hidden=false;
+        if(scoreEl)scoreEl.textContent='Отвечено '+answered+' из '+data.length+', верных '+right;
+      };
+      opts.appendChild(b);
+    });
+    box.appendChild(opts);box.appendChild(expl);host.appendChild(box);
+  });
+}
+buildQuiz(document.getElementById('quizA'),QA,null,true);
+buildQuiz(document.getElementById('quizB'),QB,document.getElementById('scoreB'),false);
+buildQuiz(document.getElementById('quizE'),QE,null,false);
+
+var panes=[].slice.call(document.querySelectorAll('.pane'));
+var tabs=document.getElementById('tabs');
+panes.forEach(function(p,i){
+  var b=document.createElement('button');b.type='button';
+  b.innerHTML='<span class="n">'+i+'</span>'+p.dataset.title;
+  b.onclick=function(){go(i);};
+  tabs.appendChild(b);
+  var nav=document.createElement('div');nav.className='nav';
+  var prev=document.createElement('button');prev.type='button';prev.textContent='← Назад';
+  prev.onclick=function(){go(i-1);};if(i===0)prev.disabled=true;
+  var next=document.createElement('button');next.type='button';next.className='next';
+  next.textContent=(i===panes.length-1)?'В начало':'Дальше →';
+  next.onclick=function(){go(i===panes.length-1?0:i+1);};
+  nav.appendChild(prev);nav.appendChild(next);p.appendChild(nav);
+});
+function go(i){
+  panes.forEach(function(p,j){p.classList.toggle('on',i===j);});
+  [].forEach.call(tabs.children,function(b,j){b.classList.toggle('on',i===j);});
+  try{tabs.children[i].scrollIntoView({block:'nearest',inline:'center'});}catch(e){}
+  try{localStorage.setItem('d16tab',String(i));}catch(e){}
+  window.scrollTo(0,0);
+}
+var start=0;
+try{var s=parseInt(localStorage.getItem('d16tab'),10);if(s>=0&&s<panes.length)start=s;}catch(e){}
+go(start);
+</script>
+
+</body></html>
