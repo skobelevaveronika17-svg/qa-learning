@@ -15,4 +15,23 @@
 
 6 →  «Файла requirements.txt нет» → Даша поставила модули у себя, но не записала список в репозиторий. У неё работает, у других нет → пДаше: pip freeze > requirements.txt, закоммитить файл
 
+пакетов в списке : pip     26.0.1
+
+какой Python запускается: C:\projects\qa-learning\.venv\Scripts\python.exe
+
+номер версии requests: requests-2.34.2
+
+пакетов стало:
+Package            Version
+------------------ ----------
+certifi            2026.10.19
+charset-normalizer 3.5.2
+idna               3.20
+pip                26.0.1
+requests           2.34.2
+urllib3            2.8.0
+
+так как мы скачали и установили данные модули
+
+
 
