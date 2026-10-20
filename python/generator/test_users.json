@@ -1,0 +1,42 @@
+[
+  {
+    "email": "valid@test.ru",
+    "password": "Aaaaaaaaaaa1",
+    "expected": "OK"
+  },
+  {
+    "email": "short@test.ru",
+    "password": "Aaaaaa1",
+    "expected": "Пароль должен содержать от 8 до 20 символов"
+  },
+  {
+    "email": "long@test.ru",
+    "password": "Aaaaaaaaaaaaaaaaaaaa1",
+    "expected": "Пароль должен содержать от 8 до 20 символов"
+  },
+  {
+    "email": "nodigit@test.ru",
+    "password": "Aaaaaaaaaa",
+    "expected": "Пароль должен содержать хотя бы одну цифру"
+  },
+  {
+    "email": "noupper@test.ru",
+    "password": "aaaaaaaaa1",
+    "expected": "Пароль должен содержать хотя бы одну заглавную букву"
+  },
+  {
+    "email": "empty@test.ru",
+    "password": "",
+    "expected": "Заполните поле"
+  },
+  {
+    "email": "min8@test.ru",
+    "password": "Aaaaaa1",
+    "expected": "OK"
+  },
+  {
+    "email": "max20@test.ru",
+    "password": "Aaaaaaaaaaaaaaaaaaa1",
+    "expected": "OK"
+  }
+]
