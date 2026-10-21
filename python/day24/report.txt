@@ -1,0 +1,4 @@
+valid@test.ru — PASSED
+short@test.ru — FAILED
+empty@test.ru — PASSED
+Итого: проверено 3

@@ -1,0 +1,9 @@
+valid@test.ru - PASSED
+short@test.ru - PASSED
+long@test.ru - PASSED
+nodigit@test.ru - PASSED
+noupper@test.ru - PASSED
+empty@test.ru - PASSED
+min8@test.ru - PASSED
+max20@test.ru - PASSED
+Итого: {'PASSED': 8}

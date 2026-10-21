@@ -1,0 +1,719 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>День 24 · Файлы</title>
+<style>
+/* Тёмная версия оформления дня 13: вкладки сверху, плашки по роли, блоки кода. Одна тёмная тема по просьбе — «на чёрном фоне». */
+:root{
+  --bg:#0d1116; --paper:#151b22; --ink:#e6ebf0; --soft:#9aa6b2; --line:#2a333d;
+  --blue:#7fb2ee; --blue-bg:#142235;
+  --red:#f0928a; --red-bg:#2b1716;
+  --green:#72c79f; --green-bg:#10251c;
+  --amber:#e7bb62; --amber-bg:#2a2210;
+  --violet:#b8a8ea; --violet-bg:#1e1a2f;
+  --code-bg:#080b0f; --code-fg:#dce7f0; --code-cm:#7d8fa0;
+  --chip:#1d252e; --th:#1a222b; --soft-bg:#10161c; --hover:#1d2731; --btn:#e6ebf0; --btn-fg:#0d1116;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.62;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding-inline:18px;padding-block:0 60px}
+header{padding:34px 0 14px}
+.day{font-size:14px;color:var(--soft)}
+h1{font-size:33px;line-height:1.15;margin:.2em 0 .3em;text-wrap:balance}
+.lead{color:var(--soft);margin:0;max-width:62ch}
+
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);padding:10px 0 8px;
+  display:flex;gap:6px;overflow-x:auto;border-bottom:1px solid var(--line)}
+.tabs button{flex:0 0 auto;background:var(--paper);border:1px solid var(--line);border-radius:8px;
+  padding:8px 13px;font:inherit;font-size:14.5px;color:var(--soft);cursor:pointer;white-space:nowrap}
+.tabs button.on{background:var(--btn);color:var(--btn-fg);border-color:var(--btn);font-weight:600}
+.tabs button .n{opacity:.55;margin-right:6px}
+button:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+.pane{display:none;background:var(--paper);border:1px solid var(--line);border-top:0;
+  border-radius:0 0 12px 12px;padding:28px 30px 34px}
+.pane.on{display:block}
+.pane h2{margin:0 0 6px;font-size:26px;line-height:1.2;text-wrap:balance}
+.pane .sub{color:var(--soft);margin:0 0 20px;font-size:15.5px}
+h3{font-size:19.5px;margin:30px 0 8px;text-wrap:balance}
+h4{font-size:17px;margin:20px 0 6px}
+p{margin:12px 0}
+ul,ol{padding-left:24px}li{margin:6px 0}
+b{color:#fff}
+code.i{background:var(--chip);border:1px solid var(--line);border-radius:4px;padding:1px 5px;
+ font-family:Consolas,monospace;font-size:.92em}
+pre{background:var(--code-bg);color:var(--code-fg);border:1px solid var(--line);border-radius:9px;padding:15px 17px;overflow-x:auto;
+ font-family:Consolas,monospace;font-size:14.5px;line-height:1.55;margin:14px 0}
+pre .cm{color:var(--code-cm)}
+pre.light{background:var(--soft-bg)}
+
+.box{border-left:4px solid;border-radius:0 8px 8px 0;padding:14px 18px;margin:18px 0}
+.box .title{font-weight:700;margin-bottom:4px}
+.def{border-color:var(--blue);background:var(--blue-bg)} .def .title{color:var(--blue)}
+.trap{border-color:var(--red);background:var(--red-bg)} .trap .title{color:var(--red)}
+.note{border-color:var(--green);background:var(--green-bg)} .note .title{color:var(--green)}
+.card{border-color:var(--amber);background:var(--amber-bg)} .card .title{color:var(--amber)}
+.task{border-color:var(--violet);background:var(--violet-bg)} .task .title{color:var(--violet)}
+.box p:first-of-type{margin-top:2px}.box p:last-child{margin-bottom:2px}
+
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15.5px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--th);font-weight:600}
+td{font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto}
+.mono{font-family:Consolas,monospace;white-space:nowrap}
+
+details{border:1px solid var(--line);background:var(--soft-bg);border-radius:8px;padding:10px 14px;margin:10px 0}
+summary{cursor:pointer;font-weight:600;color:var(--violet)}
+details[open] summary{margin-bottom:8px}
+
+.simple{border:1px solid var(--line);background:var(--soft-bg);border-radius:10px;padding:14px 18px;margin:16px 0}
+.simple .title{font-weight:700;margin-bottom:4px}
+.steps{counter-reset:st;list-style:none;padding-left:0}
+.steps>li{counter-increment:st;position:relative;padding-left:38px;margin:12px 0}
+.steps>li::before{content:counter(st);position:absolute;left:0;top:1px;width:26px;height:26px;border-radius:50%;
+  background:var(--btn);color:var(--btn-fg);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.done{border:1px dashed var(--green);border-radius:8px;padding:10px 14px;margin:14px 0;font-size:15.5px}
+.done b{color:var(--green)}
+
+.diary{border:1px solid var(--line);border-radius:12px;background:var(--soft-bg);padding:6px 20px;margin:16px 0}
+.diary .d{display:grid;grid-template-columns:92px 1fr;gap:14px;padding:12px 0;border-top:1px solid var(--line)}
+.diary .d:first-child{border-top:0}
+.diary .when{font-family:Consolas,monospace;font-size:14px;color:var(--amber);padding-top:2px}
+.diary .d p{margin:0}
+@media(max-width:560px){.diary .d{grid-template-columns:1fr;gap:2px}}
+
+.flow{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0;align-items:stretch}
+.flow .st{flex:1 1 120px;min-width:0;background:var(--soft-bg);border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-size:14.5px}
+.flow .st b{display:block;font-size:13px;color:var(--amber);letter-spacing:.03em;margin-bottom:2px}
+
+.q{border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:16px 0}
+.qn{font-weight:700;margin-bottom:6px}
+.opts{display:grid;gap:8px;margin-top:12px}
+.opt{text-align:left;background:var(--soft-bg);border:1px solid var(--line);border-radius:8px;
+ padding:10px 14px;cursor:pointer;font:inherit;font-size:16px;color:var(--ink)}
+.opt:hover{background:var(--hover)}
+.opt.right{background:var(--green-bg);border-color:var(--green);font-weight:600}
+.opt.wrong{background:var(--red-bg);border-color:var(--red)}
+.expl{margin-top:12px;padding:12px 14px;background:var(--soft-bg);border-radius:8px}
+.score{position:sticky;bottom:env(safe-area-inset-bottom,0px);background:var(--paper);border:1px solid var(--line);
+ border-radius:10px;padding:12px 18px;margin-top:18px;font-weight:600;font-variant-numeric:tabular-nums}
+.split{display:flex;align-items:center;gap:12px;margin:28px 0 8px;color:var(--soft);font-size:14.5px;font-weight:600}
+.split::before,.split::after{content:"";flex:1;border-top:1px dashed var(--line)}
+
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:34px;padding-top:18px;border-top:1px solid var(--line)}
+.nav button{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 16px;
+ font:inherit;cursor:pointer;color:var(--ink)}
+.nav .next{background:var(--btn);color:var(--btn-fg);border-color:var(--btn)}
+.nav button[disabled]{opacity:.35;cursor:default}
+@media(max-width:640px){.wrap{padding-inline:16px}.pane{padding:20px 17px 26px}h1{font-size:27px}pre{font-size:13.5px}}
+</style>
+
+<style>
+.gloss dt{font-weight:700;margin-top:10px}
+.gloss dd{margin:2px 0 0 0;color:var(--soft)}
+.week{display:grid;gap:10px;margin:14px 0}
+.week > div{display:grid;grid-template-columns:110px 1fr;gap:12px;background:var(--soft-bg);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.week .d{font-weight:700;color:var(--amber)}
+.week .off{opacity:.6}
+@media(max-width:560px){.week > div{grid-template-columns:1fr;gap:2px}}
+</style>
+
+<div class="wrap">
+
+<header>
+  <div class="day">День 24 · среда, 21 октября · Этап 2, тема 2.6, часть 1</div>
+  <h1>Файлы: чтение и запись</h1>
+  <p class="lead">Тестировщик постоянно работает с файлами: тестовые данные, настройки, логи, отчёты о прогоне. Сегодня — как открыть файл, прочитать его построчно, дописать в конец и не стереть случайно всё содержимое. Во втором заходе генератор начнёт брать настройки из файла, а не из кода.</p>
+</header>
+
+<div class="box def">
+  <div class="title">Два захода, около 4:30</div>
+  <p><b>Заход 1 · 2:30</b> — вкладки 0–6. <b>Перерыв — час без экрана.</b> <b>Заход 2 · 2:00</b> — вкладки 7–9.</p>
+  <p><b>Хвосты дня 23 — первым делом, 10 минут:</b></p>
+  <ol>
+    <li><code class="i">pip freeze | Out-File -Encoding ascii requirements.txt</code> — пересоздать файл в нормальной кодировке.</li>
+    <li>Создать <code class="i">notes/day23-venv.md</code>: сколько пакетов было и стало, почему больше, путь к Python из окружения.</li>
+    <li><code class="i">git add .</code>, коммит, push.</li>
+  </ol>
+</div>
+
+<div class="box card">
+  <div class="title">Подготовка к CP1 · сегодня — границы, 20 минут в конце дня</div>
+  <ol>
+    <li>Открой день 7, вкладки «Граничные значения» и «Вместе». Перечитай один раз.</li>
+    <li>Закрой страницу. На бумаге <b>по памяти</b> выпиши итоговую таблицу для поля «возраст 18–60»: все 15 проверок с колонкой «почему». Засеки время — цель меньше 5 минут.</li>
+    <li>Сверь с днём 7. Что пропустила — обведи и перепиши правильно.</li>
+    <li>Ответь себе вслух: чем двухточечный подход отличается от трёхточечного? Какой шаг у границы, если сумма с копейками?</li>
+    <li><b>Jira:</b> посчитай, сколько багов у тебя заведено. Просто число — напиши мне.</li>
+  </ol>
+</div>
+
+<div class="tabs" id="tabs"></div>
+
+<!-- 0 -->
+<div class="pane" data-title="Карточки и код">
+  <h2>Разминка</h2>
+  <p class="sub">25 минут: карточки 15, чтение кода 10</p>
+
+  <h3>Карточки — три блока</h3>
+  <ol class="steps">
+    <li><b>D · Условия</b> — четвёртый прогон, 8 карточек, обычный режим.</li>
+    <li><b>M · Словари</b> — второй прогон, 4 карточки, обычный режим.</li>
+    <li><b>T · Модули и окружение</b> — новый блок, 4 карточки, галочка «Знакомство», без оценки.</li>
+  </ol>
+  <div class="done"><b>Готово, когда</b> записан счёт D + M из 12.</div>
+
+  <h3>Чтение кода</h3>
+  <p>Строки, циклы, функции — подготовка к контрольной. Таблица на бумаге.</p>
+  <ol class="steps">
+    <li>В первом вопросе новый метод <code class="i">startswith("#")</code> — «строка начинается с решётки?», отвечает True или False. А <code class="i">strip()</code> убирает пробелы <b>и переносы строк</b> по краям.</li>
+    <li>Во втором вопросе <code class="i">\n</code> — это один символ «перенос строки». Подумай, что окажется после последнего <code class="i">\n</code>, если строка им заканчивается.</li>
+  </ol>
+  <div id="quizA"></div>
+</div>
+
+<!-- 1 -->
+<div class="pane" data-title="Словарик">
+  <h2>Шесть слов перед охотой</h2>
+  <p class="sub">10 минут. Подробно — на вкладке «Теория»</p>
+
+  <div class="simple">
+    <div class="title">Простыми словами</div>
+    <p>Чтобы поработать с файлом, его открывают командой <code class="i">open</code> и говорят, зачем: читать, писать заново или дописывать в конец. Перепутать эти режимы — самая частая ошибка: один из них молча стирает файл.</p>
+  </div>
+
+  <dl class="gloss">
+    <dt>open(имя, режим)</dt>
+    <dd>Открыть файл. Возвращает объект файла — обычно его называют <code class="i">f</code>.</dd>
+    <dt>Режим "r" — читать</dt>
+    <dd>Только чтение. Если режим не указан, это он. Файла нет — ошибка.</dd>
+    <dt>Режим "w" — писать заново</dt>
+    <dd>Открывает файл для записи и <b>сразу стирает всё, что в нём было</b>. Файла нет — создаёт.</dd>
+    <dt>Режим "a" — дописать</dt>
+    <dd>От английского append. Новый текст добавляется в конец, старый остаётся.</dd>
+    <dt>\n — перенос строки</dt>
+    <dd><code class="i">write</code> пишет ровно то, что дали. Хочешь новую строку — добавь <code class="i">"\n"</code> сама, иначе всё сольётся в одну строку.</dd>
+    <dt>with open(...) as f:</dt>
+    <dd>Открыть файл на время блока. Когда блок закончился, файл закрывается сам — даже если внутри случилась ошибка. Без <code class="i">with</code> файл нужно закрывать вручную: <code class="i">f.close()</code>.</dd>
+  </dl>
+</div>
+
+<!-- 2 -->
+<div class="pane" data-title="Охота">
+  <h2>Отчёт, который сам себя стирает</h2>
+  <p class="sub">25 минут · охота с запуском, как JSON в дне 19</p>
+
+  <p>Коллега написал скрипт: записать результаты прогона в <code class="i">report.txt</code>, дописать итог и показать отчёт на экране. Должно получиться так:</p>
+<pre class="light">valid@test.ru — PASSED
+short@test.ru — FAILED
+empty@test.ru — PASSED
+Итого: проверено 3</pre>
+  <p>А получается ошибка, и файл пустой. Вот скрипт:</p>
+<pre>results = [
+    {"email": "valid@test.ru", "status": "PASSED"},
+    {"email": "short@test.ru", "status": "FAILED"},
+    {"email": "empty@test.ru", "status": "PASSED"},
+]
+
+<span class="cm"># 1. Записать отчёт: строка на каждого пользователя</span>
+for r in results:
+    f = open("report.txt", "w")
+    f.write(r["email"] + " — " + r["status"])
+    f.close()
+
+<span class="cm"># 2. Дописать итог в конец</span>
+f = open("report.txt", "w")
+f.write("Итого: проверено " + str(len(results)))
+f.close()
+
+<span class="cm"># 3. Прочитать отчёт и показать на экране</span>
+f = open("report.txt", "w")
+print(f.read())</pre>
+
+  <div class="box task">
+    <div class="title">Как искать — запуская</div>
+    <ol class="steps">
+      <li>Создай <code class="i">python/day24/report_hunt.py</code>, скопируй скрипт.</li>
+      <li>Запусти. Прочитай <b>последнюю строку</b> ошибки — она укажет на первую проблему. Исправь <b>одну</b> вещь, запусти снова.</li>
+      <li>После каждого запуска открывай <code class="i">report.txt</code> в PyCharm и смотри, <b>что в нём лежит</b>. Это главный инструмент сегодняшней охоты: ошибка будет одна, а багов больше.</li>
+      <li>Повторяй, пока на экране и в файле не будет ровно четыре строки, как в образце.</li>
+      <li>Создай <code class="i">manual/day24-files-hunt.md</code>. На каждую находку — строка: <b>блок → что видно в файле или на экране → почему так → как исправить</b>.</li>
+    </ol>
+  </div>
+
+  <div class="box card">
+    <div class="title">Сколько искать</div>
+    <p><b>Шесть проблем.</b> Одна видна по ошибке Python. Три — только если смотреть в файл. Две — не видно вообще, пока всё работает, но они ломают скрипт на другом компьютере или при первой же ошибке. Для этих двух подсказка: перечитай в словарике про <code class="i">with</code> и подумай, каких аргументов не хватает в <code class="i">open</code> по сравнению с рецептом JSON из дня 19.</p>
+  </div>
+  <div class="done"><b>Готово, когда</b> скрипт печатает и пишет в файл четыре строки, как в образце, и в файле охоты шесть строк, в каждой все четыре части.</div>
+</div>
+
+<!-- 3 -->
+<div class="pane" data-title="Разбор">
+  <h2>Шесть проблем</h2>
+  <p class="sub">15 минут · открывай после охоты</p>
+
+  <div class="scroll"><table>
+    <tr><th>#</th><th>Где</th><th>Что видно</th><th>Почему</th><th>Как исправить</th></tr>
+    <tr><td>1</td><td>Блок 3</td><td><code class="i">io.UnsupportedOperation: not readable</code> — «нельзя читать»</td><td>Файл открыт в режиме <code class="i">"w"</code> — для записи. Читать из него нельзя. И главное: <code class="i">"w"</code> успел стереть файл, поэтому он пустой</td><td>Для чтения режим не пишут или пишут <code class="i">"r"</code></td></tr>
+    <tr><td>2</td><td>Блок 2</td><td>В файле только «Итого: проверено 3», строк пользователей нет</td><td><code class="i">"w"</code> стёр всё, что записал блок 1</td><td>Дописывать — режимом <code class="i">"a"</code></td></tr>
+    <tr><td>3</td><td>Блок 1</td><td>Из трёх пользователей в файле остаётся один — последний</td><td><code class="i">open(..., "w")</code> <b>внутри цикла</b>: каждый проход заново стирает файл. Та же ошибка, что «накопитель внутри цикла» из дня 6</td><td>Открыть файл <b>один раз до цикла</b>, в цикле только <code class="i">write</code></td></tr>
+    <tr><td>4</td><td>Блоки 1 и 2</td><td>Всё слеплено в одну строку: <code class="i">valid@test.ru — PASSEDshort@test.ru — FAILED…</code></td><td><code class="i">write</code> не добавляет перенос сам</td><td>В конец каждой записи — <code class="i">+ "\n"</code></td></tr>
+    <tr><td>5</td><td>Все <code class="i">open</code></td><td>У тебя может быть всё нормально. А у коллеги на другом компьютере вместо «Итого» и тире — кракозябры</td><td>Нет <code class="i">encoding="utf-8"</code>. Windows без него пишет русский текст в своей старой кодировке, а другие программы читают его как UTF-8. Вчерашний requirements.txt в UTF-16 — та же история</td><td>Всегда <code class="i">encoding="utf-8"</code></td></tr>
+    <tr><td>6</td><td>Все <code class="i">open</code></td><td>Пока всё работает — ничего. В блоке 3 файл вообще не закрыт</td><td>Без <code class="i">with</code>, если между open и close случится ошибка, close не выполнится, и файл останется открытым — его нельзя удалить или переписать другой программой</td><td><code class="i">with open(...) as f:</code> — закроется сам</td></tr>
+  </table></div>
+
+  <p>Исправленный скрипт:</p>
+<pre>with open("report.txt", "w", encoding="utf-8") as f:
+    for r in results:
+        f.write(r["email"] + " — " + r["status"] + "\n")
+
+with open("report.txt", "a", encoding="utf-8") as f:
+    f.write("Итого: проверено " + str(len(results)) + "\n")
+
+with open("report.txt", encoding="utf-8") as f:
+    print(f.read())</pre>
+
+  <div class="box note">
+    <div class="title">Почему эта охота про тестирование</div>
+    <p>Проблемы 2 и 3 не дают ни одной ошибки. Скрипт «работает», а отчёт неправильный. Такое находят только тем, что открывают результат и смотрят глазами — как вчера с requirements.txt на GitHub. Тестировщик проверяет не «упало или нет», а «то ли получилось».</p>
+  </div>
+</div>
+
+<!-- 4 -->
+<div class="pane" data-title="Теория">
+  <h2>Файлы в Python</h2>
+  <p class="sub">35 минут · четыре части</p>
+
+  <h3>1. Режимы — главное, что нужно помнить</h3>
+  <div class="box def">
+    <div class="title">[Бумага] Три режима</div>
+    <div class="scroll"><table>
+      <tr><th>Режим</th><th>Зачем</th><th>Файла нет</th><th>Файл есть</th></tr>
+      <tr><td class="mono">"r"</td><td>Читать. По умолчанию</td><td>Ошибка FileNotFoundError</td><td>Читает с начала</td></tr>
+      <tr><td class="mono">"w"</td><td>Писать заново</td><td>Создаёт</td><td><b>Стирает всё</b> и пишет с нуля</td></tr>
+      <tr><td class="mono">"a"</td><td>Дописать в конец</td><td>Создаёт</td><td>Старое остаётся, новое — в конец</td></tr>
+    </table></div>
+    <p>Запоминалка: <b>w</b> — <b>w</b>ipe, стереть. <b>a</b> — <b>a</b>dd, добавить.</p>
+  </div>
+
+  <h3>2. Как читать</h3>
+  <p>Пусть в файле <code class="i">users.txt</code> три строки:</p>
+<pre class="light">anna@test.ru
+ivan@test.ru
+olga@test.ru</pre>
+  <div class="scroll"><table>
+    <tr><th>Способ</th><th>Что получаем</th><th>Когда</th></tr>
+    <tr><td class="mono">f.read()</td><td>Весь файл одной строкой: <code class="i">"anna@test.ru\nivan@test.ru\nolga@test.ru\n"</code></td><td>Файл маленький, нужен целиком</td></tr>
+    <tr><td class="mono">for line in f:</td><td>По одной строке за проход. <b>Каждая с <code class="i">\n</code> на конце</b>: <code class="i">"anna@test.ru\n"</code></td><td>Почти всегда. Особенно — большие файлы, логи</td></tr>
+  </table></div>
+
+  <h4>Разобранный пример — построчное чтение</h4>
+<pre>with open("users.txt", encoding="utf-8") as f:
+    for line in f:
+        email = line.strip()
+        if email == "":
+            continue
+        print(email, len(email))</pre>
+  <div class="scroll"><table>
+    <tr><th>Проход</th><th>line</th><th>email после strip</th><th>Печать</th></tr>
+    <tr><td>1</td><td class="mono">"anna@test.ru\n"</td><td class="mono">"anna@test.ru"</td><td>anna@test.ru 12</td></tr>
+    <tr><td>2</td><td class="mono">"ivan@test.ru\n"</td><td class="mono">"ivan@test.ru"</td><td>ivan@test.ru 12</td></tr>
+    <tr><td>3</td><td class="mono">"olga@test.ru\n"</td><td class="mono">"olga@test.ru"</td><td>olga@test.ru 12</td></tr>
+  </table></div>
+  <div class="box trap">
+    <div class="title">Ловушка: невидимый \n</div>
+    <p>Без <code class="i">strip()</code> длина была бы 13, а не 12, и сравнение <code class="i">line == "anna@test.ru"</code> давало бы False. Это классический баг тестов, которые читают данные из файла: «строки выглядят одинаково, а не равны». Правило: каждую строку из файла сразу <code class="i">strip()</code>.</p>
+    <p>Проверка на пустую строку нужна для пустых строк в файле, особенно последней — её часто оставляют случайно.</p>
+  </div>
+
+  <h3>3. Как писать</h3>
+<pre>with open("report.txt", "w", encoding="utf-8") as f:
+    f.write("Строка 1\n")
+    f.write("Строка 2\n")</pre>
+  <p><code class="i">write</code> принимает только строку. Число сначала превращают: <code class="i">str(len(results))</code> или через f-строку.</p>
+  <div class="box def">
+    <div class="title">[Бумага] Рецепт, который подходит почти всегда</div>
+<pre class="light">with open(путь, режим, encoding="utf-8") as f:</pre>
+    <ol>
+      <li>Всегда <code class="i">with</code> — закроется сам.</li>
+      <li>Всегда <code class="i">encoding="utf-8"</code> — русский текст не сломается на другом компьютере.</li>
+      <li>Режим осознанно: читать — без режима, заново — <code class="i">"w"</code>, дописать — <code class="i">"a"</code>.</li>
+      <li>При записи — <code class="i">"\n"</code> сама. При чтении — <code class="i">strip()</code> сама.</li>
+    </ol>
+  </div>
+
+  <h3>4. Где ищется файл — путь</h3>
+  <p>Когда ты пишешь <code class="i">open("settings.txt")</code>, Python ищет файл в <b>текущей папке терминала</b>, а не рядом со скриптом. Запустишь из PyCharm кнопкой Run — найдёт. Запустишь из терминала, стоя в корне репозитория, — <code class="i">FileNotFoundError</code>. Вчера у тебя это было: <code class="i">test_users.json</code> появлялся то в одной папке, то в другой.</p>
+  <p>Надёжный способ — строить путь от файла скрипта:</p>
+<pre>from pathlib import Path
+
+BASE = Path(__file__).parent          <span class="cm"># папка, где лежит этот .py</span>
+
+with open(BASE / "settings.txt", encoding="utf-8") as f:
+    ...</pre>
+  <div class="scroll"><table>
+    <tr><th>Кусок</th><th>Что это</th></tr>
+    <tr><td class="mono">__file__</td><td>Путь к текущему файлу .py, Python знает его сам. Например <code class="i">C:\projects\qa-learning\python\generator\config.py</code></td></tr>
+    <tr><td class="mono">Path(...).parent</td><td>Папка, в которой лежит файл: <code class="i">…\python\generator</code></td></tr>
+    <tr><td class="mono">BASE / "settings.txt"</td><td>Склеить путь: <code class="i">…\python\generator\settings.txt</code>. Да, через знак деления — pathlib так устроен</td></tr>
+  </table></div>
+
+  <div class="box card">
+    <div class="title">Зачем это тестировщику</div>
+    <ol>
+      <li><b>Тестовые данные</b> — из CSV, JSON, txt. Это data-driven, который ты делаешь с дня 19.</li>
+      <li><b>Настройки</b> — адрес стенда, логин, таймауты. Их не пишут в код: стенд поменялся — поменяли файл, код не трогали.</li>
+      <li><b>Логи</b> — читаешь построчно и ищешь строки с ERROR после прогона.</li>
+      <li><b>Отчёты</b> — Allure, который будет на этапе pytest, тоже пишет файлы.</li>
+    </ol>
+  </div>
+
+  <div class="box card">
+    <div class="title">Формулировка для собеседования — выучи вслух</div>
+    <p>Вопрос: «Чем отличаются режимы w и a?»</p>
+    <p>«Оба открывают файл на запись и создают его, если файла нет. Но w сразу стирает содержимое, а a дописывает в конец. Открываю файлы через with — тогда файл закроется сам, даже если внутри будет ошибка, — и всегда указываю encoding utf-8.»</p>
+  </div>
+</div>
+
+<!-- 5 -->
+<div class="pane" data-title="Задание">
+  <h2>Чек-лист: загрузка аватара</h2>
+  <p class="sub">30 минут · ручное тестирование файлов · подготовка к контрольной по границам</p>
+
+  <p>Раз сегодня про файлы — тестируем функцию, которая принимает файл от пользователя. Это одно из самых частых заданий на собеседовании.</p>
+
+  <div class="box def">
+    <div class="title">Требование</div>
+    <ol>
+      <li>Пользователь загружает аватар в личном кабинете.</li>
+      <li>Форматы: JPG и PNG.</li>
+      <li>Размер файла: до 5 МБ.</li>
+      <li>Размер картинки: не меньше 200 × 200 пикселей.</li>
+      <li>При ошибке показывается текст под кнопкой загрузки. Тексты — уточнить у аналитика.</li>
+    </ol>
+  </div>
+
+  <h3>Что сделать — по шагам</h3>
+  <p>Файл <code class="i">manual/day24-avatar-checklist.md</code>.</p>
+  <ol class="steps">
+    <li><b>Классы эквивалентности по формату</b> — минимум шесть. Подумай не только «JPG, PNG, GIF»: а файл с расширением <code class="i">.jpg</code>, который на самом деле текстовый документ? А <code class="i">.JPG</code> большими буквами? А <code class="i">.jpeg</code>? А файл без расширения? Для каждого — «валидный / невалидный / уточнить».</li>
+    <li><b>Граничные значения размера файла.</b> Граница — 5 МБ. Трёхточечный подход: чуть меньше, ровно, чуть больше. <b>Но сначала вопрос:</b> 5 МБ — это 5 000 000 байт или 5 242 880 (5 × 1024 × 1024)? Это разные числа, и программист мог понять так, а аналитик иначе. Не выбирай сама — запиши вопрос аналитику и распиши границы для обоих вариантов.</li>
+    <li><b>Граничные значения размера картинки.</b> Граница 200 × 200. Здесь <b>два</b> измерения: что если ширина 200, а высота 199? Распиши минимум пять проверок: обе стороны на границе, одна сторона на 1 меньше, другая на 1 меньше, обе больше, обе меньше.</li>
+    <li><b>Особые случаи</b> — минимум четыре: файл 0 байт; имя файла на русском и с пробелами; очень длинное имя файла; загрузка второго аватара поверх первого.</li>
+    <li><b>Вопросы аналитику</b> — в конце файла, пронумерованные, с вариантами ответа. Минимум три. Один — про МБ из шага 2.</li>
+  </ol>
+
+  <p>Формат строки чек-листа, как в дне 10:</p>
+<pre class="light">| № | Проверка | Данные | Ожидание |
+|---|---|---|---|
+| 1 | Граница размера изнутри | файл ровно 200 × 200 px, PNG, 1 МБ | загружается |</pre>
+
+  <div class="box trap">
+    <div class="title">Не перепутай</div>
+    <p>В строках про размер файла держи формат валидным — PNG, а в строках про формат держи размер нормальным — 1 МБ. Ломается только одно правило за раз, как в тест-кейсах.</p>
+  </div>
+  <div class="done"><b>Готово, когда</b> минимум 20 строк: 6+ про формат, 3–6 про размер файла, 5+ про размер картинки, 4+ особых, и 3+ вопроса аналитику с вариантами.</div>
+</div>
+
+<!-- 6 -->
+<div class="pane" data-title="Тест">
+  <h2>Тест</h2>
+  <p class="sub">8 вопросов, 10 минут · конец первого захода</p>
+  <div id="quizB"></div>
+  <div class="score" id="scoreB">Отвечено 0 из 8</div>
+  <div class="split">перерыв — не меньше часа без экрана</div>
+</div>
+
+<!-- 7 -->
+<div class="pane" data-title="Python: настройки">
+  <h2>Генератор читает настройки из файла</h2>
+  <p class="sub">60 минут · папка python/generator/</p>
+
+  <p><b>Зачем.</b> Сейчас домен <code class="i">test.ru</code> и границы 8 и 20 вписаны прямо в код. Если стенд переедет на другой домен или требования поменяются — придётся искать эти числа по всем файлам. Настройки выносят в отдельный файл: поменял одну строку — поменялось везде.</p>
+
+  <h3>Шаг 1 · Файл настроек · 5 минут</h3>
+  <p>В папке <code class="i">python/generator/</code> создай <code class="i">settings.txt</code>, ровно так — с комментарием и пустой строкой, это нарочно:</p>
+<pre class="light"># настройки генератора
+domain=test.ru
+
+min_length=8
+max_length=20</pre>
+
+  <h3>Шаг 2 · config.py с функцией load_settings · 25 минут</h3>
+  <p><b>Что сделать.</b> Новый модуль <code class="i">config.py</code> в той же папке. В нём функция <code class="i">load_settings(path)</code>: читает файл построчно и возвращает словарь.</p>
+  <p>Это почти <code class="i">parse_cookies</code> из дня 22, только строки берутся из файла, а не режутся по <code class="i">"; "</code>.</p>
+  <ol class="steps">
+    <li>В начале файла:
+<pre class="light">from pathlib import Path
+
+BASE = Path(__file__).parent</pre></li>
+    <li>Функция: пустой словарь, потом <code class="i">with open(path, encoding="utf-8") as f:</code> и цикл <code class="i">for line in f:</code>.</li>
+    <li>В цикле, по порядку:
+      <ul>
+        <li><code class="i">line = line.strip()</code> — убрать <code class="i">\n</code>;</li>
+        <li>если строка пустая <b>или</b> начинается с <code class="i">#</code> — <code class="i">continue</code>, пропустить;</li>
+        <li>разрезать по <code class="i">"="</code> на две части — со вторым аргументом <code class="i">1</code>, как в звёздочке дня 22;</li>
+        <li>положить в словарь: часть [0] — ключ, часть [1] — значение.</li>
+      </ul>
+    </li>
+    <li><code class="i">return</code> словаря — <b>после</b> цикла и после блока <code class="i">with</code>, без отступа внутри них. Помнишь вчерашнее «Итого»?</li>
+    <li>Проверки внизу, спрятанные под <code class="i">if __name__ == "__main__":</code>:
+<pre class="light">if __name__ == "__main__":
+    s = load_settings(BASE / "settings.txt")
+    print(s == {"domain": "test.ru", "min_length": "8", "max_length": "20"})
+    print(int(s["min_length"]) == 8)</pre></li>
+  </ol>
+  <p><b>Заметь:</b> в словаре <code class="i">"8"</code> — строка, а не число. Из файла всё читается строками, как и из split. Поэтому во второй проверке <code class="i">int(...)</code>.</p>
+  <p><b>Проверка.</b> Run для <code class="i">config.py</code> — два True. Если первый False — напечатай <code class="i">print(s)</code> и сравни глазами: скорее всего, в ключе или значении остался пробел или <code class="i">\n</code>, или в словарь попал комментарий.</p>
+
+  <h3>Шаг 3 · run.py берёт настройки · 20 минут</h3>
+  <ol class="steps">
+    <li>Добавь импорт: <code class="i">from config import BASE, load_settings</code>.</li>
+    <li>После импортов прочитай настройки и разложи по переменным:
+<pre class="light">settings = load_settings(BASE / "settings.txt")
+domain = settings["domain"]
+min_len = int(settings["min_length"])
+max_len = int(settings["max_length"])</pre></li>
+    <li>В <code class="i">generate_users()</code> поменяй <b>четырёх граничных</b> пользователей, чтобы длины брались из настроек:
+      <ul>
+        <li>min8 → <code class="i">make_password(min_len)</code>;</li>
+        <li>max20 → <code class="i">make_password(max_len)</code>;</li>
+        <li>short → <code class="i">make_password(min_len - 1)</code>;</li>
+        <li>long → <code class="i">make_password(max_len + 1)</code>.</li>
+      </ul>
+      Остальных четырёх не трогай.</li>
+    <li>Во всех <code class="i">make_email(...)</code> передай домен вторым аргументом: <code class="i">make_email("valid", domain)</code>.</li>
+    <li>JSON пиши и читай по пути от BASE: <code class="i">open(BASE / "test_users.json", ...)</code>. Тогда файл всегда окажется в папке генератора, откуда бы ты ни запускала.</li>
+    <li>Цикл проверки и итог перенеси <b>из</b> блока чтения <code class="i">with</code> — без отступа, после него. Это вчерашнее замечание.</li>
+  </ol>
+  <p><b>Проверка.</b> Запуск <code class="i">run.py</code> — восемь PASSED, как вчера.</p>
+
+  <h3>Шаг 4 · Отчёт в файл · 10 минут</h3>
+  <p>Применяем охоту. Кроме печати на экран, запиши тот же результат в <code class="i">report.txt</code> в папке генератора: строка на каждого пользователя и итог последней строкой.</p>
+  <ol class="steps">
+    <li>До цикла проверки — пустой список <code class="i">lines = []</code>.</li>
+    <li>В цикле: собери строку результата в переменную, напечатай её и добавь в список: <code class="i">lines.append(line)</code>.</li>
+    <li>После цикла — один <code class="i">with open(BASE / "report.txt", "w", encoding="utf-8") as f:</code>, внутри цикл по <code class="i">lines</code> с <code class="i">f.write(line + "\n")</code>, потом строка итога.</li>
+    <li>Открой <code class="i">report.txt</code> в PyCharm и сравни с выводом на экране — должно совпасть строка в строку.</li>
+  </ol>
+
+  <h3>Шаг 5 · Проверить, что настройки работают · 5 минут</h3>
+  <ol class="steps">
+    <li>В <code class="i">settings.txt</code> поменяй <code class="i">domain=test.ru</code> на <code class="i">domain=qa.by</code>. Запусти — все email должны стать <code class="i">…@qa.by</code>, код ты не трогала.</li>
+    <li>Верни <code class="i">test.ru</code>.</li>
+  </ol>
+
+  <div class="box card">
+    <div class="title">Со звёздочкой — подумать, не обязательно писать код</div>
+    <p>Поставь в настройках <code class="i">min_length=10</code> и запусти. Какие пользователи упали и почему? Подсказка: что знает о границах генератор и что — <code class="i">check_password</code>? Какой вывод про настройки тестовых данных и требования? Ответь двумя фразами. Потом верни 8.</p>
+  </div>
+
+  <div class="box trap">
+    <div class="title">Что прислать по этой вкладке</div>
+    <ol>
+      <li>Запушить и написать «запушила».</li>
+      <li>Вставить вывод <code class="i">run.py</code> и содержимое <code class="i">report.txt</code>.</li>
+      <li>Ответ на звёздочку, если делала.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- 8 -->
+<div class="pane" data-title="Тест-кейсы">
+  <h2>TC-014 и TC-015</h2>
+  <p class="sub">30 минут · после них — 15 из 20</p>
+
+  <div class="box note">
+    <div class="title">Дубли проверены</div>
+    <p>По твоему test-cases.md: правило 3.6 (нет заглавной) и 3.9 (нет соединения) ещё не проверяются.</p>
+  </div>
+
+  <h3>TC-014 · В пароле нет заглавной буквы</h3>
+  <p>Правило 3.6: «В пароле нет ни одной заглавной буквы → "Пароль должен содержать хотя бы одну заглавную букву"».</p>
+  <ol class="steps">
+    <li><b>Пароль</b> — нарушает <b>только</b> 3.6: длина от 8 до 20 и есть цифра. Запиши длину по буквам, как в TC-012.</li>
+    <li><b>Ожидаемый результат</b> — три вещи, как в TC-012: сообщение дословно, где, ушёл ли запрос на сервер.</li>
+    <li><b>Предусловие и постусловие</b> — подумай сама: дойдёт ли дело до сервера?</li>
+    <li>Это почти копия TC-004. Копируй, но <b>после копирования перечитай каждую строку</b> и спроси: «это правда для этого кейса?»</li>
+  </ol>
+
+  <h3>TC-015 · Нет соединения с сервером</h3>
+  <p>Правило 3.9: «Сервер не ответил, соединение потеряно → "Нет соединения. Проверьте подключение и повторите"», над формой.</p>
+  <p><b>Главный вопрос этого кейса:</b> как тестировщику сделать так, чтобы соединение пропало? Выдёргивать роутер не нужно. В DevTools на вкладке <b>Network</b> есть выпадающий список <b>No throttling</b> — в нём пункт <b>Offline</b>. Браузер начинает вести себя так, будто интернета нет.</p>
+  <ol class="steps">
+    <li><b>Предусловие</b> — состояние системы: пользователь Анна зарегистрирован, не заблокирован, неверных попыток 0, не авторизован. Здесь запрос должен уйти на сервер — данные верные.</li>
+    <li><b>Шаги:</b> открыть страницу входа → открыть DevTools (F12) → Network → переключить No throttling на Offline → ввести верные email и пароль → «Войти».</li>
+    <li><b>Ожидаемый результат</b> последнего шага: сообщение дословно и где. Подумай и про поля: что с паролем — очищается ли он, если это не «неверный пароль», а сбой сети? Если в требованиях нет ответа — вопрос аналитику, не догадка.</li>
+    <li><b>Добавь шаг:</b> вернуть Offline обратно на No throttling и снова нажать «Войти». Ожидаемый результат — вход выполнен. Это проверяет, что после сбоя всё восстанавливается.</li>
+    <li><b>Постусловие:</b> что вернуть в исходное состояние? Подумай про две вещи: пользователь и DevTools.</li>
+  </ol>
+
+<pre class="light">ID:
+Название:
+Приоритет:
+Предусловие:
+Тестовые данные:
+Шаги:
+  1.
+Ожидаемый результат:
+Постусловие:</pre>
+
+  <div class="done"><b>Готово, когда</b> TC-014 нарушает только 3.6 и в ожидаемом результате три вещи; в TC-015 шаги через Offline, есть шаг восстановления и постусловие про пользователя и DevTools.</div>
+</div>
+
+<!-- 9 -->
+<div class="pane" data-title="Итоги">
+  <h2>Закрываем день</h2>
+  <p class="sub">5 минут</p>
+
+  <div class="box note">
+    <div class="title">[Бумага]</div>
+    <ol>
+      <li>Три режима: r, w, a. w стирает, a дописывает.</li>
+      <li>Рецепт: <code class="i">with open(путь, режим, encoding="utf-8") as f:</code>.</li>
+      <li>При записи <code class="i">"\n"</code> сама, при чтении <code class="i">strip()</code> сама.</li>
+      <li><code class="i">read()</code> — весь файл строкой, <code class="i">for line in f</code> — построчно.</li>
+      <li>Относительный путь ищется от папки терминала. Надёжно — <code class="i">Path(__file__).parent / "имя"</code>.</li>
+      <li>Из файла всё читается строками — числа через <code class="i">int()</code>.</li>
+      <li>Файл: проверять результат глазами, а не только «упало или нет».</li>
+    </ol>
+  </div>
+
+  <div class="box card">
+    <div class="title">[Карточки] Новый блок U · Файлы</div>
+    <p>Четыре карточки уже в колоде. Первый прогон — завтра, «Знакомство».</p>
+  </div>
+
+  <div class="box def">
+    <div class="title">Что мне прислать</div>
+    <ol>
+      <li>Счёт карточек D + M из 12.</li>
+      <li>Чтение кода — сколько из 4.</li>
+      <li>Охоту — запушить, написать, сколько из 6 нашла сама.</li>
+      <li>Номера вопросов теста, где ошиблась.</li>
+      <li>Чек-лист аватара — запушить.</li>
+      <li>Генератор — «запушила», вывод и report.txt.</li>
+      <li>TC-014 и TC-015 — запушить.</li>
+    </ol>
+  </div>
+
+  <div class="box card">
+    <div class="title">Не забудь — подготовка к CP1</div>
+    <p>Блок в начале страницы: таблица 18–60 по памяти и число багов в Jira. 20 минут.</p>
+  </div>
+
+  <h3>План до конца недели</h3>
+  <div class="week">
+    <div><div class="d">Ср 21</div><div>День 24 — файлы. Сегодня</div></div>
+    <div><div class="d">Чт 22</div><div>День 25 — исключения: try, except, raise. Генератор не падает, если нет settings.txt. TC-016, TC-017. Подготовка к CP1 — Python: списки, словари, функции; скриншот багов из Jira</div></div>
+    <div><div class="d">Пт 23</div><div><b>CP1</b> — контрольная по границам и Python, проверка кейсов и багов, ретро трёх недель нового темпа, решение по темпу</div></div>
+    <div class="off"><div class="d">Сб 24 – Вс 25</div><div>Выходные у родителей</div></div>
+    <div><div class="d">26 – 31</div><div>Неделя разгрузки: 2–2,5 часа в день, только повторение, добор кейсов до 20 и багов в Jira</div></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+var QA=[
+{q:'lines = ["domain=test.ru\\n", "\\n", "# комментарий\\n", "min_length=8\\n"]\ncount = 0\nfor line in lines:\n    line = line.strip()\n    if line == "" or line.startswith("#"):\n        continue\n    count += 1\nprint(count)',
+ o:['4','3','2','1'],a:2,
+ e:'Вторая строка после strip становится пустой — пропуск. Третья начинается с # — пропуск. Считаются только domain и min_length. Ровно так завтра будет работать load_settings.'},
+{q:'text = "a\\nb\\nc"\nprint(len(text.split("\\n")), len("a\\nb\\n".split("\\n")))',
+ o:['3 2','3 3','2 2','3 4'],a:1,
+ e:'"a\\nb\\nc" режется на ["a", "b", "c"]. А "a\\nb\\n" — на ["a", "b", ""]: после последнего переноса остаётся пустая строка. Поэтому при чтении файлов пустые строки пропускают.'},
+{q:'s = "min_length=8"\npair = s.split("=")\nprint(pair[1] + "1", int(pair[1]) + 1)',
+ o:['9 9','81 9','81 81','Ошибка'],a:1,
+ e:'pair[1] — строка "8". Строка плюс строка — склейка: "81". int("8") — число 8, плюс 1 — 9. Всё, что прочитано из файла, — строки, числа нужно превращать через int.'},
+{q:'def label(n):\n    if n < 8:\n        return "short"\n    if n > 20:\n        return "long"\n    return "ok"\n\nprint(label(8), label(21), label(7))',
+ o:['short long short','ok long short','ok ok short','short long ok'],a:1,
+ e:'Граница 8 — не меньше 8, не больше 20, значит ok. 21 больше 20 — long. 7 меньше 8 — short. Это check_password в миниатюре, и границы на контрольной будут именно такие.'}
+];
+
+var QB=[
+{q:'Чем режим "w" отличается от "a"?',
+ o:['Ничем','"w" стирает файл и пишет заново, "a" дописывает в конец','"w" только читает, "a" только пишет','"a" стирает, "w" дописывает'],a:1,
+ e:'Оба создают файл, если его нет. Но "w" сразу удаляет старое содержимое. w — wipe, a — add.'},
+{q:'Что будет при open("report.txt", "w"), если файл report.txt уже есть и в нём 100 строк?',
+ o:['Ошибка: файл уже существует','Строки останутся, новые допишутся в конец','Все 100 строк сотрутся сразу при открытии','Python спросит, стирать ли'],a:2,
+ e:'Файл очищается в момент открытия, даже если потом ничего не записать. Поэтому в охоте файл оказался пустым.'},
+{q:'Зачем открывать файлы через with?',
+ o:['Так быстрее','Файл закроется сам, даже если внутри блока случится ошибка','Без with нельзя писать по-русски','with читает файл целиком'],a:1,
+ e:'Без with нужно не забыть f.close(), а при ошибке до close он не выполнится. with закрывает в любом случае.'},
+{q:'Что вернёт f.write("Итого") без "\\n" дважды подряд?',
+ o:['Две строки: Итого и Итого','Одну строку: ИтогоИтого','Ошибку','Пустую строку'],a:1,
+ e:'write пишет ровно то, что дали. Перенос строки нужно добавлять самой.'},
+{q:'В файле строка anna@test.ru. Прочитали через for line in f. Чему равно line == "anna@test.ru"?',
+ o:['True','False — на конце line есть \\n','Ошибка','Зависит от кодировки'],a:1,
+ e:'Строки из файла приходят с переносом на конце. line.strip() == "anna@test.ru" — True.'},
+{q:'Зачем указывать encoding="utf-8"?',
+ o:['Чтобы файл был меньше','Чтобы русский текст одинаково читался на разных компьютерах и системах','Это нужно только для JSON','Без него Python не откроет файл'],a:1,
+ e:'Windows без явной кодировки может записать файл в свою старую кодировку. На другом компьютере или на GitHub будут кракозябры.'},
+{q:'open("settings.txt") работает при запуске кнопкой Run, а из терминала — FileNotFoundError. Почему?',
+ o:['Файл повреждён','Относительный путь ищется от текущей папки терминала, а не от папки скрипта','В терминале нельзя открывать файлы','Нужно запускать от администратора'],a:1,
+ e:'Решение — путь от файла скрипта: Path(__file__).parent / "settings.txt".'},
+{q:'Требование: аватар до 5 МБ. Что тестировщик делает первым?',
+ o:['Проверяет 4, 5 и 6 МБ','Спрашивает аналитика: 5 МБ — это 5 000 000 или 5 242 880 байт, и включительно ли','Берёт любое значение — разница маленькая','Проверяет только 5 МБ'],a:1,
+ e:'Граница должна быть точной, иначе граничные значения бессмысленны. Разница в 242 880 байт — это как раз то место, где программист и аналитик понимают требование по-разному.'}
+];
+
+function buildQuiz(host,data,scoreEl,code){
+  var answered=0,right=0;
+  data.forEach(function(item,i){
+    var box=document.createElement('div');box.className='q';
+    var t=document.createElement('div');t.className='qn';t.textContent='Вопрос '+(i+1);box.appendChild(t);
+    if(code){var pre=document.createElement('pre');pre.textContent=item.q;box.appendChild(pre);
+      var hint=document.createElement('div');hint.textContent='Что напечатается?';box.appendChild(hint);}
+    else{var qt=document.createElement('div');qt.textContent=item.q;box.appendChild(qt);}
+    var opts=document.createElement('div');opts.className='opts';
+    var expl=document.createElement('div');expl.className='expl';expl.hidden=true;expl.textContent=item.e;
+    var locked=false;
+    item.o.forEach(function(text,j){
+      var b=document.createElement('button');b.className='opt';b.type='button';b.textContent=text;
+      if(code)b.style.fontFamily='Consolas,monospace';
+      b.onclick=function(){
+        if(locked)return;locked=true;answered++;if(j===item.a)right++;
+        [].forEach.call(opts.children,function(el,k){
+          if(k===item.a)el.classList.add('right');else if(k===j)el.classList.add('wrong');
+        });
+        expl.hidden=false;
+        if(scoreEl)scoreEl.textContent='Отвечено '+answered+' из '+data.length+', верных '+right;
+      };
+      opts.appendChild(b);
+    });
+    box.appendChild(opts);box.appendChild(expl);host.appendChild(box);
+  });
+}
+buildQuiz(document.getElementById('quizA'),QA,null,true);
+buildQuiz(document.getElementById('quizB'),QB,document.getElementById('scoreB'),false);
+
+var panes=[].slice.call(document.querySelectorAll('.pane'));
+var tabs=document.getElementById('tabs');
+panes.forEach(function(p,i){
+  var b=document.createElement('button');b.type='button';
+  b.innerHTML='<span class="n">'+i+'</span>'+p.dataset.title;
+  b.onclick=function(){go(i);};
+  tabs.appendChild(b);
+  var nav=document.createElement('div');nav.className='nav';
+  var prev=document.createElement('button');prev.type='button';prev.textContent='← Назад';
+  prev.onclick=function(){go(i-1);};if(i===0)prev.disabled=true;
+  var next=document.createElement('button');next.type='button';next.className='next';
+  next.textContent=(i===panes.length-1)?'В начало':'Дальше →';
+  next.onclick=function(){go(i===panes.length-1?0:i+1);};
+  nav.appendChild(prev);nav.appendChild(next);p.appendChild(nav);
+});
+function go(i){
+  panes.forEach(function(p,j){p.classList.toggle('on',i===j);});
+  [].forEach.call(tabs.children,function(b,j){b.classList.toggle('on',i===j);});
+  try{tabs.children[i].scrollIntoView({block:'nearest',inline:'center'});}catch(e){}
+  try{localStorage.setItem('d24tab',String(i));}catch(e){}
+  window.scrollTo(0,0);
+}
+var start=0;
+try{var s=parseInt(localStorage.getItem('d24tab'),10);if(s>=0&&s<panes.length)start=s;}catch(e){}
+go(start);
+</script>
+
+</body></html>

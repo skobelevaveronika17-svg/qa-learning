@@ -1,0 +1,5 @@
+# настройки генератора
+domain=test.ru
+
+min_length=8
+max_length=20
